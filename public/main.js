@@ -24,6 +24,10 @@ function showGameboard() {
 }
 
 ready(function() {
+  var debug = 0;
+  function toggleDebug(e){if(!e.repeat&&e.key=='`'){e.preventDefault();debug=!debug}}
+  document.addEventListener('keydown', toggleDebug);
+
   var socket = io();
 
   var battleToken = window.localStorage.getItem('battleToken');
@@ -92,7 +96,54 @@ ready(function() {
   socket.on('signup error', handleErrors);
 
   function step(t) {
+    // var LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+    var context = document.getElementById('canvas').getContext('2d');
+
+    context.clearRect(0, 0, 1200, 600);
+    // Draw grid lines and numbers/letters
+    context.lineWidth = 4;
+    context.fillStyle = '#333';
+    context.strokeStyle = '#333';
+    context.strokeRect(40, 80, 480, 480);
+    context.strokeRect(680, 80, 480, 480);
+
+    context.lineWidth = 2;
+    context.font = '16px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    for (var x = 0; x < 12; x++) {
+      var xPos = 80 + 40 * x;
+      if (x % 2 == 0) {
+        context.strokeRect(40, 40 + xPos, 480, 40);
+        context.strokeRect(xPos, 80, 40, 480);
+        context.strokeRect(680, 40 + xPos, 480, 40);
+        context.strokeRect(640 + xPos, 80, 40, 480);
+      }
+
+      context.strokeText(x + 1, 10, 20 + xPos);
+      context.strokeText(String.fromCharCode(65 + x), xPos - 20, 60);
+      context.strokeText(x + 1, 650, 20 + xPos);
+      context.strokeText(String.fromCharCode(65 + x), 620 + xPos, 60);
+    }
+    // context.stroke();
+
+    context.font = '24px Arial';
+    context.lineWidth = 1;
+    context.strokeText('Your Fleet', 280, 20);
+    context.fillText('Your Fleet', 280, 20);
+    context.strokeText("The Opponent's Fleet", 920, 20);
+    context.fillText("The Opponent's Fleet", 920, 20);
+
+    // Debug rendering
+    if (debug) {
+      context.fillStyle='#0F0';
+      for(var y=0;y<600;y+=40){context.fillRect(0,y,1200,1)}
+      for(var x=0;x<1200;x+=40){context.fillRect(x,0,1,600)}
+    }
+
     // Pause recursion if the user leaves the tab
     if(!s){var s=t}if(t-s<2000)window.requestAnimationFrame(step);
   }
+  window.requestAnimationFrame(step);
 });
