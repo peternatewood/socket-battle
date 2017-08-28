@@ -7,8 +7,16 @@ function ready(fun) {
   }
 }
 
+function showForm() {
+  var spinner = document.getElementById('spinner');
+  var form = document.getElementById('form');
+
+  spinner.style.display = 'none';
+  form.style.display = 'block';
+}
+
 function showGameboard() {
-  var form = document.getElementById('form-table')
+  var form = document.getElementById('form-table');
   var game = document.getElementById('gameboard');
 
   form.style.display = 'none';
@@ -22,12 +30,17 @@ ready(function() {
   if (battleToken) {
     socket.emit('login token', battleToken);
   }
+  else {
+    showForm();
+  }
+
   socket.on('token valid', function(response) {
     if (response.success) {
       showGameboard();
       window.localStorage.setItem('battleToken', JSON.stringify(response.battleToken));
     }
     else {
+      showForm();
       window.localStorage.removeItem('battleToken');
     }
   });
