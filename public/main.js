@@ -7,8 +7,30 @@ function ready(fun) {
   }
 }
 
+function showGameboard() {
+  var form = document.getElementById('form-table')
+  var game = document.getElementById('gameboard');
+
+  form.style.display = 'none';
+  game.style.display = 'block';
+}
+
 ready(function() {
   var socket = io();
+
+  var battleToken = window.localStorage.getItem('battleToken');
+  if (battleToken) {
+    socket.emit('login token', battleToken);
+  }
+  socket.on('token valid', function(response) {
+    if (response.success) {
+      showGameboard();
+      window.localStorage.setItem('battleToken', JSON.stringify(response.battleToken));
+    }
+    else {
+      window.localStorage.removeItem('battleToken');
+    }
+  });
 
   // Signup/login form
   function handleFormSubmit(event) {
@@ -34,17 +56,23 @@ ready(function() {
   document.getElementById('form').addEventListener('submit', handleFormSubmit);
 
   function handleFormSuccess(response) {
-    errors = document.getElementById('errors');
+    var errors = document.getElementById('errors');
     errors.innerHTML = response.message;
     errors.className = 'errors valid';
 
-    // setTimeout(function() {  }, 300);
+    var battleToken = {
+      username: response.username,
+      token: response.token
+    };
+    window.localStorage.setItem('battleToken', JSON.stringify(battleToken));
+
+    setTimeout(showGameboard, 400);
   }
   socket.on('signup valid', handleFormSuccess);
   socket.on('login valid', handleFormSuccess);
 
   function handleErrors(message) {
-    errors = document.getElementById('errors');
+    var errors = document.getElementById('errors');
     errors.innerHTML = message;
   }
   socket.on('login error', handleErrors);

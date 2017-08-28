@@ -24,13 +24,16 @@ app.get('/battle', function(request, response) {
 
 var users = {
   'admin': {
-    loggedIn: false,
     passwordHash: 'sha1$5f55e186$1$a18a9b40dfaa7c7f2c83d184f8ce6abc8ba9eb1f',
-    socketId: '',
+    token: null,
   },
 };
 
 var loginRooms = {};
+
+function generateToken() {
+  return password.generate(Date.now().toString());
+}
 
 io.on('connection', function(socket) {
   var loggedIn = false;
@@ -38,6 +41,34 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log('user disconnected');
+  });
+
+  socket.on('login token', function(jsonString) {
+    var user = {};
+    var jsonParsed = false;
+    try {
+      data = JSON.parse(jsonString);
+      jsonParsed = true;
+      user = users[data.username];
+    }
+    catch (e) {
+      console.log('Failed to parse data', jsonString, e);
+    }
+
+    if (jsonParsed && user && user.token === data.token) {
+      loggedIn = true;
+      var token = generateToken();
+      user.token = token;
+
+      battleToken = {
+        username: data.username,
+        token: token
+      };
+      socket.emit('token valid', { success: true, battleToken: battleToken });
+    }
+    else {
+      socket.emit('token valid', { success: false });
+    }
   });
 
   socket.on('signup', function(data) {
@@ -56,17 +87,19 @@ io.on('connection', function(socket) {
     }
 
     if (isValidUser) {
+      var token = generateToken();
+
       users[data.username] = {
-        loggedIn: true,
         passwordHash: password.generate(data.password),
-        socketId: socket.id,
+        token: token
       };
 
       loggedIn = true;
 
       var response = {
         message: 'Welcome ' + data.username,
-        redirect: '/battle'
+        username: data.username,
+        token: token
       };
       socket.emit('signup valid', response);
     }
@@ -84,9 +117,13 @@ io.on('connection', function(socket) {
       else {
         loggedIn = true;
 
+        var token = generateToken();
+        user.token = token;
+
         var response = {
           message: 'Welcome ' + data.username,
-          redirect: '/battle'
+          username: data.username,
+          token: token
         };
         socket.emit('login valid', response);
       }
