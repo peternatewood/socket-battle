@@ -1,0 +1,101 @@
+body {
+  background: #0AE;
+  text-align: center;
+  margin: 0;
+}
+
+table {
+  margin: 0 auto;
+  height: 100vh;
+}
+
+input[type="text"],
+input[type="password"] {
+  background: transparent;
+  font: bold 32px Arial, sans-serif;
+  text-align: right;
+  border: none;
+  border-bottom: 1px solid #000;
+  padding: 8px 16px;
+  transition: 400ms;
+}
+input[type="text"]:focus,
+input[type="password"]:focus {
+  background: #FFF;
+}
+
+a,
+a:active,
+a:focus,
+a:visited {
+  background: #06A;
+  color: #FFF;
+  font: bold 32px Arial, sans-serif;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+a:hover {
+  background: #027;
+}
+
+.errors {
+  color: #E44;
+  font: bold 32px Arial, sans-serif;
+  padding: 8px 0;
+  height: 40px;
+}
+.errors.valid {
+  color: #4EE;
+}
+
+#signup-form {
+  display: none;
+}
+
+#gameboard {
+  display: none;
+}
+
+#canvas {
+  display: block;
+  background: #000;
+  margin: 12px auto;
+}
+
+#button-wrapper {
+  overflow-x: hidden;
+}
+
+#fire-button {
+  position: absolute;
+  left: -999em;
+}
+
+#fire-label {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  background: #FF0;
+  font: bold 32px Arial, sans-serif;
+  padding: 12px 14px 12px 60px;
+}
+#fire-label:before {
+  content: '';
+  position: absolute;
+  background: #F00;
+  box-shadow: inset 0 0 2px #000;
+  border: 6px solid red;
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  left: 8px;
+  top: 8px;
+}
+#fire-label:hover:before {
+  background: #F66;
+}
+#fire-label:focus:before,
+#fire-label:active:before {
+  background: #A00;
+}

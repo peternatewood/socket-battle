@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Battle</title>
+  <meta charset="utf-8" name="viewport" content="width=device-width initial-scale=1"/>
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+  <table id="form-table"><tr><td>
+    <form id="form" action="">
+      <input id="username" type="text" placeholder="Username"/>
+      <input id="password" type="password" placeholder="Password"/>
+
+      <a href="#" id="login" data-login-or-signup="login">Login</a>
+      <a href="#" id="signup" data-login-or-signup="signup">Signup</a>
+
+      <div id="errors" class="errors"></div>
+    </form>
+  </td></tr></table>
+
+  <div id="gameboard">
+    <noscript>Please enable JavaScript to play this game</noscript>
+    <canvas id="canvas" width="1200" height="600">
+      <!-- Table for browser requirements -->
+      <table>
+        <caption>Sorry, your browser does not meet the minimum requirements for this game</caption>
+        <thead>
+          <tr><th>Browser</th><th>Oldest Supported Version</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Internet Explorer</td><td>9.0</td></tr>
+          <tr><td>Firefox</td><td>3.6</td></tr>
+          <tr><td>Chrome</td><td>4.0</td></tr>
+          <tr><td>Safari</td><td>4.0</td></tr>
+          <tr><td>Opera</td><td>10.1</td></tr>
+        </tbody>
+      </table>
+    </canvas>
+    <div id="button-wrapper">
+      <input id="fire-button" type="button" value="Fire!">
+      <label for="fire-button" id="fire-label">FIRE!</label>
+    </div>
+  </div>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/main.js"></script>
+</body>
+</html>
