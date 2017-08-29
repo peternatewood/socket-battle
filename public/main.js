@@ -145,6 +145,73 @@ ready(function() {
 
     return this;
   }
+  Ship.prototype.direction = 'north';
+  Ship.prototype.rotate = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    switch (this.direction) {
+      case 'north':
+        this.direction = 'east';
+        this.renderPoints = [
+          this.x + halfSize -  6, this.y,
+          this.x + halfSize - 30, this.y + 12,
+          this.x - halfSize +  8, this.y + 12,
+          this.x - halfSize +  8, this.y - 12,
+          this.x + halfSize - 30, this.y - 12
+        ];
+        break;
+      case 'east' :
+        this.direction = 'south';
+        this.renderPoints = [
+          this.x,      this.y + halfSize - 6,
+          this.x + 12, this.y + halfSize - 30,
+          this.x + 12, this.y - halfSize +  8,
+          this.x - 12, this.y - halfSize +  8,
+          this.x - 12, this.y + halfSize - 30
+        ];
+        break;
+      case 'south':
+        this.direction = 'west';
+        this.renderPoints = [
+          this.x - halfSize +  6, this.y,
+          this.x - halfSize + 30, this.y + 12,
+          this.x + halfSize -  8, this.y + 12,
+          this.x + halfSize -  8, this.y - 12,
+          this.x - halfSize + 30, this.y - 12
+        ];
+        break;
+      case 'west' :
+        this.direction = 'north';
+        this.renderPoints = [
+          this.x,      this.y - halfSize +  6,
+          this.x + 12, this.y - halfSize + 30,
+          this.x + 12, this.y + halfSize -  8,
+          this.x - 12, this.y + halfSize -  8,
+          this.x - 12, this.y - halfSize + 30
+        ];
+        break;
+    }
+  };
+  Ship.prototype.drop = function() {};
+  Ship.prototype.isMouseOver = function(x, y) {
+    var halfSize = (40 * this.size) / 2;
+    // Hitbox
+    var l, r, t, b;
+    if (this.direction == 'north' || this.direction == 'south') {
+      l = this.x - 20;
+      r = this.x + 20;
+      t = this.y - halfSize;
+      b = this.y + halfSize;
+    }
+    else if (this.direction == 'east' || this.direction == 'west') {
+      l = this.x - halfSize;
+      r = this.x + halfSize;
+      t = this.y - 20;
+      b = this.y + 20;
+    }
+
+    return x >= l && x <= r && y >= t && y <= b;
+  };
   Ship.prototype.render = function(context) {
     context.fillStyle = '#CCC';
     context.beginPath();
@@ -164,6 +231,44 @@ ready(function() {
     new Ship(140, 160, 2),
     new Ship(300, 140, 5)
   ];
+  ships[1].rotate();
+  ships[2].rotate();
+  ships[2].rotate();
+  ships[3].rotate();
+  ships[3].rotate();
+  ships[3].rotate();
+
+  var canvas = document.getElementById('canvas');
+  canvas.addEventListener('mousedown', function(event) {
+    var x = event.layerX;
+    var y = event.layerY;
+    for (var i = 0; i < ships.length; i++) {
+      if (ships[i].isMouseOver(x, y)) {
+        console.log('Mouse is over', ships[i].name, ships[i].x, ships[i].y);
+        heldShip = i;
+        break;
+      }
+    }
+  });
+  canvas.addEventListener('mouseup', function(event) {
+    if (typeof heldShip === 'number') {
+      console.log('Mouse dropped', ships[heldShip].name, ships[heldShip].x, ships[heldShip].y);
+      heldShip = null;
+    }
+  });
+  canvas.addEventListener('mousemove', function(event) {
+    if (heldShip) {
+      var xDist = event.layerX - ships[heldShip].x;
+      var yDist = event.layerY - ships[heldShip].y;
+
+      ships[heldShip].x += xDist;
+      ships[heldShip].y += yDist;
+      for (var i = 0; i < 10; i += 2) {
+        ships[heldShip].renderPoints[i] += xDist;
+        ships[heldShip].renderPoints[i + 1] += yDist;
+      }
+    }
+  });
 
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
