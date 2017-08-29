@@ -115,6 +115,8 @@ ready(function() {
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
+  var trayWidth = 500;
+
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
 
@@ -145,7 +147,6 @@ ready(function() {
       context.strokeText(x + 1, 650, 20 + xPos);
       context.strokeText(String.fromCharCode(65 + x), 620 + xPos, 60);
     }
-    // context.stroke();
 
     context.font = '24px Arial';
     context.lineWidth = 1;
@@ -153,6 +154,15 @@ ready(function() {
     context.fillText('Your Fleet', 280, 20);
     context.strokeText("The Opponent's Fleet", 920, 20);
     context.fillText("The Opponent's Fleet", 920, 20);
+
+    // Tray of ship pieces
+    if (trayWidth) {
+      context.fillStyle = '#AAA';
+      context.strokeStyle = '#333';
+      context.lineWidth = 8;
+      context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
+      context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
+    }
 
     // Debug rendering
     if (debug) {
