@@ -116,11 +116,14 @@ ready(function() {
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
   var trayWidth = 500;
+
   // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
   var Ship = function(x, y, size, direction) {
     // Center
     this.x = x;
     this.y = y;
+    this.oldX = x;
+    this.oldY = y;
 
     this.size = size;
     this.life = size;
@@ -194,6 +197,7 @@ ready(function() {
     this.setRenderPoints();
   };
   Ship.prototype.drop = function() {
+    // Slot into gameboard grid if within bounds
     if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
       var halfSize = (40 * this.size) / 2;
 
@@ -205,10 +209,16 @@ ready(function() {
         this.x = Math.min(520 - halfSize, Math.max(80 + halfSize, 40 * (this.x / 40 >> 0) + 20));
         this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
       }
+      this.oldX = this.x;
+      this.oldY = this.y;
       this.setRenderPoints();
       this.onBoard = true;
     }
+    // Otherwise put back where it was
     else {
+      this.x = this.oldX;
+      this.y = this.oldY;
+      this.setRenderPoints();
       this.onBoard = false;
     }
   };
@@ -250,10 +260,10 @@ ready(function() {
   var heldShip;
 
   var ships = [
-    new Ship(60, 160, 4),
-    new Ship(140, 100, 3, 'east'),
-    new Ship(140, 160, 2, 'south'),
-    new Ship(300, 140, 5, 'west')
+    new Ship(730, 150, 4),
+    new Ship(770, 130, 3),
+    new Ship(810, 110, 2),
+    new Ship(850, 170, 5)
   ];
 
   var canvas = document.getElementById('canvas');
