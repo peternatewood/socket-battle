@@ -125,15 +125,7 @@ ready(function() {
     this.size = size;
     this.life = size;
 
-    var halfSize = (40 * size) / 2;
-
-    this.renderPoints = [
-      this.x,      this.y - halfSize + 6,
-      this.x + 12, this.y - halfSize + 30,
-      this.x + 12, this.y + halfSize - 8,
-      this.x - 12, this.y + halfSize - 8,
-      this.x - 12, this.y - halfSize + 30
-    ];
+    this.setRenderPoints();
 
     switch (size) {
       case 2: this.name = 'Patrol Boat'; break;
@@ -147,42 +139,11 @@ ready(function() {
   }
   Ship.prototype.direction = 'north';
   Ship.prototype.onBoard = false;
-  Ship.prototype.rotate = function() {
+  Ship.prototype.setRenderPoints = function() {
     var halfSize = (40 * this.size) / 2;
 
     switch (this.direction) {
       case 'north':
-        this.direction = 'east';
-        this.renderPoints = [
-          this.x + halfSize -  6, this.y,
-          this.x + halfSize - 30, this.y + 12,
-          this.x - halfSize +  8, this.y + 12,
-          this.x - halfSize +  8, this.y - 12,
-          this.x + halfSize - 30, this.y - 12
-        ];
-        break;
-      case 'east':
-        this.direction = 'south';
-        this.renderPoints = [
-          this.x,      this.y + halfSize - 6,
-          this.x + 12, this.y + halfSize - 30,
-          this.x + 12, this.y - halfSize +  8,
-          this.x - 12, this.y - halfSize +  8,
-          this.x - 12, this.y + halfSize - 30
-        ];
-        break;
-      case 'south':
-        this.direction = 'west';
-        this.renderPoints = [
-          this.x - halfSize +  6, this.y,
-          this.x - halfSize + 30, this.y + 12,
-          this.x + halfSize -  8, this.y + 12,
-          this.x + halfSize -  8, this.y - 12,
-          this.x - halfSize + 30, this.y - 12
-        ];
-        break;
-      case 'west':
-        this.direction = 'north';
         this.renderPoints = [
           this.x,      this.y - halfSize +  6,
           this.x + 12, this.y - halfSize + 30,
@@ -191,7 +152,46 @@ ready(function() {
           this.x - 12, this.y - halfSize + 30
         ];
         break;
+      case 'east':
+        this.renderPoints = [
+          this.x + halfSize -  6, this.y,
+          this.x + halfSize - 30, this.y + 12,
+          this.x - halfSize +  8, this.y + 12,
+          this.x - halfSize +  8, this.y - 12,
+          this.x + halfSize - 30, this.y - 12
+        ];
+        break;
+      case 'south':
+        this.renderPoints = [
+          this.x,      this.y + halfSize - 6,
+          this.x + 12, this.y + halfSize - 30,
+          this.x + 12, this.y - halfSize +  8,
+          this.x - 12, this.y - halfSize +  8,
+          this.x - 12, this.y + halfSize - 30
+        ];
+        break;
+      case 'west':
+        this.renderPoints = [
+          this.x - halfSize +  6, this.y,
+          this.x - halfSize + 30, this.y + 12,
+          this.x + halfSize -  8, this.y + 12,
+          this.x + halfSize -  8, this.y - 12,
+          this.x - halfSize + 30, this.y - 12
+        ];
+        break;
     }
+  };
+  Ship.prototype.rotate = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    switch (this.direction) {
+      case 'north'  : this.direction = 'east'; break;
+      case 'east'   : this.direction = 'south'; break;
+      case 'south'  : this.direction = 'west'; break;
+      case 'west'   : this.direction = 'north'; break;
+    }
+
+    this.setRenderPoints();
   };
   Ship.prototype.drop = function() {
     if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
@@ -205,46 +205,7 @@ ready(function() {
         this.x = Math.min(520 - halfSize, Math.max(80 + halfSize, 40 * (this.x / 40 >> 0) + 20));
         this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
       }
-
-      switch (this.direction) {
-        case 'north':
-          this.renderPoints = [
-            this.x,      this.y - halfSize +  6,
-            this.x + 12, this.y - halfSize + 30,
-            this.x + 12, this.y + halfSize -  8,
-            this.x - 12, this.y + halfSize -  8,
-            this.x - 12, this.y - halfSize + 30
-          ];
-          break;
-        case 'east':
-          this.renderPoints = [
-            this.x + halfSize -  6, this.y,
-            this.x + halfSize - 30, this.y + 12,
-            this.x - halfSize +  8, this.y + 12,
-            this.x - halfSize +  8, this.y - 12,
-            this.x + halfSize - 30, this.y - 12
-          ];
-          break;
-        case 'south':
-          this.renderPoints = [
-            this.x,      this.y + halfSize - 6,
-            this.x + 12, this.y + halfSize - 30,
-            this.x + 12, this.y - halfSize +  8,
-            this.x - 12, this.y - halfSize +  8,
-            this.x - 12, this.y + halfSize - 30
-          ];
-          break;
-        case 'west':
-          this.renderPoints = [
-            this.x - halfSize +  6, this.y,
-            this.x - halfSize + 30, this.y + 12,
-            this.x + halfSize -  8, this.y + 12,
-            this.x + halfSize -  8, this.y - 12,
-            this.x - halfSize + 30, this.y - 12
-          ];
-          break;
-      }
-
+      this.setRenderPoints();
       this.onBoard = true;
     }
     else {
