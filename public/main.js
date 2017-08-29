@@ -203,10 +203,10 @@ ready(function() {
 
       if (this.direction == 'north' || this.direction == 'south') {
         this.x = Math.min(500, Math.max(60, 40 * (this.x / 40 >> 0) + 20));
-        this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * (this.y / 40 >> 0) + 20));
+        this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * (this.y / 40 >> 0) + ((this.size % 2) * 20)));
       }
       else if (this.direction == 'east' || this.direction == 'west') {
-        this.x = Math.min(520 - halfSize, Math.max(80 + halfSize, 40 * (this.x / 40 >> 0) + 20));
+        this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * (this.x / 40 >> 0) + ((this.size % 2) * 20)));
         this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
       }
       this.oldX = this.x;
