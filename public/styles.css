@@ -4,6 +4,19 @@ body {
   margin: 0;
 }
 
+header {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#signout {
+  display: block;
+  font-size: 18px;
+  border-radius: 0 0 0 8px;
+}
+
 table {
   margin: 0 auto;
   height: 100vh;
