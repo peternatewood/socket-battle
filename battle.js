@@ -42,7 +42,7 @@ catch (err) {
 
 var users = {};
 
-connection.query('SELECT * FROM users', function(err, rows, fields) {
+connection.query('SELECT username, password_hash, token FROM users', function(err, rows, fields) {
   if (err) {
     throw err;
   }
