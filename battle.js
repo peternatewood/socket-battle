@@ -6,6 +6,7 @@ var path = require('path');
 var password = require('password-hash');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var mysql = require('mysql');
 
 server.listen(PORT, function() {
   console.log('Server listening at port %d', PORT);
@@ -21,6 +22,22 @@ app.get('/signup', function(request, response) {
 app.get('/battle', function(request, response) {
   response.sendFile(path.join(__dirname, 'public/battle.html'));
 });
+
+// Database connection
+var dbCredentials = {
+  host      : process.env.DB_HOST     || 'localhost',
+  user      : process.env.DB_USER     || 'root',
+  password  : process.env.DB_PASSWORD || 'root',
+  database  : process.env.DB_NAME     || 'socket_battle'
+};
+var connection = mysql.createConnection(dbCredentials);
+
+try {
+  connection.connect();
+}
+catch (err) {
+  console.error('Database connection error', err, dbCredentials);
+}
 
 var users = {
   'admin': {
