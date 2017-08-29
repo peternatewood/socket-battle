@@ -116,9 +116,25 @@ io.on('connection', function(socket) {
 
     if (isValidUser) {
       var token = generateToken();
+      var password = passwordHash.generate(data.password);
+
+      var fields = {
+        username: data.username,
+        password_hash: password,
+        token: token,
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      connection.query('INSERT INTO users SET ?', fields, function(err, results, fields) {
+        if (err) {
+          throw err;
+        }
+        console.log('new user results', results);
+      });
 
       users[data.username] = {
-        passwordHash: passwordHash.generate(data.password),
+        passwordHash: password,
         token: token
       };
 
