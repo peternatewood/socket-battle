@@ -191,4 +191,15 @@ io.on('connection', function(socket) {
       }
     }
   })
+
+  socket.on('signout', function(username) {
+    connection.query('UPDATE users SET token = NULL WHERE username = ?', username, function(err, results, fields) {
+      if (err) {
+        throw err;
+      }
+      else {
+        loggedIn = false;
+      }
+    });
+  });
 });
