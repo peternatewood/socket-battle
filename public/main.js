@@ -271,14 +271,19 @@ ready(function() {
     return x >= l && x <= r && y >= t && y <= b;
   };
   Ship.prototype.render = function(context) {
-    context.fillStyle = '#CCC';
+    context.fillStyle = '#888';
+    context.strokeStyle = '#CCC';
+    context.lineWidth = 4;
+
     context.beginPath();
     context.moveTo(this.renderPoints[0], this.renderPoints[1]);
     for (var i = 2; i < 10; i += 2) {
       context.lineTo(this.renderPoints[i], this.renderPoints[i + 1]);
     }
     context.closePath();
+
     context.fill();
+    context.stroke();
   };
 
   var heldShip;
