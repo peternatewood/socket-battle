@@ -116,6 +116,54 @@ ready(function() {
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
   var trayWidth = 500;
+  // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
+  var Ship = function(x, y, size) {
+    // Center
+    this.x = x;
+    this.y = y;
+
+    this.size = size;
+    this.life = size;
+
+    var halfSize = (40 * size) / 2;
+
+    this.renderPoints = [
+      this.x,      this.y - halfSize + 6,
+      this.x + 12, this.y - halfSize + 30,
+      this.x + 12, this.y + halfSize - 8,
+      this.x - 12, this.y + halfSize - 8,
+      this.x - 12, this.y - halfSize + 30
+    ];
+
+    switch (size) {
+      case 2: this.name = 'Patrol Boat'; break;
+      case 3: this.name = 'Submarine'; break;
+      case 4: this.name = 'Destroyer'; break;
+      case 5: this.name = 'Battleship'; break;
+      case 6: this.name = 'Carrier'; break;
+    }
+
+    return this;
+  }
+  Ship.prototype.render = function(context) {
+    context.fillStyle = '#CCC';
+    context.beginPath();
+    context.moveTo(this.renderPoints[0], this.renderPoints[1]);
+    for (var i = 2; i < 10; i += 2) {
+      context.lineTo(this.renderPoints[i], this.renderPoints[i + 1]);
+    }
+    context.closePath();
+    context.fill();
+  };
+
+  var heldShip;
+
+  var ships = [
+    new Ship(60, 160, 4),
+    new Ship(140, 100, 3),
+    new Ship(140, 160, 2),
+    new Ship(300, 140, 5)
+  ];
 
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
@@ -162,6 +210,11 @@ ready(function() {
       context.lineWidth = 8;
       context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
       context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
+    }
+
+    // Ships
+    for (var i = 0; i < ships.length; i++) {
+      ships[i].render(context);
     }
 
     // Debug rendering
