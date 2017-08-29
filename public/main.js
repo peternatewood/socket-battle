@@ -59,7 +59,7 @@ ready(function() {
       password: password.value
     };
 
-    var loginOrSignup = event.target.dataset.signup;
+    var loginOrSignup = event.target.dataset.loginOrSignup;
     if (loginOrSignup) {
       socket.emit(loginOrSignup, signupData);
     }
