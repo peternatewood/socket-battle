@@ -3,9 +3,10 @@ const PORT = process.env.PORT || 4500;
 var express = require('express');
 var app = express();
 var path = require('path');
-var password = require('password-hash');
+var passwordHash = require('password-hash');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var mysql = require('mysql');
 
 server.listen(PORT, function() {
   console.log('Server listening at port %d', PORT);
@@ -22,17 +23,43 @@ app.get('/battle', function(request, response) {
   response.sendFile(path.join(__dirname, 'public/battle.html'));
 });
 
-var users = {
-  'admin': {
-    passwordHash: 'sha1$5f55e186$1$a18a9b40dfaa7c7f2c83d184f8ce6abc8ba9eb1f',
-    token: null,
-  },
+// Database connection
+var dbCredentials = {
+  host      : process.env.DB_HOST     || 'localhost',
+  user      : process.env.DB_USER     || 'root',
+  password  : process.env.DB_PASSWORD || 'root',
+  database  : process.env.DB_NAME     || 'socket_battle'
 };
+var connection = mysql.createConnection(dbCredentials);
+
+try {
+  connection.connect();
+}
+catch (err) {
+  console.error('Database connection error', err, dbCredentials);
+  // TODO what to do if the database won't connect?
+}
+
+var users = {};
+
+connection.query('SELECT username, password_hash, token FROM users', function(err, rows, fields) {
+  if (err) {
+    throw err;
+  }
+
+  for (var i = 0; i < rows.length; i++) {
+    u = rows[i];
+    users[u.username] = {
+      passwordHash: u.password_hash,
+      token: u.token
+    };
+  }
+});
 
 var loginRooms = {};
 
 function generateToken() {
-  return password.generate(Date.now().toString());
+  return passwordHash.generate(Date.now().toString());
 }
 
 io.on('connection', function(socket) {
@@ -50,6 +77,7 @@ io.on('connection', function(socket) {
       data = JSON.parse(jsonString);
       jsonParsed = true;
       user = users[data.username];
+      console.log('returning login', data);
     }
     catch (e) {
       console.log('Failed to parse data', jsonString, e);
@@ -58,13 +86,21 @@ io.on('connection', function(socket) {
     if (jsonParsed && user && user.token === data.token) {
       loggedIn = true;
       var token = generateToken();
-      user.token = token;
 
-      battleToken = {
-        username: data.username,
-        token: token
-      };
-      socket.emit('token valid', { success: true, battleToken: battleToken });
+      connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
+        if (err) {
+          throw err;
+        }
+        else {
+          user.token = token;
+
+          battleToken = {
+            username: data.username,
+            token: token
+          };
+          socket.emit('token valid', { success: true, battleToken: battleToken });
+        }
+      });
     }
     else {
       socket.emit('token valid', { success: false });
@@ -72,7 +108,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('signup', function(data) {
-    console.log('new user', data.username);
+    console.log('new user', data.username, data.password);
 
     var isValidUser = true;
     if (data.username === '' || data.password === '') {
@@ -88,45 +124,82 @@ io.on('connection', function(socket) {
 
     if (isValidUser) {
       var token = generateToken();
+      var password = passwordHash.generate(data.password);
 
-      users[data.username] = {
-        passwordHash: password.generate(data.password),
-        token: token
-      };
-
-      loggedIn = true;
-
-      var response = {
-        message: 'Welcome ' + data.username,
+      var fields = {
         username: data.username,
-        token: token
+        password_hash: password,
+        token: token,
+        created_at: new Date(),
+        updated_at: new Date()
       };
-      socket.emit('signup valid', response);
+
+      connection.query('INSERT INTO users SET ?', fields, function(err, results, fields) {
+        if (err) {
+          throw err;
+        }
+        else {
+          users[data.username] = {
+            passwordHash: password,
+            token: token
+          };
+
+          loggedIn = true;
+
+          var response = {
+            message: 'Welcome ' + data.username,
+            username: data.username,
+            token: token
+          };
+          socket.emit('signup valid', response);
+        }
+      });
     }
   });
 
   socket.on('login', function(data) {
+    console.log('new login', data.username, data.password);
+
     if (data.username === '' || data.password === '') {
       socket.emit('login error', 'Please provide your username and password');
     }
     else {
       var user = users[data.username];
-      if (!user || !password.verify(data.password, user.passwordHash)) {
+      if (!user || !passwordHash.verify(data.password, user.passwordHash)) {
         socket.emit('login error', 'Your username, password, or both is incorrect');
       }
       else {
         loggedIn = true;
 
         var token = generateToken();
-        user.token = token;
 
-        var response = {
-          message: 'Welcome ' + data.username,
-          username: data.username,
-          token: token
-        };
-        socket.emit('login valid', response);
+        connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
+          if (err) {
+            throw err;
+          }
+          else {
+            user.token = token;
+
+            var response = {
+              message: 'Welcome ' + data.username,
+              username: data.username,
+              token: token
+            };
+            socket.emit('login valid', response);
+          }
+        });
       }
     }
   })
+
+  socket.on('signout', function(username) {
+    connection.query('UPDATE users SET token = NULL WHERE username = ?', username, function(err, results, fields) {
+      if (err) {
+        throw err;
+      }
+      else {
+        loggedIn = false;
+      }
+    });
+  });
 });

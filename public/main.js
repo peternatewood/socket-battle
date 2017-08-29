@@ -17,10 +17,14 @@ function showForm() {
 
 function showGameboard() {
   var form = document.getElementById('form-table');
+  var errors = document.getElementById('errors');
   var game = document.getElementById('gameboard');
+  var signout = document.getElementById('signout-wrapper');
 
   form.style.display = 'none';
-  game.style.display = 'block';
+  errors.innerHTML = '';
+  game.style.display = 'table';
+  signout.style.display = 'block';
 }
 
 ready(function() {
@@ -41,6 +45,7 @@ ready(function() {
   socket.on('token valid', function(response) {
     if (response.success) {
       showGameboard();
+      battleToken = response.battleToken;
       window.localStorage.setItem('battleToken', JSON.stringify(response.battleToken));
     }
     else {
@@ -59,7 +64,7 @@ ready(function() {
       password: password.value
     };
 
-    var loginOrSignup = event.target.dataset.signup;
+    var loginOrSignup = event.target.dataset.loginOrSignup;
     if (loginOrSignup) {
       socket.emit(loginOrSignup, signupData);
     }
@@ -77,7 +82,7 @@ ready(function() {
     errors.innerHTML = response.message;
     errors.className = 'errors valid';
 
-    var battleToken = {
+    battleToken = {
       username: response.username,
       token: response.token
     };
@@ -95,8 +100,22 @@ ready(function() {
   socket.on('login error', handleErrors);
   socket.on('signup error', handleErrors);
 
+  function handleSignoutClick(event) {
+    event.preventDefault();
+    socket.emit('signout', battleToken.username);
+    window.localStorage.removeItem('battleToken');
+
+    var form = document.getElementById('form-table');
+    var game = document.getElementById('gameboard');
+    var signout = document.getElementById('signout-wrapper');
+
+    form.style.display = '';
+    game.style.display = 'none';
+    signout.style.display = 'none';
+  }
+  document.getElementById('signout').addEventListener('click', handleSignoutClick);
+
   function step(t) {
-    // var LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
     var context = document.getElementById('canvas').getContext('2d');
 
     context.clearRect(0, 0, 1200, 600);
