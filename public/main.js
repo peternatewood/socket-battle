@@ -146,6 +146,7 @@ ready(function() {
     return this;
   }
   Ship.prototype.direction = 'north';
+  Ship.prototype.onBoard = false;
   Ship.prototype.rotate = function() {
     var halfSize = (40 * this.size) / 2;
 
@@ -160,7 +161,7 @@ ready(function() {
           this.x + halfSize - 30, this.y - 12
         ];
         break;
-      case 'east' :
+      case 'east':
         this.direction = 'south';
         this.renderPoints = [
           this.x,      this.y + halfSize - 6,
@@ -180,7 +181,7 @@ ready(function() {
           this.x - halfSize + 30, this.y - 12
         ];
         break;
-      case 'west' :
+      case 'west':
         this.direction = 'north';
         this.renderPoints = [
           this.x,      this.y - halfSize +  6,
@@ -192,7 +193,64 @@ ready(function() {
         break;
     }
   };
-  Ship.prototype.drop = function() {};
+  Ship.prototype.drop = function() {
+    if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
+      var halfSize = (40 * this.size) / 2;
+
+      if (this.direction == 'north' || this.direction == 'south') {
+        this.x = Math.min(500, Math.max(60, 40 * (this.x / 40 >> 0) + 20));
+        this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * (this.y / 40 >> 0) + 20));
+      }
+      else if (this.direction == 'east' || this.direction == 'west') {
+        this.x = Math.min(520 - halfSize, Math.max(80 + halfSize, 40 * (this.x / 40 >> 0) + 20));
+        this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
+      }
+
+      switch (this.direction) {
+        case 'north':
+          this.renderPoints = [
+            this.x,      this.y - halfSize +  6,
+            this.x + 12, this.y - halfSize + 30,
+            this.x + 12, this.y + halfSize -  8,
+            this.x - 12, this.y + halfSize -  8,
+            this.x - 12, this.y - halfSize + 30
+          ];
+          break;
+        case 'east':
+          this.renderPoints = [
+            this.x + halfSize -  6, this.y,
+            this.x + halfSize - 30, this.y + 12,
+            this.x - halfSize +  8, this.y + 12,
+            this.x - halfSize +  8, this.y - 12,
+            this.x + halfSize - 30, this.y - 12
+          ];
+          break;
+        case 'south':
+          this.renderPoints = [
+            this.x,      this.y + halfSize - 6,
+            this.x + 12, this.y + halfSize - 30,
+            this.x + 12, this.y - halfSize +  8,
+            this.x - 12, this.y - halfSize +  8,
+            this.x - 12, this.y + halfSize - 30
+          ];
+          break;
+        case 'west':
+          this.renderPoints = [
+            this.x - halfSize +  6, this.y,
+            this.x - halfSize + 30, this.y + 12,
+            this.x + halfSize -  8, this.y + 12,
+            this.x + halfSize -  8, this.y - 12,
+            this.x - halfSize + 30, this.y - 12
+          ];
+          break;
+      }
+
+      this.onBoard = true;
+    }
+    else {
+      this.onBoard = false;
+    }
+  };
   Ship.prototype.isMouseOver = function(x, y) {
     var halfSize = (40 * this.size) / 2;
     // Hitbox
@@ -244,7 +302,6 @@ ready(function() {
     var y = event.layerY;
     for (var i = 0; i < ships.length; i++) {
       if (ships[i].isMouseOver(x, y)) {
-        console.log('Mouse is over', ships[i].name, ships[i].x, ships[i].y);
         heldShip = i;
         break;
       }
@@ -252,12 +309,12 @@ ready(function() {
   });
   canvas.addEventListener('mouseup', function(event) {
     if (typeof heldShip === 'number') {
-      console.log('Mouse dropped', ships[heldShip].name, ships[heldShip].x, ships[heldShip].y);
+      ships[heldShip].drop();
       heldShip = null;
     }
   });
   canvas.addEventListener('mousemove', function(event) {
-    if (heldShip) {
+    if (typeof heldShip === 'number') {
       var xDist = event.layerX - ships[heldShip].x;
       var yDist = event.layerY - ships[heldShip].y;
 
