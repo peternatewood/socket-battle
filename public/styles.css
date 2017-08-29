@@ -9,6 +9,7 @@ header {
   position: absolute;
   top: 0;
   right: 0;
+  z-index: 1;
 }
 
 #signout {
@@ -122,6 +123,7 @@ a:hover {
 
 #canvas {
   display: block;
+  position: relative;
   background: transparent;
   margin: 12px auto;
 }

@@ -56,7 +56,20 @@ connection.query('SELECT username, password_hash, token FROM users', function(er
   }
 });
 
-var loginRooms = {};
+// Games and socketio rooms
+var activeGames = {};
+function getEmptyRoom(games) {
+  var roomNum = 0;
+  for (var room in games) {
+    if (games.hasOwnProperty(room)) {
+      if (games[room].playerCount < 2) {
+        return room;
+      }
+      roomNum++;
+    }
+  }
+  return roomNum;
+}
 
 function generateToken() {
   return passwordHash.generate(Date.now().toString());
@@ -64,6 +77,7 @@ function generateToken() {
 
 io.on('connection', function(socket) {
   var loggedIn = false;
+  var username;
   console.log('a user connected', socket.id);
 
   socket.on('disconnect', function() {
@@ -85,6 +99,7 @@ io.on('connection', function(socket) {
 
     if (jsonParsed && user && user.token === data.token) {
       loggedIn = true;
+      username = data.username;
       var token = generateToken();
 
       connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
@@ -145,6 +160,7 @@ io.on('connection', function(socket) {
           };
 
           loggedIn = true;
+          username = data.username;
 
           var response = {
             message: 'Welcome ' + data.username,
@@ -170,6 +186,7 @@ io.on('connection', function(socket) {
       }
       else {
         loggedIn = true;
+        username = data.username;
 
         var token = generateToken();
 
@@ -199,7 +216,26 @@ io.on('connection', function(socket) {
       }
       else {
         loggedIn = false;
+        username = null;
       }
     });
+  });
+
+  socket.on('start game', function(data) {
+    console.log('start game', username);
+    var room = getEmptyRoom(activeGames);
+    // No empty rooms
+    if (typeof room == 'number') {
+      room = 'game ' + room;
+      activeGames[room] = {
+        playerCount: 0,
+        players: []
+      };
+    }
+    socket.join(room);
+    activeGames[room].playerCount++;
+    activeGames[room].players.push(username);
+
+    socket.emit('joined game', { room: room, playerNum: activeGames[room].playerCount });
   });
 });

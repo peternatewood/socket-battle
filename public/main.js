@@ -115,6 +115,266 @@ ready(function() {
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
+  socket.on('joined game', function(response) {
+    console.log('Welcome to', response.room, 'Player', response.playerNum);
+  });
+
+  var trayWidth = 500;
+
+  var fleetBoard = [
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0
+  ];
+  function clearTiles(board, ship) {
+    var bounds = ship.getBounds();
+    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
+    var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
+    var shipTail = shipHead + increment * ship.size;
+
+    for (var i = shipHead; i < shipTail; i += increment) {
+      if (board[i]) {
+        board[i] = 0;
+      }
+    }
+  }
+  // Returns true only if the ship is overlaying all empty tiles
+  function updateBoard(board, ship) {
+    var bounds = ship.getBounds();
+    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
+    var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
+    var shipTail = shipHead + increment * ship.size;
+
+    var tiles = [];
+    for (var i = shipHead; i < shipTail; i += increment) {
+      // If tile is occupied by a ship
+      if (board[i]) {
+        return false;
+      }
+      tiles.push(i);
+    }
+
+    for (var i = 0; i < ship.size; i++) {
+      board[tiles[i]] = 1;
+    }
+    return true;
+  }
+
+  // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
+  var Ship = function(x, y, size, direction) {
+    // Center
+    this.x = x;
+    this.y = y;
+    this.oldX = x;
+    this.oldY = y;
+
+    this.size = size;
+    this.life = size;
+    this.direction = direction || 'north';
+
+    this.setRenderPoints();
+
+    switch (size) {
+      case 2: this.name = 'Patrol Boat'; break;
+      case 3: this.name = 'Submarine'; break;
+      case 4: this.name = 'Destroyer'; break;
+      case 5: this.name = 'Battleship'; break;
+      case 6: this.name = 'Carrier'; break;
+    }
+
+    return this;
+  }
+  Ship.prototype.onBoard = false;
+  Ship.prototype.setRenderPoints = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    switch (this.direction) {
+      case 'north':
+        this.renderPoints = [
+          this.x,      this.y - halfSize +  6,
+          this.x + 12, this.y - halfSize + 30,
+          this.x + 12, this.y + halfSize -  8,
+          this.x - 12, this.y + halfSize -  8,
+          this.x - 12, this.y - halfSize + 30
+        ];
+        break;
+      case 'east':
+        this.renderPoints = [
+          this.x + halfSize -  6, this.y,
+          this.x + halfSize - 30, this.y + 12,
+          this.x - halfSize +  8, this.y + 12,
+          this.x - halfSize +  8, this.y - 12,
+          this.x + halfSize - 30, this.y - 12
+        ];
+        break;
+      case 'south':
+        this.renderPoints = [
+          this.x,      this.y + halfSize - 6,
+          this.x + 12, this.y + halfSize - 30,
+          this.x + 12, this.y - halfSize +  8,
+          this.x - 12, this.y - halfSize +  8,
+          this.x - 12, this.y + halfSize - 30
+        ];
+        break;
+      case 'west':
+        this.renderPoints = [
+          this.x - halfSize +  6, this.y,
+          this.x - halfSize + 30, this.y + 12,
+          this.x + halfSize -  8, this.y + 12,
+          this.x + halfSize -  8, this.y - 12,
+          this.x - halfSize + 30, this.y - 12
+        ];
+        break;
+    }
+  };
+  Ship.prototype.rotate = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    switch (this.direction) {
+      case 'north'  : this.direction = 'east'; break;
+      case 'east'   : this.direction = 'south'; break;
+      case 'south'  : this.direction = 'west'; break;
+      case 'west'   : this.direction = 'north'; break;
+    }
+
+    this.setRenderPoints();
+  };
+  Ship.prototype.getBounds = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    if (this.direction == 'north' || this.direction == 'south') {
+      return {
+        l: this.x - 20,
+        r: this.x + 20,
+        t: this.y - halfSize,
+        b: this.y + halfSize
+      };
+    }
+    else if (this.direction == 'east' || this.direction == 'west') {
+      return {
+        l: this.x - halfSize,
+        r: this.x + halfSize,
+        t: this.y - 20,
+        b: this.y + 20
+      };
+    }
+  };
+  Ship.prototype.drop = function() {
+    // Slot into gameboard grid if within bounds
+    if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
+      var halfSize = (40 * this.size) / 2;
+
+      if (this.direction == 'north' || this.direction == 'south') {
+        this.x = Math.min(500, Math.max(60, 40 * (this.x / 40 >> 0) + 20));
+        this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * (this.y / 40 >> 0) + ((this.size % 2) * 20)));
+      }
+      else if (this.direction == 'east' || this.direction == 'west') {
+        this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * (this.x / 40 >> 0) + ((this.size % 2) * 20)));
+        this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
+      }
+
+      if (updateBoard(fleetBoard, this)) {
+        this.oldX = this.x;
+        this.oldY = this.y;
+        this.setRenderPoints();
+        this.onBoard = true;
+        return;
+      }
+    }
+    // Otherwise put back where it was
+    this.x = this.oldX;
+    this.y = this.oldY;
+    updateBoard(fleetBoard, this);
+    this.setRenderPoints();
+    this.onBoard = false;
+  };
+  Ship.prototype.isMouseOver = function(x, y) {
+    var bounds = this.getBounds();
+
+    return x >= bounds.l && x <= bounds.r && y >= bounds.t && y <= bounds.b;
+  };
+  Ship.prototype.render = function(context) {
+    context.fillStyle = '#888';
+    context.strokeStyle = '#CCC';
+    context.lineWidth = 4;
+
+    context.beginPath();
+    context.moveTo(this.renderPoints[0], this.renderPoints[1]);
+    for (var i = 2; i < 10; i += 2) {
+      context.lineTo(this.renderPoints[i], this.renderPoints[i + 1]);
+    }
+    context.closePath();
+
+    context.fill();
+    context.stroke();
+  };
+
+  var heldShip;
+
+  var ships = [
+    new Ship(730, 150, 4),
+    new Ship(770, 130, 3),
+    new Ship(810, 110, 2),
+    new Ship(850, 170, 5)
+  ];
+
+  var canvas = document.getElementById('canvas');
+  // Intercept and stop right-click menu
+  canvas.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  canvas.addEventListener('mousedown', function(event) {
+    var x = event.layerX;
+    var y = event.layerY;
+    for (var i = 0; i < ships.length; i++) {
+      if (ships[i].isMouseOver(x, y)) {
+        if (event.button == 0) {
+          heldShip = i;
+          clearTiles(fleetBoard, ships[i]);
+        }
+        if (typeof heldShip === 'number' && event.button == 2) {
+          ships[heldShip].rotate();
+        }
+        break;
+      }
+    }
+  });
+  canvas.addEventListener('mouseup', function(event) {
+    if (typeof heldShip === 'number' && event.button == 0) {
+      ships[heldShip].drop();
+      heldShip = null;
+    }
+  });
+  canvas.addEventListener('mousemove', function(event) {
+    if (typeof heldShip === 'number') {
+      var xDist = event.layerX - ships[heldShip].x;
+      var yDist = event.layerY - ships[heldShip].y;
+
+      ships[heldShip].x += xDist;
+      ships[heldShip].y += yDist;
+      for (var i = 0; i < 10; i += 2) {
+        ships[heldShip].renderPoints[i] += xDist;
+        ships[heldShip].renderPoints[i + 1] += yDist;
+      }
+    }
+  });
+
+  function handleFireButtonClick(event) {
+    event.preventDefault();
+    socket.emit('start game', fleetBoard);
+  }
+  document.getElementById('fire-button').addEventListener('click', handleFireButtonClick);
+
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
 
@@ -145,7 +405,6 @@ ready(function() {
       context.strokeText(x + 1, 650, 20 + xPos);
       context.strokeText(String.fromCharCode(65 + x), 620 + xPos, 60);
     }
-    // context.stroke();
 
     context.font = '24px Arial';
     context.lineWidth = 1;
@@ -154,11 +413,35 @@ ready(function() {
     context.strokeText("The Opponent's Fleet", 920, 20);
     context.fillText("The Opponent's Fleet", 920, 20);
 
+    // Tray of ship pieces
+    if (trayWidth) {
+      context.fillStyle = '#AAA';
+      context.strokeStyle = '#333';
+      context.lineWidth = 8;
+      context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
+      context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
+    }
+
+    // Ships
+    for (var i = 0; i < ships.length; i++) {
+      ships[i].render(context);
+    }
+
     // Debug rendering
     if (debug) {
-      context.fillStyle='#0F0';
-      for(var y=0;y<600;y+=40){context.fillRect(0,y,1200,1)}
-      for(var x=0;x<1200;x+=40){context.fillRect(x,0,1,600)}
+      context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      context.fillRect(0, 0, 240, 240);
+
+      // context.fillStyle='#0F0';
+      // for(var y=0;y<600;y+=40){context.fillRect(0,y,1200,1)}
+      // for(var x=0;x<1200;x+=40){context.fillRect(x,0,1,600)}
+
+      context.fillStyle = '#333';
+      context.textAlign = 'left';
+      context.font = '16px Courier';
+      for (var i = 0; i < 144; i += 12) {
+        context.fillText(fleetBoard.slice(i, i + 12).join(''), 8, 16 + i * 1.2);
+      }
     }
 
     // Pause recursion if the user leaves the tab
