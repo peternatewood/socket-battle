@@ -77,7 +77,7 @@ io.on('connection', function(socket) {
       data = JSON.parse(jsonString);
       jsonParsed = true;
       user = users[data.username];
-      console.log('returning login', jsonParsed);
+      console.log('returning login', data);
     }
     catch (e) {
       console.log('Failed to parse data', jsonString, e);
@@ -86,13 +86,21 @@ io.on('connection', function(socket) {
     if (jsonParsed && user && user.token === data.token) {
       loggedIn = true;
       var token = generateToken();
-      user.token = token;
 
-      battleToken = {
-        username: data.username,
-        token: token
-      };
-      socket.emit('token valid', { success: true, battleToken: battleToken });
+      connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
+        if (err) {
+          throw err;
+        }
+        else {
+          user.token = token;
+
+          battleToken = {
+            username: data.username,
+            token: token
+          };
+          socket.emit('token valid', { success: true, battleToken: battleToken });
+        }
+      });
     }
     else {
       socket.emit('token valid', { success: false });
@@ -130,22 +138,22 @@ io.on('connection', function(socket) {
         if (err) {
           throw err;
         }
-        console.log('new user results', results);
+        else {
+          users[data.username] = {
+            passwordHash: password,
+            token: token
+          };
+
+          loggedIn = true;
+
+          var response = {
+            message: 'Welcome ' + data.username,
+            username: data.username,
+            token: token
+          };
+          socket.emit('signup valid', response);
+        }
       });
-
-      users[data.username] = {
-        passwordHash: password,
-        token: token
-      };
-
-      loggedIn = true;
-
-      var response = {
-        message: 'Welcome ' + data.username,
-        username: data.username,
-        token: token
-      };
-      socket.emit('signup valid', response);
     }
   });
 
@@ -164,14 +172,22 @@ io.on('connection', function(socket) {
         loggedIn = true;
 
         var token = generateToken();
-        user.token = token;
 
-        var response = {
-          message: 'Welcome ' + data.username,
-          username: data.username,
-          token: token
-        };
-        socket.emit('login valid', response);
+        connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
+          if (err) {
+            throw err;
+          }
+          else {
+            user.token = token;
+
+            var response = {
+              message: 'Welcome ' + data.username,
+              username: data.username,
+              token: token
+            };
+            socket.emit('login valid', response);
+          }
+        });
       }
     }
   })
