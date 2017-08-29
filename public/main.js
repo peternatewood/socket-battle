@@ -115,6 +115,10 @@ ready(function() {
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
+  socket.on('joined game', function(response) {
+    console.log('Welcome to', response.room, 'Player', response.playerNum);
+  });
+
   var trayWidth = 500;
 
   var fleetBoard = [
@@ -133,11 +137,10 @@ ready(function() {
   ];
   function clearTiles(board, ship) {
     var bounds = ship.getBounds();
+    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
     var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
     var shipTail = shipHead + increment * ship.size;
-    var horizontal = ship.direction == 'west' || ship.direction == 'east';
 
-    var increment = horizontal ? 1 : 12;
     for (var i = shipHead; i < shipTail; i += increment) {
       if (board[i]) {
         board[i] = 0;
@@ -147,12 +150,11 @@ ready(function() {
   // Returns true only if the ship is overlaying all empty tiles
   function updateBoard(board, ship) {
     var bounds = ship.getBounds();
+    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
     var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
     var shipTail = shipHead + increment * ship.size;
-    var horizontal = ship.direction == 'west' || ship.direction == 'east';
 
     var tiles = [];
-    var increment = horizontal ? 1 : 12;
     for (var i = shipHead; i < shipTail; i += increment) {
       // If tile is occupied by a ship
       if (board[i]) {
@@ -366,6 +368,12 @@ ready(function() {
       }
     }
   });
+
+  function handleFireButtonClick(event) {
+    event.preventDefault();
+    socket.emit('start game', fleetBoard);
+  }
+  document.getElementById('fire-button').addEventListener('click', handleFireButtonClick);
 
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
