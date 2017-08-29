@@ -56,14 +56,13 @@ connection.query('SELECT username, password_hash, token FROM users', function(er
   }
 });
 
-var loginRooms = {};
-
 function generateToken() {
   return passwordHash.generate(Date.now().toString());
 }
 
 io.on('connection', function(socket) {
   var loggedIn = false;
+  var username;
   console.log('a user connected', socket.id);
 
   socket.on('disconnect', function() {
@@ -85,6 +84,7 @@ io.on('connection', function(socket) {
 
     if (jsonParsed && user && user.token === data.token) {
       loggedIn = true;
+      username = data.username;
       var token = generateToken();
 
       connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
@@ -145,6 +145,7 @@ io.on('connection', function(socket) {
           };
 
           loggedIn = true;
+          username = data.username;
 
           var response = {
             message: 'Welcome ' + data.username,
@@ -170,6 +171,7 @@ io.on('connection', function(socket) {
       }
       else {
         loggedIn = true;
+        username = data.username;
 
         var token = generateToken();
 
@@ -199,6 +201,7 @@ io.on('connection', function(socket) {
       }
       else {
         loggedIn = false;
+        username = null;
       }
     });
   });
