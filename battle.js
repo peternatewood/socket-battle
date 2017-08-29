@@ -56,6 +56,21 @@ connection.query('SELECT username, password_hash, token FROM users', function(er
   }
 });
 
+// Games and socketio rooms
+var activeGames = {};
+function getEmptyRoom(games) {
+  var roomNum = 0;
+  for (var room in games) {
+    if (games.hasOwnProperty(room)) {
+      if (games[room].playerCount < 2) {
+        return room;
+      }
+      roomNum++;
+    }
+  }
+  return roomNum;
+}
+
 function generateToken() {
   return passwordHash.generate(Date.now().toString());
 }
@@ -204,5 +219,23 @@ io.on('connection', function(socket) {
         username = null;
       }
     });
+  });
+
+  socket.on('start game', function(data) {
+    console.log('start game', username);
+    var room = getEmptyRoom(activeGames);
+    // No empty rooms
+    if (typeof room == 'number') {
+      room = 'game ' + room;
+      activeGames[room] = {
+        playerCount: 0,
+        players: []
+      };
+    }
+    socket.join(room);
+    activeGames[room].playerCount++;
+    activeGames[room].players.push(username);
+
+    socket.emit('joined game', { room: room, playerNum: activeGames[room].playerCount });
   });
 });
