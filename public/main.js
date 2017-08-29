@@ -196,6 +196,26 @@ ready(function() {
 
     this.setRenderPoints();
   };
+  Ship.prototype.getBounds = function() {
+    var halfSize = (40 * this.size) / 2;
+
+    if (this.direction == 'north' || this.direction == 'south') {
+      return {
+        l: this.x - 20,
+        r: this.x + 20,
+        t: this.y - halfSize,
+        b: this.y + halfSize
+      };
+    }
+    else if (this.direction == 'east' || this.direction == 'west') {
+      return {
+        l: this.x - halfSize,
+        r: this.x + halfSize,
+        t: this.y - 20,
+        b: this.y + 20
+      };
+    }
+  };
   Ship.prototype.drop = function() {
     // Slot into gameboard grid if within bounds
     if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
@@ -209,6 +229,7 @@ ready(function() {
         this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * (this.x / 40 >> 0) + ((this.size % 2) * 20)));
         this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
       }
+
       this.oldX = this.x;
       this.oldY = this.y;
       this.setRenderPoints();
@@ -223,23 +244,9 @@ ready(function() {
     }
   };
   Ship.prototype.isMouseOver = function(x, y) {
-    var halfSize = (40 * this.size) / 2;
-    // Hitbox
-    var l, r, t, b;
-    if (this.direction == 'north' || this.direction == 'south') {
-      l = this.x - 20;
-      r = this.x + 20;
-      t = this.y - halfSize;
-      b = this.y + halfSize;
-    }
-    else if (this.direction == 'east' || this.direction == 'west') {
-      l = this.x - halfSize;
-      r = this.x + halfSize;
-      t = this.y - 20;
-      b = this.y + 20;
-    }
+    var bounds = this.getBounds();
 
-    return x >= l && x <= r && y >= t && y <= b;
+    return x >= bounds.l && x <= bounds.r && y >= bounds.t && y <= bounds.b;
   };
   Ship.prototype.render = function(context) {
     context.fillStyle = '#888';
