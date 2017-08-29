@@ -23,7 +23,7 @@ function showGameboard() {
 
   form.style.display = 'none';
   errors.innerHTML = '';
-  game.style.display = 'block';
+  game.style.display = 'table';
   signout.style.display = 'block';
 }
 

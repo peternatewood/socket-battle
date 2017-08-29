@@ -117,6 +117,7 @@ a:hover {
 
 #gameboard {
   display: none;
+  width: 1200px;
 }
 
 #canvas {
