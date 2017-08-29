@@ -302,18 +302,28 @@ ready(function() {
   ships[3].rotate();
 
   var canvas = document.getElementById('canvas');
+  // Intercept and stop right-click menu
+  canvas.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  });
   canvas.addEventListener('mousedown', function(event) {
     var x = event.layerX;
     var y = event.layerY;
     for (var i = 0; i < ships.length; i++) {
       if (ships[i].isMouseOver(x, y)) {
-        heldShip = i;
+        if (event.button == 0) {
+          heldShip = i;
+        }
+        if (typeof heldShip === 'number' && event.button == 2) {
+          ships[heldShip].rotate();
+        }
         break;
       }
     }
   });
   canvas.addEventListener('mouseup', function(event) {
-    if (typeof heldShip === 'number') {
+    if (typeof heldShip === 'number' && event.button == 0) {
       ships[heldShip].drop();
       heldShip = null;
     }
