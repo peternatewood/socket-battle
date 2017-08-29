@@ -117,13 +117,14 @@ ready(function() {
 
   var trayWidth = 500;
   // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
-  var Ship = function(x, y, size) {
+  var Ship = function(x, y, size, direction) {
     // Center
     this.x = x;
     this.y = y;
 
     this.size = size;
     this.life = size;
+    this.direction = direction || 'north';
 
     this.setRenderPoints();
 
@@ -137,7 +138,6 @@ ready(function() {
 
     return this;
   }
-  Ship.prototype.direction = 'north';
   Ship.prototype.onBoard = false;
   Ship.prototype.setRenderPoints = function() {
     var halfSize = (40 * this.size) / 2;
@@ -251,16 +251,10 @@ ready(function() {
 
   var ships = [
     new Ship(60, 160, 4),
-    new Ship(140, 100, 3),
-    new Ship(140, 160, 2),
-    new Ship(300, 140, 5)
+    new Ship(140, 100, 3, 'east'),
+    new Ship(140, 160, 2, 'south'),
+    new Ship(300, 140, 5, 'west')
   ];
-  ships[1].rotate();
-  ships[2].rotate();
-  ships[2].rotate();
-  ships[3].rotate();
-  ships[3].rotate();
-  ships[3].rotate();
 
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
