@@ -417,10 +417,11 @@ ready(function() {
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
 
     if (response.inProgress) {
-      trayWidth--;
+      trayWidth = 0;
       document.getElementById('loading-wrapper').style.display = 'none';
     }
     else {
+      document.getElementById('loading-wrapper').style.display = 'table';
       searchingForGame = true;
     }
   });

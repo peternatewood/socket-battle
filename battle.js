@@ -57,12 +57,25 @@ connection.query('SELECT username, password_hash, token FROM users', function(er
 });
 
 // Games and socketio rooms
+var Game = function(username, fleetBoard, ships) {
+  this.players = [username];
+  this.fleetBoards = [fleetBoard];
+  this.ships = [ships];
+
+  return this;
+}
+Game.prototype.targetBoards = [];
+Game.prototype.turn = 0;
+Game.prototype.isEmpty = function() {
+  return this.players.length < 2;
+}
+
 var activeGames = {};
 function getEmptyRoom(games) {
   var roomNum = 0;
   for (var room in games) {
     if (games.hasOwnProperty(room)) {
-      if (games[room].playerCount < 2) {
+      if (games[room].isEmpty()) {
         return room;
       }
       roomNum++;
@@ -87,23 +100,14 @@ io.on('connection', function(socket) {
     console.log('user disconnected');
   });
 
-  socket.on('login token', function(jsonString) {
-    var user = {};
-    var jsonParsed = false;
-    try {
-      data = JSON.parse(jsonString);
-      jsonParsed = true;
-      user = users[data.username];
-      console.log('returning login', data);
-    }
-    catch (e) {
-      console.log('Failed to parse data', jsonString, e);
-    }
+  socket.on('login token', function(data) {
+    var user = users[data.username];
 
-    if (jsonParsed && user && user.token === data.token) {
+    if (user && user.token === data.token) {
       loggedIn = true;
       username = data.username;
       var token = generateToken();
+      console.log('user logging in', activeGames);
 
       connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
         if (err) {
@@ -111,12 +115,22 @@ io.on('connection', function(socket) {
         }
         else {
           user.token = token;
-
-          battleToken = {
+          console.log(username, 'logged in');
+          var gameData = {
             username: data.username,
             token: token
           };
-          socket.emit('token valid', { success: true, battleToken: battleToken });
+          // Player is rejoining game
+          if (data.playerNum && data.room && activeGames[data.room] && activeGames[data.room].players[data.playerNum - 1] == username) {
+            gameData.playerNum = data.playerNum;
+            gameData.room = data.room;
+
+            socket.join(data.room);
+            socket.emit('game rejoined', { inProgress: !activeGames[data.room].isEmpty(), gameData: gameData });
+          }
+          else {
+            socket.emit('token valid', { success: true, gameData: gameData });
+          }
         }
       });
     }
@@ -210,7 +224,7 @@ io.on('connection', function(socket) {
         });
       }
     }
-  })
+  });
 
   socket.on('signout', function(username) {
     connection.query('UPDATE users SET token = NULL WHERE username = ?', username, function(err, results, fields) {
@@ -230,24 +244,22 @@ io.on('connection', function(socket) {
     // If no empty rooms, make a new one
     if (typeof room == 'number') {
       room = 'game ' + room;
-      activeGames[room] = {
-        playerCount: 0,
-        players: [],
-        fleetBoards: [],
-        targetBoards: [],
-        ships: [],
-        turn: 0
-      };
+      activeGames[room] = new Game(username, data.fleetBoard, data.ships);
+      playerNum = 1;
     }
-    socket.join(room);
-    activeGames[room].players.push(username);
-    activeGames[room].fleetBoards.push(data.fleetBoard);
-    activeGames[room].ships.push(data.ships);
-    playerNum = ++activeGames[room].playerCount;
+    else {
+      activeGames[room].players.push(username);
+      activeGames[room].fleetBoards.push(data.fleetBoard);
+      activeGames[room].ships.push(data.ships);
+      playerNum = 2;
+    }
 
+    socket.join(room);
     socket.emit('joined game', { room: room, playerNum: playerNum });
-    if (playerNum == 2) {
-      socket.emit('game ready');
+
+    if (!activeGames[room].isEmpty()) {
+      io.to(room).emit('game ready');
+      console.log('game ready', room, activeGames[room].players.join(' vs '));
     }
   });
 });
