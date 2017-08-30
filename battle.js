@@ -77,7 +77,10 @@ function generateToken() {
 
 io.on('connection', function(socket) {
   var loggedIn = false;
+
+  var playerNum;
   var username;
+
   console.log('a user connected', socket.id);
 
   socket.on('disconnect', function() {
@@ -224,18 +227,27 @@ io.on('connection', function(socket) {
   socket.on('start game', function(data) {
     console.log('start game', username);
     var room = getEmptyRoom(activeGames);
-    // No empty rooms
+    // If no empty rooms, make a new one
     if (typeof room == 'number') {
       room = 'game ' + room;
       activeGames[room] = {
         playerCount: 0,
-        players: []
+        players: [],
+        fleetBoards: [],
+        targetBoards: [],
+        ships: [],
+        turn: 0
       };
     }
     socket.join(room);
-    activeGames[room].playerCount++;
     activeGames[room].players.push(username);
+    activeGames[room].fleetBoards.push(data.fleetBoard);
+    activeGames[room].ships.push(data.ships);
+    playerNum = ++activeGames[room].playerCount;
 
-    socket.emit('joined game', { room: room, playerNum: activeGames[room].playerCount });
+    socket.emit('joined game', { room: room, playerNum: playerNum });
+    if (playerNum == 2) {
+      socket.emit('game ready');
+    }
   });
 });
