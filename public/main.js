@@ -115,10 +115,6 @@ ready(function() {
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
-  socket.on('joined game', function(response) {
-    console.log('Welcome to', response.room, 'Player', response.playerNum);
-  });
-
   var trayWidth = 500;
 
   var fleetBoard = [
@@ -386,7 +382,7 @@ ready(function() {
   function handleFireButtonClick(event) {
     event.preventDefault();
     if (! searchingForGame) {
-      socket.emit('start game', fleetBoard);
+      socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
       // Show loading canvas
       document.getElementById('loading-wrapper').style.display = 'block';
       document.getElementById('loading-canvas').addEventListener('mousemove', function(event) {
@@ -397,6 +393,10 @@ ready(function() {
     }
   }
   document.getElementById('fire-button').addEventListener('click', handleFireButtonClick);
+
+  socket.on('joined game', function(response) {
+    console.log('Welcome to', response.room, 'Player', response.playerNum);
+  });
 
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
