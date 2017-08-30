@@ -323,6 +323,10 @@ ready(function() {
     new Ship(850, 170, 5)
   ];
 
+  function isShipOnBoard(ship) {
+    return ship.onBoard;
+  }
+
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
   canvas.addEventListener('contextmenu', function(event) {
@@ -387,7 +391,7 @@ ready(function() {
 
   function handleFireButtonClick(event) {
     event.preventDefault();
-    if (! searchingForGame) {
+    if (! searchingForGame && ships.every(isShipOnBoard)) {
       socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
       // Show loading canvas
       document.getElementById('loading-wrapper').style.display = 'table';
