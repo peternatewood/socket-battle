@@ -34,9 +34,9 @@ ready(function() {
 
   var socket = io();
 
-  var battleToken = window.localStorage.getItem('battleToken');
-  if (battleToken) {
-    socket.emit('login token', battleToken);
+  var gameData = window.localStorage.getItem('gameData');
+  if (gameData) {
+    socket.emit('login token', JSON.parse(gameData));
   }
   else {
     showForm();
@@ -45,12 +45,12 @@ ready(function() {
   socket.on('token valid', function(response) {
     if (response.success) {
       showGameboard();
-      battleToken = response.battleToken;
-      window.localStorage.setItem('battleToken', JSON.stringify(response.battleToken));
+      gameData = response.gameData;
+      window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
     }
     else {
       showForm();
-      window.localStorage.removeItem('battleToken');
+      window.localStorage.removeItem('gameData');
     }
   });
 
@@ -82,11 +82,11 @@ ready(function() {
     errors.innerHTML = response.message;
     errors.className = 'errors valid';
 
-    battleToken = {
+    gameData = {
       username: response.username,
       token: response.token
     };
-    window.localStorage.setItem('battleToken', JSON.stringify(battleToken));
+    window.localStorage.setItem('gameData', JSON.stringify(gameData));
 
     setTimeout(showGameboard, 400);
   }
@@ -102,8 +102,8 @@ ready(function() {
 
   function handleSignoutClick(event) {
     event.preventDefault();
-    socket.emit('signout', battleToken.username);
-    window.localStorage.removeItem('battleToken');
+    socket.emit('signout', gameData.username);
+    window.localStorage.removeItem('gameData');
 
     var form = document.getElementById('form-table');
     var game = document.getElementById('gameboard');
@@ -379,16 +379,18 @@ ready(function() {
     pingS: 0
   };
 
+  function handleLoadingMouseMove(event) {
+    loader.targetX = event.layerX >> 0;
+    loader.targetY = event.layerY >> 0;
+  }
+  document.getElementById('loading-canvas').addEventListener('mousemove', handleLoadingMouseMove);
+
   function handleFireButtonClick(event) {
     event.preventDefault();
     if (! searchingForGame) {
       socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
       // Show loading canvas
-      document.getElementById('loading-wrapper').style.display = 'block';
-      document.getElementById('loading-canvas').addEventListener('mousemove', function(event) {
-        loader.targetX = event.layerX >> 0;
-        loader.targetY = event.layerY >> 0;
-      });
+      document.getElementById('loading-wrapper').style.display = 'table';
       searchingForGame = true;
     }
   }
@@ -396,6 +398,31 @@ ready(function() {
 
   socket.on('joined game', function(response) {
     console.log('Welcome to', response.room, 'Player', response.playerNum);
+    gameData.room = response.room;
+    gameData.playerNum = response.playerNum;
+    window.localStorage.setItem('gameData', JSON.stringify(gameData));
+  });
+
+  socket.on('game ready', function() {
+    console.log('Game ready');
+    searchingForGame = false;
+    trayWidth--;
+    document.getElementById('loading-wrapper').style.display = 'none';
+  });
+
+  socket.on('game rejoined', function(response) {
+    console.log('Game rejoined', response);
+    showGameboard();
+    gameData = response.gameData;
+    window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
+
+    if (response.inProgress) {
+      trayWidth--;
+      document.getElementById('loading-wrapper').style.display = 'none';
+    }
+    else {
+      searchingForGame = true;
+    }
   });
 
   function step(t) {
@@ -437,12 +464,16 @@ ready(function() {
     context.fillText("The Opponent's Fleet", 920, 20);
 
     // Tray of ship pieces
-    if (trayWidth) {
+    if (trayWidth > 0) {
       context.fillStyle = '#AAA';
       context.strokeStyle = '#333';
       context.lineWidth = 8;
       context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
       context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
+
+      if (trayWidth < 500) {
+        trayWidth -= 8;
+      }
     }
 
     // Ships
