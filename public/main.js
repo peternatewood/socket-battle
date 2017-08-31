@@ -444,6 +444,13 @@ ready(function() {
     pingS: 0
   };
 
+  var radar = {
+    x: -1,
+    y: -1,
+    rad: 0,
+    life: 0
+  };
+
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
   canvas.addEventListener('contextmenu', function(event) {
@@ -488,6 +495,12 @@ ready(function() {
           }
         }
       }
+    }
+
+    if (!searchingForGame && x >= 6 && x <= 72 && y >= 606 && y <= 672) {
+      radar.x = x;
+      radar.y = y;
+      radar.life = 60;
     }
   });
   canvas.addEventListener('mouseup', function(event) {
@@ -826,6 +839,53 @@ ready(function() {
     context.closePath();
     context.stroke();
 
+    // Radar toy
+    var rad = radar.rad + PI / 72;
+    if (rad >= TAU) {
+      rad -= TAU;
+    }
+    radar.rad = rad;
+    context.fillStyle = '#888';
+    context.beginPath();
+    context.moveTo(0, 600);
+    context.lineTo(80, 600);
+    context.lineTo(80, 680);
+    context.closePath();
+    context.fill();
+    context.fillStyle = '#CCC';
+    context.beginPath();
+    context.moveTo(0, 600);
+    context.lineTo(80, 680);
+    context.lineTo(0, 680);
+    context.closePath();
+    context.fill();
+    context.fillStyle = '#030';
+    context.fillRect(6, 606, 68, 68);
+    context.lineWidth = 1;
+    context.strokeStyle = '#4F4';
+    context.beginPath();
+    context.moveTo(40, 606);
+    context.lineTo(40, 674);
+    context.moveTo(6, 640);
+    context.lineTo(74, 640);
+    context.moveTo(55, 640);
+    context.arc(40, 640, 15, 0, TAU);
+    context.moveTo(70, 640);
+    context.arc(40, 640, 30, 0, TAU);
+    context.moveTo(40, 640);
+    context.lineTo(40 + 30 * Math.cos(radar.rad), 640 + 30 * Math.sin(radar.rad));
+    context.closePath();
+    context.stroke();
+
+    if (radar.life > 0) {
+      context.fillStyle = '#4F4';
+      context.beginPath();
+      context.arc(radar.x, radar.y, radar.life / 10, 0, TAU);
+      context.closePath();
+      context.fill();
+      radar.life--;
+    }
+
     // Loader toy
     if (searchingForGame) {
       var xDist = loader.targetX - loader.x;
@@ -875,7 +935,7 @@ ready(function() {
       context.closePath();
 
       var spin = loader.spin + PI / 36;
-      if (spin > 2 * PI) {
+      if (spin > TAU) {
         spin = 0;
       }
       loader.spin = spin;
