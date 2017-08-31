@@ -20,7 +20,11 @@ function showGameboard() {
   var errors = document.getElementById('errors');
   var game = document.getElementById('gameboard');
   var signout = document.getElementById('signout-wrapper');
+  var username = document.getElementById('username');
+  var password = document.getElementById('password');
 
+  username.value = '';
+  password.value = '';
   form.style.display = 'none';
   errors.innerHTML = '';
   game.style.display = 'table';
@@ -33,6 +37,8 @@ ready(function() {
   document.addEventListener('keydown', toggleDebug);
 
   var socket = io();
+
+  var isGameInProgress = false;
 
   var gameData = window.localStorage.getItem('gameData');
   if (gameData) {
@@ -105,11 +111,13 @@ ready(function() {
     socket.emit('signout', gameData.username);
     window.localStorage.removeItem('gameData');
 
-    var form = document.getElementById('form-table');
+    var formTable = document.getElementById('form-table');
+    var form = document.getElementById('form');
     var game = document.getElementById('gameboard');
     var signout = document.getElementById('signout-wrapper');
 
-    form.style.display = '';
+    formTable.style.display = '';
+    form.style.display = 'block';
     game.style.display = 'none';
     signout.style.display = 'none';
   }
@@ -163,6 +171,34 @@ ready(function() {
       board[tiles[i]] = 1;
     }
     return true;
+  }
+
+  var targetBoard = [
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0
+  ];
+  function isOverTargetBoard(x, y) {
+    return x >= 680 && x <= 1160 && y >= 80 && y <= 560;
+  }
+  // 0: no action, 1: targetted, 2: miss, 3: hit
+  function setTargetBoardTile(board, x, y, val) {
+    var index = ((x - 680) / 40 >> 0) + 12 * ((y - 80) / 40 >> 0);
+    if (typeof board[index] == 'number') {
+      board[index] = val;
+    }
+    else {
+      console.log('No such index', index, 'in target board');
+    }
   }
 
   // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
@@ -327,6 +363,12 @@ ready(function() {
     return ship.onBoard;
   }
 
+  var mouse = {
+    over: false,
+    x: null,
+    y: null
+  };
+
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
   canvas.addEventListener('contextmenu', function(event) {
@@ -336,16 +378,23 @@ ready(function() {
   canvas.addEventListener('mousedown', function(event) {
     var x = event.layerX;
     var y = event.layerY;
-    for (var i = 0; i < ships.length; i++) {
-      if (ships[i].isMouseOver(x, y)) {
-        if (event.button == 0) {
-          heldShip = i;
-          clearTiles(fleetBoard, ships[i]);
+    if (isGameInProgress) {
+      if (isOverTargetBoard(x, y)) {
+        setTargetBoardTile(targetBoard, x, y, 1);
+      }
+    }
+    else {
+      for (var i = 0; i < ships.length; i++) {
+        if (ships[i].isMouseOver(x, y)) {
+          if (event.button == 0) {
+            heldShip = i;
+            clearTiles(fleetBoard, ships[i]);
+          }
+          if (typeof heldShip === 'number' && event.button == 2) {
+            ships[heldShip].rotate();
+          }
+          break;
         }
-        if (typeof heldShip === 'number' && event.button == 2) {
-          ships[heldShip].rotate();
-        }
-        break;
       }
     }
   });
@@ -356,15 +405,30 @@ ready(function() {
     }
   });
   canvas.addEventListener('mousemove', function(event) {
+    var x = event.layerX;
+    var y = event.layerY;
+    mouse.x = x;
+    mouse.y = y;
+
     if (typeof heldShip === 'number') {
-      var xDist = event.layerX - ships[heldShip].x;
-      var yDist = event.layerY - ships[heldShip].y;
+      var xDist = x - ships[heldShip].x;
+      var yDist = y - ships[heldShip].y;
 
       ships[heldShip].x += xDist;
       ships[heldShip].y += yDist;
       for (var i = 0; i < 10; i += 2) {
         ships[heldShip].renderPoints[i] += xDist;
         ships[heldShip].renderPoints[i + 1] += yDist;
+      }
+    }
+    else {
+      if (isOverTargetBoard(x, y)) {
+        if (!mouse.over) {
+          mouse.over = true;
+        }
+      }
+      else if (mouse.over) {
+        mouse.over = false;
       }
     }
   });
@@ -410,6 +474,7 @@ ready(function() {
   socket.on('game ready', function() {
     console.log('Game ready');
     searchingForGame = false;
+    isGameInProgress = true;
     trayWidth--;
     document.getElementById('loading-wrapper').style.display = 'none';
   });
@@ -421,8 +486,9 @@ ready(function() {
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
 
     if (response.inProgress) {
-      trayWidth = 0;
       document.getElementById('loading-wrapper').style.display = 'none';
+      trayWidth = 0;
+      isGameInProgress = true;
     }
     else {
       document.getElementById('loading-wrapper').style.display = 'table';
@@ -486,22 +552,21 @@ ready(function() {
       ships[i].render(context);
     }
 
-    // Debug rendering
-    if (debug) {
-      context.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      context.fillRect(0, 0, 240, 240);
-
-      // context.fillStyle='#0F0';
-      // for(var y=0;y<600;y+=40){context.fillRect(0,y,1200,1)}
-      // for(var x=0;x<1200;x+=40){context.fillRect(x,0,1,600)}
-
-      context.fillStyle = '#333';
-      context.textAlign = 'left';
-      context.font = '16px Courier';
-      for (var i = 0; i < 144; i += 12) {
-        context.fillText(fleetBoard.slice(i, i + 12).join(''), 8, 16 + i * 1.2);
+    // Target board
+    if (isGameInProgress) {
+      for (var i = 0; i < 144; i++) {
+        switch (targetBoard[i]) {
+          case 1: break;
+          case 2: break;
+          case 3: break;
+        }
       }
     }
+    if (mouse.over) {
+      context.fillStyle = 'rgba(0,0,0,0.2)';
+      context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
+    }
+
     // Loader toy
     if (searchingForGame) {
       var xDist = loader.targetX - loader.x;
@@ -565,6 +630,23 @@ ready(function() {
         loader.pingS = 90;
         loader.pingX = (450 + 300 * Math.random()) >> 0;
         loader.pingY = (150 + 300 * Math.random()) >> 0;
+      }
+    }
+
+    // Debug rendering
+    if (debug) {
+      context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      context.fillRect(0, 0, 240, 240);
+
+      // context.fillStyle='#0F0';
+      // for(var y=0;y<600;y+=40){context.fillRect(0,y,1200,1)}
+      // for(var x=0;x<1200;x+=40){context.fillRect(x,0,1,600)}
+
+      context.fillStyle = '#333';
+      context.textAlign = 'left';
+      context.font = '16px Courier';
+      for (var i = 0; i < 144; i += 12) {
+        context.fillText(fleetBoard.slice(i, i + 12).join(''), 8, 16 + i * 1.2);
       }
     }
 
