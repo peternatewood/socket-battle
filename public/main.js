@@ -579,16 +579,26 @@ ready(function() {
             context.strokeStyle = '#4F4';
             context.lineWidth = 4;
             context.beginPath();
-            context.moveTo(left + 20, top);
-            context.lineTo(left + 20, top + 40);
-            context.moveTo(left, top + 20);
-            context.lineTo(left + 40, top + 20);
-            context.moveTo(left + 35, top + 20);
-            context.arc(left + 20, top + 20, 15, 0, 2 * Math.PI);
+            context.moveTo(left + 20, top + 4);
+            context.lineTo(left + 20, top + 36);
+            context.moveTo(left + 4, top + 20);
+            context.lineTo(left + 36, top + 20);
+            context.moveTo(left + 32, top + 20);
+            context.arc(left + 20, top + 20, 12, 0, 2 * Math.PI);
             context.stroke();
             context.closePath();
             break;
-          case 2: break;
+          case 2:
+            context.strokeStyle = '#FFF';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.moveTo(left + 8, top + 8);
+            context.lineTo(left + 32, top + 32);
+            context.moveTo(left + 32, top + 8);
+            context.lineTo(left + 8, top + 32);
+            context.stroke();
+            context.closePath();
+            break;
           case 3: break;
         }
       }
