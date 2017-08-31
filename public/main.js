@@ -383,6 +383,15 @@ ready(function() {
   canvas.addEventListener('mousedown', function(event) {
     var x = event.layerX;
     var y = event.layerY;
+    if (mouse.fire) {
+      if (! searchingForGame && ships.every(isShipOnBoard)) {
+        socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
+        // Show loading canvas
+        document.getElementById('loading-wrapper').style.display = 'table';
+        searchingForGame = true;
+      }
+    }
+
     if (isGameInProgress) {
       if (isOverTargetBoard(x, y)) {
         if (typeof targetIndex == 'number') {
@@ -441,7 +450,7 @@ ready(function() {
         }
       }
 
-      if (x >= 520 && x <= 680 && y >= 538 && y <= 600) {
+      if (x >= 520 && x <= 680 && y >= 618 && y <= 680) {
         if (!mouse.fire) {
           mouse.fire = true;
         }
@@ -641,34 +650,34 @@ ready(function() {
 
     // Fire button
     context.fillStyle = '#FF0';
-    context.fillRect(520, 616, 160, 62);
+    context.fillRect(520, 618, 160, 62);
     context.fillStyle = '#000';
     context.beginPath();
-    context.moveTo(520, 647);
-    context.lineTo(535, 616);
-    context.lineTo(550, 616);
-    context.lineTo(520, 678);
+    context.moveTo(520, 649);
+    context.lineTo(535, 618);
+    context.lineTo(550, 618);
+    context.lineTo(520, 680);
     context.closePath();
     context.fill();
     context.beginPath();
-    context.moveTo(552, 678);
-    context.lineTo(582, 616);
-    context.lineTo(597, 616);
-    context.lineTo(567, 678);
+    context.moveTo(552, 680);
+    context.lineTo(582, 618);
+    context.lineTo(597, 618);
+    context.lineTo(567, 680);
     context.closePath();
     context.fill();
     context.beginPath();
-    context.moveTo(603, 678);
-    context.lineTo(633, 616);
-    context.lineTo(648, 616);
-    context.lineTo(618, 678);
+    context.moveTo(603, 680);
+    context.lineTo(633, 618);
+    context.lineTo(648, 618);
+    context.lineTo(618, 680);
     context.closePath();
     context.fill();
     context.beginPath();
-    context.moveTo(680, 616);
-    context.lineTo(650, 678);
-    context.lineTo(665, 678);
-    context.lineTo(680, 647);
+    context.moveTo(680, 618);
+    context.lineTo(650, 680);
+    context.lineTo(665, 680);
+    context.lineTo(680, 649);
     context.closePath();
     context.fill();
     context.fillStyle = '#AAA';
