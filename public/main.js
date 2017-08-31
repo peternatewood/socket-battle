@@ -374,6 +374,20 @@ ready(function() {
     y: null
   };
 
+  var searchingForGame = false;
+
+  var loader = {
+    rad: 0,
+    spin: Math.PI,
+    x: 200,
+    y: 200,
+    targetX: 200,
+    targetY: 200,
+    pingX: 0,
+    pingY: 0,
+    pingS: 0
+  };
+
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
   canvas.addEventListener('contextmenu', function(event) {
@@ -386,8 +400,6 @@ ready(function() {
     if (mouse.fire) {
       if (! searchingForGame && ships.every(isShipOnBoard)) {
         socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
-        // Show loading canvas
-        document.getElementById('loading-wrapper').style.display = 'table';
         searchingForGame = true;
       }
     }
@@ -427,7 +439,11 @@ ready(function() {
     mouse.x = x;
     mouse.y = y;
 
-    if (!searchingForGame) {
+    if (searchingForGame) {
+      loader.targetX = x;
+      loader.targetY = y;
+    }
+    else {
       if (typeof heldShip === 'number') {
         var xDist = x - ships[heldShip].x;
         var yDist = y - ships[heldShip].y;
@@ -461,26 +477,6 @@ ready(function() {
     }
   });
 
-  var searchingForGame = false;
-
-  var loader = {
-    rad: 0,
-    spin: Math.PI,
-    x: 200,
-    y: 200,
-    targetX: 200,
-    targetY: 200,
-    pingX: 0,
-    pingY: 0,
-    pingS: 0
-  };
-
-  function handleLoadingMouseMove(event) {
-    loader.targetX = event.layerX >> 0;
-    loader.targetY = event.layerY >> 0;
-  }
-  document.getElementById('loading-canvas').addEventListener('mousemove', handleLoadingMouseMove);
-
   socket.on('joined game', function(response) {
     console.log('Welcome to', response.room, 'Player', response.playerNum);
     gameData.room = response.room;
@@ -493,7 +489,6 @@ ready(function() {
     searchingForGame = false;
     isGameInProgress = true;
     trayWidth--;
-    document.getElementById('loading-wrapper').style.display = 'none';
   });
 
   socket.on('game rejoined', function(response) {
@@ -515,12 +510,10 @@ ready(function() {
     }
 
     if (response.inProgress) {
-      document.getElementById('loading-wrapper').style.display = 'none';
       trayWidth = 0;
       isGameInProgress = true;
     }
     else {
-      document.getElementById('loading-wrapper').style.display = 'table';
       searchingForGame = true;
     }
   });
@@ -706,37 +699,35 @@ ready(function() {
       }
       loader.rad = Math.atan2(loader.y - 300, loader.x - 600);
 
-      var x = document.getElementById('loading-canvas').getContext('2d');
+      context.fillStyle = 'rgba(0,0,0,0.6)';
+      context.fillRect(0, 0, 1200, 680);
 
-      x.clearRect(0, 0, 1200, 600);
+      context.fillStyle = '#4F4';
+      context.strokeStyle = '#4F4';
+      context.lineWidth = 2;
+      context.textAlign = 'center';
+      context.font = '32px Courier';
 
+      context.fillText('Searching for Partner...', 600, 60);
 
-      x.fillStyle = '#4F4';
-      x.strokeStyle = '#4F4';
-      x.lineWidth = 2;
-      x.textAlign = 'center';
-      x.font = '32px Courier';
+      context.beginPath();
+      context.moveTo(600, 300);
+      context.lineTo(loader.x, loader.y);
+      context.moveTo(600, 140);
+      context.lineTo(600, 460);
+      context.moveTo(440, 300);
+      context.lineTo(760, 300);
+      context.moveTo(600 + 60 * Math.cos(loader.rad - PI / 4), 300 + 60 * Math.sin(loader.rad - PI / 4));
+      context.arc(600, 300, 60, loader.rad - PI / 4, loader.rad + PI / 4);
+      context.moveTo(600 + 120 * Math.cos(loader.spin - PI / 4), 300 + 120 * Math.sin(loader.spin - PI / 4));
+      context.arc(600, 300, 120, loader.spin - PI / 4, loader.spin + Math.PI / 4);
+      context.stroke();
+      context.closePath();
 
-      x.fillText('Searching for Partner...', 600, 60);
-
-      x.beginPath();
-      x.moveTo(600, 300);
-      x.lineTo(loader.x, loader.y);
-      x.moveTo(600, 140);
-      x.lineTo(600, 460);
-      x.moveTo(440, 300);
-      x.lineTo(760, 300);
-      x.moveTo(600 + 60 * Math.cos(loader.rad - PI / 4), 300 + 60 * Math.sin(loader.rad - PI / 4));
-      x.arc(600, 300, 60, loader.rad - PI / 4, loader.rad + PI / 4);
-      x.moveTo(600 + 120 * Math.cos(loader.spin - PI / 4), 300 + 120 * Math.sin(loader.spin - PI / 4));
-      x.arc(600, 300, 120, loader.spin - PI / 4, loader.spin + Math.PI / 4);
-      x.stroke();
-      x.closePath();
-
-      x.beginPath();
-      x.arc(loader.pingX, loader.pingY, loader.pingS / 10, 0, 2 * Math.PI);
-      x.fill();
-      x.closePath();
+      context.beginPath();
+      context.arc(loader.pingX, loader.pingY, loader.pingS / 10, 0, 2 * Math.PI);
+      context.fill();
+      context.closePath();
 
       var spin = loader.spin + PI / 36;
       if (spin > 2 * PI) {
