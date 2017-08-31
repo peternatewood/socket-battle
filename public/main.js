@@ -239,7 +239,7 @@ ready(function() {
         break;
       case 3:
         this.name = 'Submarine';
-        this.horizontalName = 'SUBMARINE';
+        this.horizontalName = 'SUB';
         this.verticalName = 'SUB';
         break;
       case 4:
