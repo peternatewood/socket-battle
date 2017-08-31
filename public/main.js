@@ -474,7 +474,9 @@ ready(function() {
           if (ships[i].isMouseOver(x, y)) {
             if (event.button == 0) {
               heldShip = i;
-              clearTiles(fleetBoard, ships[i]);
+              if (ships[i].onBoard) {
+                clearTiles(fleetBoard, ships[i]);
+              }
             }
             if (typeof heldShip === 'number' && event.button == 2) {
               ships[heldShip].rotate();
@@ -588,6 +590,7 @@ ready(function() {
     // TODO Render message, maybe animation
     console.log('Tile already hit');
   });
+
   socket.on('salvo missed', function(index) {
     // TODO Render message and animation
     console.log('salvo missed', index);
@@ -607,6 +610,13 @@ ready(function() {
   socket.on('ship hit', function(index) {
     console.log('ships hit', index);
     fleetBoard[index] = 3;
+  });
+
+  socket.on('winner', function(opponent) {
+    console.log('You beat', opponent);
+  });
+  socket.on('loser', function(opponent) {
+    console.log(opponent, 'beat you');
   });
 
   function step(t) {
@@ -907,6 +917,9 @@ ready(function() {
       context.font = '16px Courier';
       for (var i = 0; i < 144; i += 12) {
         context.fillText(fleetBoard.slice(i, i + 12).join(''), 8, 16 + i * 1.2);
+      }
+      if (typeof heldShip == 'number') {
+        context.fillText('Ship: ' + ships[heldShip].x + ', ' + ships[heldShip].y, 8, 200);
       }
     }
 
