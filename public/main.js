@@ -370,8 +370,8 @@ ready(function() {
   var mouse = {
     over: false,
     fire: false,
-    x: null,
-    y: null
+    x: -1,
+    y: -1
   };
 
   var searchingForGame = false;
@@ -475,6 +475,10 @@ ready(function() {
         mouse.fire = false;
       }
     }
+  });
+  canvas.addEventListener('mouseout', function(event) {
+    mouse.x = -1;
+    mouse.y = -1;
   });
 
   socket.on('joined game', function(response) {
