@@ -173,6 +173,7 @@ ready(function() {
     return true;
   }
 
+  // 0: no action, 1: targetted, 2: miss, 3: hit
   var targetBoard = [
     0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,
@@ -191,12 +192,13 @@ ready(function() {
   function isOverTargetBoard(x, y) {
     return x >= 680 && x <= 1160 && y >= 80 && y <= 560;
   }
-  // 0: no action, 1: targetted, 2: miss, 3: hit
-  function setTargetBoardTile(board, x, y, val) {
+  function setTargetBoardTile(board, x, y) {
     var index = ((x - 680) / 40 >> 0) + 12 * ((y - 80) / 40 >> 0);
     if (typeof board[index] == 'number') {
-      board[index] = val;
-      return index;
+      if (board[index] == 0) {
+        board[index] = 1;
+        return index;
+      }
     }
     else {
       console.log('No such index', index, 'in target board');
@@ -385,7 +387,7 @@ ready(function() {
         if (typeof targetIndex == 'number') {
           targetBoard[targetIndex] = 0;
         }
-        targetIndex = setTargetBoardTile(targetBoard, x, y, 1);
+        targetIndex = setTargetBoardTile(targetBoard, x, y);
       }
     }
     else {
