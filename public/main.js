@@ -580,6 +580,9 @@ ready(function() {
     }
   });
 
+  socket.on('not your turn', function() {
+    console.log('Not your turn');
+  });
   socket.on('salvo missed', function(index) {
     // TODO Render message and animation
     console.log('salvo missed', index);
