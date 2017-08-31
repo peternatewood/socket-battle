@@ -151,19 +151,20 @@ io.on('connection', function(socket) {
             token: token
           };
           // Player is rejoining game
-          var gameRoom = activeGames[data.room];
+          var room = activeGames[data.room];
           var index = data.playerNum - 1;
 
-          if (data.playerNum && data.room && gameRoom && gameRoom.players[index] == username) {
+          if (data.playerNum && data.room && room && room.players[index] == username) {
+            gameRoom = data.room;
             gameData.playerNum = data.playerNum;
             gameData.room = data.room;
 
             var response = {
               inProgress: !activeGames[data.room].isEmpty(),
               gameData: gameData,
-              ships: gameRoom.ships[index],
-              fleetBoard: gameRoom.fleetBoards[index],
-              targetBoard: gameRoom.targetBoards[index]
+              ships: room.ships[index],
+              fleetBoard: room.fleetBoards[index],
+              targetBoard: room.targetBoards[index]
             };
 
             socket.join(data.room);
@@ -302,8 +303,46 @@ io.on('connection', function(socket) {
     socket.emit('joined game', { room: room, playerNum: playerNum });
 
     if (!activeGames[room].isEmpty()) {
+      activeGames[room].turn = 1;
       io.to(room).emit('game ready');
       console.log('game ready', room, activeGames[room].players.join(' vs '));
+    }
+  });
+
+  socket.on('fire salvo', function(targetIndex) {
+    var game = activeGames[gameRoom];
+    if (game.turn == playerNum) {
+      var opponent = playerNum == 1 ? 1 : 0;
+      var tile = game.fleetBoards[opponent][targetIndex];
+      switch (tile) {
+        case 0:
+          tile = 2;
+          socket.emit('salvo missed', targetIndex);
+          socket.broadcast.to(gameRoom).emit('ships missed', targetIndex);
+          break;
+        case 1:
+          tile = 3;
+          // Find hit ship and decrement life
+          socket.emit('salvo hit', targetIndex);
+          socket.broadcast.to(gameRoom).emit('ship hit', targetIndex);
+          // If there are no remaining ship tiles
+          if (game.fleetBoards[opponent].every(function(tile) { return tile != 1 })) {
+            socket.emit('winner', game.players[opponent]);
+            socket.broadcast.to(gameRoom).emit('loser', username);
+            // Clean up game-related data
+            delete activeGames[gameRoom];
+            playerNum = null;
+            gameRoom = null;
+          }
+          break;
+        default:
+          socket.emit('tile already hit');
+          return; // So that we don't jump to the next turn
+      }
+      game.turn = opponent + 1;
+    }
+    else {
+      socket.emit('not your turn');
     }
   });
 });
