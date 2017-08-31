@@ -421,7 +421,7 @@ ready(function() {
         ships[heldShip].renderPoints[i + 1] += yDist;
       }
     }
-    else {
+    else if (isGameInProgress) {
       if (isOverTargetBoard(x, y)) {
         if (!mouse.over) {
           mouse.over = true;
@@ -484,6 +484,18 @@ ready(function() {
     showGameboard();
     gameData = response.gameData;
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
+
+    // Update ships, fleet board, target board
+    for (var i = 0; i < response.ships.length; i++) {
+      ships[i].x = response.ships[i].x;
+      ships[i].y = response.ships[i].y;
+      ships[i].onBoard = true;
+      ships[i].setRenderPoints();
+    }
+    for (var i = 0; i < 144; i++) {
+      fleetBoard[i] = response.fleetBoard[i];
+      targetBoard[i] = response.targetBoard[i];
+    }
 
     if (response.inProgress) {
       document.getElementById('loading-wrapper').style.display = 'none';
