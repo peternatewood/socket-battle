@@ -369,10 +369,13 @@ ready(function() {
   var heldShip;
 
   var ships = [
-    new Ship(730, 150, 4),
-    new Ship(770, 130, 3),
-    new Ship(810, 110, 2),
-    new Ship(850, 170, 5)
+    new Ship(740, 450, 6),
+    new Ship(780, 430, 5),
+    new Ship(820, 410, 4),
+    new Ship(860, 390, 3),
+    new Ship(900, 390, 3),
+    new Ship(940, 370, 2),
+    new Ship(980, 370, 2)
   ];
 
   function isShipOnBoard(ship) {
@@ -582,6 +585,14 @@ ready(function() {
       context.lineWidth = 8;
       context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
       context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
+
+      context.fillStyle = '#000';
+      context.textAlign = 'left';
+      context.fillText('Click and drag to place your ships!', 1220 - trayWidth, 100);
+      context.fillText('Rotate a grabbed ship with', 1220 - trayWidth, 160);
+      context.fillText('the right mouse button or spacebar', 1220 - trayWidth, 200);
+      context.fillText("Click the FIRE! button when you're", 1220 - trayWidth, 260);
+      context.fillText("ready to start!", 1220 - trayWidth, 300);
 
       if (trayWidth < 500) {
         trayWidth -= 8;
