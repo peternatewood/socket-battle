@@ -602,7 +602,21 @@ ready(function() {
             context.stroke();
             context.closePath();
             break;
-          case 3: break;
+          case 3:
+            context.fillStyle = '#F44';
+            context.beginPath();
+            context.arc(left + 20, top + 20, 4, 0, TAU);
+            context.fill();
+            context.closePath();
+            context.strokeStyle = '#F44';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.arc(left + 20, top + 20, 8, 0, TAU);
+            context.moveTo(left + 34, top + 20);
+            context.arc(left + 20, top + 20, 14, 0, TAU);
+            context.stroke();
+            context.closePath();
+            break;
         }
       }
     }
