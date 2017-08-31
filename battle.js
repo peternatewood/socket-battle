@@ -122,6 +122,7 @@ io.on('connection', function(socket) {
 
   var playerNum;
   var username;
+  var gameRoom;
 
   console.log('a user connected', socket.id);
 
@@ -272,8 +273,10 @@ io.on('connection', function(socket) {
         throw err;
       }
       else {
+        socket.leave(gameRoom);
         loggedIn = false;
         username = null;
+        gameRoom = null;
       }
     });
   });
@@ -294,6 +297,7 @@ io.on('connection', function(socket) {
       playerNum = 2;
     }
 
+    gameRoom = room;
     socket.join(room);
     socket.emit('joined game', { room: room, playerNum: playerNum });
 
