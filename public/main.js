@@ -581,7 +581,12 @@ ready(function() {
   });
 
   socket.on('not your turn', function() {
+    // TODO Render message, maybe animation
     console.log('Not your turn');
+  });
+  socket.on('tile already hit', function() {
+    // TODO Render message, maybe animation
+    console.log('Tile already hit');
   });
   socket.on('salvo missed', function(index) {
     // TODO Render message and animation
