@@ -35,11 +35,12 @@ ready(function() {
   var debug = 0;
   function handleKeyDown(e) {
     if(!e.repeat && !e.altKey && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
       if (e.key == '`') {
+        e.preventDefault();
         debug =! debug;
       }
       if (typeof heldShip === 'number' && e.key == ' ') {
+        e.preventDefault();
         ships[heldShip].rotate();
       }
     }
@@ -178,6 +179,7 @@ ready(function() {
       }
       tiles.push(i);
     }
+    ship.tiles = tiles;
 
     for (var i = 0; i < ship.size; i++) {
       board[tiles[i]] = 1;
@@ -261,6 +263,7 @@ ready(function() {
 
     return this;
   }
+  Ship.prototype.tiles = [];
   Ship.prototype.onBoard = false;
   Ship.prototype.setRenderPoints = function() {
     var halfSize = (40 * this.size) / 2;
@@ -597,19 +600,26 @@ ready(function() {
     targetIndex = null;
     targetBoard[index] = 2;
   });
-  socket.on('salvo hit', function(index) {
-    // TODO Render message and animation
-    console.log('salvo hit', index);
-    targetIndex = null;
-    targetBoard[index] = 3;
-  });
   socket.on('ships missed', function(index) {
     console.log('ships missed', index);
     fleetBoard[index] = 2;
   });
-  socket.on('ship hit', function(index) {
-    console.log('ships hit', index);
-    fleetBoard[index] = 3;
+
+  socket.on('salvo hit', function(response) {
+    // TODO Render message and animation
+    console.log('salvo hit', response.name);
+    if (response.sunk) {
+      console.log('You sunk', response.name);
+    }
+    targetIndex = null;
+    targetBoard[response.index] = 3;
+  });
+  socket.on('ship hit', function(response) {
+    console.log('ships hit', response.name);
+    if (response.sunk) {
+      console.log('Your', response.name, 'was sunk');
+    }
+    fleetBoard[response.index] = 3;
   });
 
   socket.on('winner', function(opponent) {
@@ -809,6 +819,8 @@ ready(function() {
     context.arc(550, 649, 22, 0, TAU);
     context.closePath();
     context.fill();
+    context.lineWidth = 2;
+    context.strokeStyle = '#000';
     context.beginPath();
     context.arc(550, 649, 16, 0, TAU);
     context.closePath();
