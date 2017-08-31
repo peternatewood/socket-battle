@@ -369,6 +369,7 @@ ready(function() {
 
   var mouse = {
     over: false,
+    fire: false,
     x: null,
     y: null
   };
@@ -417,25 +418,36 @@ ready(function() {
     mouse.x = x;
     mouse.y = y;
 
-    if (typeof heldShip === 'number') {
-      var xDist = x - ships[heldShip].x;
-      var yDist = y - ships[heldShip].y;
+    if (!searchingForGame) {
+      if (typeof heldShip === 'number') {
+        var xDist = x - ships[heldShip].x;
+        var yDist = y - ships[heldShip].y;
 
-      ships[heldShip].x += xDist;
-      ships[heldShip].y += yDist;
-      for (var i = 0; i < 10; i += 2) {
-        ships[heldShip].renderPoints[i] += xDist;
-        ships[heldShip].renderPoints[i + 1] += yDist;
-      }
-    }
-    else if (isGameInProgress) {
-      if (isOverTargetBoard(x, y)) {
-        if (!mouse.over) {
-          mouse.over = true;
+        ships[heldShip].x += xDist;
+        ships[heldShip].y += yDist;
+        for (var i = 0; i < 10; i += 2) {
+          ships[heldShip].renderPoints[i] += xDist;
+          ships[heldShip].renderPoints[i + 1] += yDist;
         }
       }
-      else if (mouse.over) {
-        mouse.over = false;
+      else if (isGameInProgress) {
+        if (isOverTargetBoard(x, y)) {
+          if (!mouse.over) {
+            mouse.over = true;
+          }
+        }
+        else if (mouse.over) {
+          mouse.over = false;
+        }
+      }
+
+      if (x >= 520 && x <= 680 && y >= 538 && y <= 600) {
+        if (!mouse.fire) {
+          mouse.fire = true;
+        }
+      }
+      else if (mouse.fire) {
+        mouse.fire = false;
       }
     }
   });
@@ -521,7 +533,7 @@ ready(function() {
     var PI = Math.PI;
     var TAU = 2 * PI;
 
-    context.clearRect(0, 0, 1200, 600);
+    context.clearRect(0, 0, 1200, 680);
     // Draw grid lines and numbers/letters
     context.lineWidth = 4;
     context.fillStyle = '#333';
@@ -626,6 +638,57 @@ ready(function() {
       context.fillStyle = 'rgba(0,0,0,0.2)';
       context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
     }
+
+    // Fire button
+    context.fillStyle = '#FF0';
+    context.fillRect(520, 616, 160, 62);
+    context.fillStyle = '#000';
+    context.beginPath();
+    context.moveTo(520, 647);
+    context.lineTo(535, 616);
+    context.lineTo(550, 616);
+    context.lineTo(520, 678);
+    context.closePath();
+    context.fill();
+    context.beginPath();
+    context.moveTo(552, 678);
+    context.lineTo(582, 616);
+    context.lineTo(597, 616);
+    context.lineTo(567, 678);
+    context.closePath();
+    context.fill();
+    context.beginPath();
+    context.moveTo(603, 678);
+    context.lineTo(633, 616);
+    context.lineTo(648, 616);
+    context.lineTo(618, 678);
+    context.closePath();
+    context.fill();
+    context.beginPath();
+    context.moveTo(680, 616);
+    context.lineTo(650, 678);
+    context.lineTo(665, 678);
+    context.lineTo(680, 647);
+    context.closePath();
+    context.fill();
+    context.fillStyle = '#AAA';
+    context.fillRect(574, 628, 100, 40);
+    context.font = '32px Arial';
+    context.textAlign = 'right';
+    context.fillStyle = '#FFF';
+    context.strokeStyle = '#000';
+    context.lineWidth = 2;
+    context.strokeText('FIRE!', 667, 648);
+    context.fillText('FIRE!', 666, 649);
+    context.fillStyle = mouse.fire ? '#F88' : '#F00';
+    context.beginPath();
+    context.arc(548, 649, 22, 0, TAU);
+    context.closePath();
+    context.fill();
+    context.beginPath();
+    context.arc(548, 649, 16, 0, TAU);
+    context.closePath();
+    context.stroke();
 
     // Loader toy
     if (searchingForGame) {
