@@ -232,11 +232,31 @@ ready(function() {
     this.setRenderPoints();
 
     switch (size) {
-      case 2: this.name = 'Patrol Boat'; break;
-      case 3: this.name = 'Submarine'; break;
-      case 4: this.name = 'Destroyer'; break;
-      case 5: this.name = 'Battleship'; break;
-      case 6: this.name = 'Carrier'; break;
+      case 2:
+        this.name = 'Patrol Boat';
+        this.horizontalName = 'PT';
+        this.verticalName = 'PT';
+        break;
+      case 3:
+        this.name = 'Submarine';
+        this.horizontalName = 'SUBMARINE';
+        this.verticalName = 'SUB';
+        break;
+      case 4:
+        this.name = 'Destroyer';
+        this.horizontalName = 'DESTROYER';
+        this.verticalName = 'DESTROY';
+        break;
+      case 5:
+        this.name = 'Battleship';
+        this.horizontalName = 'BATTLESHIP';
+        this.verticalName = 'BATTLE';
+        break;
+      case 6:
+        this.name = 'Aircraft Carrier';
+        this.horizontalName = 'AIRCRAFT CARRIER';
+        this.verticalName = 'CARRIER';
+        break;
     }
 
     return this;
@@ -364,6 +384,24 @@ ready(function() {
 
     context.fill();
     context.stroke();
+
+    // Ship names
+    context.fillStyle = '#000';
+    context.strokeStyle = '#000';
+    context.lineWidth = 1;
+    context.font = '16px Arial';
+    context.textAlign = 'center'
+    if (this.direction == 'west' || this.direction == 'east') {
+      context.fillText(this.horizontalName, this.x + (this.direction == 'west' ? 6 : -6), this.y);
+      context.strokeText(this.horizontalName, this.x + (this.direction == 'west' ? 6 : -6), this.y);
+    }
+    else {
+      var start = this.y - 8 * (this.verticalName.length - 1) + (this.direction == 'north' ? 6 : -6);
+      for (var i = 0; i < this.verticalName.length; i++) {
+        context.fillText(this.verticalName[i], this.x, start + 16 * i);
+        context.strokeText(this.verticalName[i], this.x, start + 16 * i);
+      }
+    }
   };
 
   var heldShip;
