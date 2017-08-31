@@ -323,8 +323,18 @@ io.on('connection', function(socket) {
         case 1:
           tile = 3;
           // Find hit ship and decrement life
-          socket.emit('salvo hit', targetIndex);
-          socket.broadcast.to(gameRoom).emit('ship hit', targetIndex);
+          var ships = game.ships[opponent];
+          var index = ships.findIndex(function(s) { return s.tiles.includes(targetIndex); });
+          ships[index].life--;
+
+          var response = {
+            index: targetIndex,
+            name: ships[index].name,
+            sunk: ships[index].life == 0
+          };
+
+          socket.emit('salvo hit', response);
+          socket.broadcast.to(gameRoom).emit('ship hit', response);
           // If there are no remaining ship tiles
           if (game.fleetBoards[opponent].every(function(tile) { return tile != 1 })) {
             socket.emit('winner', game.players[opponent]);
