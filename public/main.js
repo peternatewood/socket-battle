@@ -33,8 +33,18 @@ function showGameboard() {
 
 ready(function() {
   var debug = 0;
-  function toggleDebug(e){if(!e.repeat&&e.key=='`'){e.preventDefault();debug=!debug}}
-  document.addEventListener('keydown', toggleDebug);
+  function handleKeyDown(e) {
+    if(!e.repeat && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      if (e.key == '`') {
+        debug =! debug;
+      }
+      if (typeof heldShip === 'number' && e.key == ' ') {
+        ships[heldShip].rotate();
+      }
+    }
+  }
+  document.addEventListener('keydown', handleKeyDown);
 
   var socket = io();
 
