@@ -481,17 +481,6 @@ ready(function() {
   }
   document.getElementById('loading-canvas').addEventListener('mousemove', handleLoadingMouseMove);
 
-  function handleFireButtonClick(event) {
-    event.preventDefault();
-    if (! searchingForGame && ships.every(isShipOnBoard)) {
-      socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
-      // Show loading canvas
-      document.getElementById('loading-wrapper').style.display = 'table';
-      searchingForGame = true;
-    }
-  }
-  document.getElementById('fire-button').addEventListener('click', handleFireButtonClick);
-
   socket.on('joined game', function(response) {
     console.log('Welcome to', response.room, 'Player', response.playerNum);
     gameData.room = response.room;
