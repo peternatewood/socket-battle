@@ -148,17 +148,3 @@ a:hover {
   background: transparent;
   margin: 0 auto;
 }
-
-#loading-wrapper {
-  display: none;
-  position: fixed;
-  background: rgba(0,0,0,0.5);
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 2;
-}
-#loading-canvas {
-  position: relative;
-  margin: 0 auto;
-}
