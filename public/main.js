@@ -582,6 +582,7 @@ ready(function() {
     for (var i = 0; i < response.ships.length; i++) {
       ships[i].x = response.ships[i].x;
       ships[i].y = response.ships[i].y;
+      ships[i].direction = response.ships[i].direction;
       ships[i].onBoard = true;
       ships[i].setRenderPoints();
     }
