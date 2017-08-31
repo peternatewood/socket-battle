@@ -458,6 +458,9 @@ ready(function() {
         }
         targetIndex = setTargetBoardTile(targetBoard, x, y);
       }
+      else if (mouse.fire) {
+        socket.emit('fire salvo', targetIndex);
+      }
     }
     else {
       if (mouse.fire) {
@@ -575,6 +578,27 @@ ready(function() {
     else {
       searchingForGame = true;
     }
+  });
+
+  socket.on('salvo missed', function(index) {
+    // TODO Render message and animation
+    console.log('salvo missed', index);
+    targetIndex = null;
+    targetBoard[index] = 2;
+  });
+  socket.on('salvo hit', function(index) {
+    // TODO Render message and animation
+    console.log('salvo hit', index);
+    targetIndex = null;
+    targetBoard[index] = 3;
+  });
+  socket.on('ships missed', function(index) {
+    console.log('ships missed', index);
+    fleetBoard[index] = 2;
+  });
+  socket.on('ship hit', function(index) {
+    console.log('ships hit', index);
+    fleetBoard[index] = 3;
   });
 
   function step(t) {
