@@ -145,7 +145,9 @@ a:hover {
 #canvas {
   display: block;
   position: relative;
-  background: transparent;
+  background: #0CE;
+  border: 4px solid #333;
+  border-radius: 4px;
   margin: 0 auto;
   cursor: none;
 }

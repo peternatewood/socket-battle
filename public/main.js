@@ -552,9 +552,9 @@ ready(function() {
         context.strokeRect(640 + xPos, 80, 40, 480);
       }
 
-      context.strokeText(x + 1, 10, 20 + xPos);
+      context.strokeText(x + 1, 20, 20 + xPos);
       context.strokeText(String.fromCharCode(65 + x), xPos - 20, 60);
-      context.strokeText(x + 1, 650, 20 + xPos);
+      context.strokeText(x + 1, 660, 20 + xPos);
       context.strokeText(String.fromCharCode(65 + x), 620 + xPos, 60);
     }
 
