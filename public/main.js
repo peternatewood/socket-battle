@@ -187,6 +187,7 @@ ready(function() {
     0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0
   ];
+  var targetIndex;
   function isOverTargetBoard(x, y) {
     return x >= 680 && x <= 1160 && y >= 80 && y <= 560;
   }
@@ -195,6 +196,7 @@ ready(function() {
     var index = ((x - 680) / 40 >> 0) + 12 * ((y - 80) / 40 >> 0);
     if (typeof board[index] == 'number') {
       board[index] = val;
+      return index;
     }
     else {
       console.log('No such index', index, 'in target board');
@@ -380,7 +382,10 @@ ready(function() {
     var y = event.layerY;
     if (isGameInProgress) {
       if (isOverTargetBoard(x, y)) {
-        setTargetBoardTile(targetBoard, x, y, 1);
+        if (typeof targetIndex == 'number') {
+          targetBoard[targetIndex] = 0;
+        }
+        targetIndex = setTargetBoardTile(targetBoard, x, y, 1);
       }
     }
     else {
@@ -567,8 +572,22 @@ ready(function() {
     // Target board
     if (isGameInProgress) {
       for (var i = 0; i < 144; i++) {
+        var left = 680 + 40 * (i % 12);
+        var top = 80 + 40 * (i / 12 >> 0);
         switch (targetBoard[i]) {
-          case 1: break;
+          case 1:
+            context.strokeStyle = '#4F4';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.moveTo(left + 20, top);
+            context.lineTo(left + 20, top + 40);
+            context.moveTo(left, top + 20);
+            context.lineTo(left + 40, top + 20);
+            context.moveTo(left + 35, top + 20);
+            context.arc(left + 20, top + 20, 15, 0, 2 * Math.PI);
+            context.stroke();
+            context.closePath();
+            break;
           case 2: break;
           case 3: break;
         }
