@@ -553,6 +553,7 @@ ready(function() {
     }
   });
   canvas.addEventListener('mouseout', function(event) {
+    mouse.over = false;
     mouse.x = -1;
     mouse.y = -1;
   });
