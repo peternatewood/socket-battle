@@ -64,7 +64,36 @@ var Game = function(username, fleetBoard, ships) {
 
   return this;
 }
-Game.prototype.targetBoards = [];
+Game.prototype.targetBoards = [
+  [
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0
+  ],
+  [
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0
+  ]
+];
 Game.prototype.turn = 0;
 Game.prototype.isEmpty = function() {
   return this.players.length < 2;
@@ -121,12 +150,23 @@ io.on('connection', function(socket) {
             token: token
           };
           // Player is rejoining game
-          if (data.playerNum && data.room && activeGames[data.room] && activeGames[data.room].players[data.playerNum - 1] == username) {
+          var gameRoom = activeGames[data.room];
+          var index = data.playerNum - 1;
+
+          if (data.playerNum && data.room && gameRoom && gameRoom.players[index] == username) {
             gameData.playerNum = data.playerNum;
             gameData.room = data.room;
 
+            var response = {
+              inProgress: !activeGames[data.room].isEmpty(),
+              gameData: gameData,
+              ships: gameRoom.ships[index],
+              fleetBoard: gameRoom.fleetBoards[index],
+              targetBoard: gameRoom.targetBoards[index]
+            };
+
             socket.join(data.room);
-            socket.emit('game rejoined', { inProgress: !activeGames[data.room].isEmpty(), gameData: gameData });
+            socket.emit('game rejoined', response);
           }
           else {
             socket.emit('token valid', { success: true, gameData: gameData });
