@@ -516,6 +516,9 @@ ready(function() {
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
 
+    var PI = Math.PI;
+    var TAU = 2 * PI;
+
     context.clearRect(0, 0, 1200, 600);
     // Draw grid lines and numbers/letters
     context.lineWidth = 4;
@@ -584,7 +587,7 @@ ready(function() {
             context.moveTo(left + 4, top + 20);
             context.lineTo(left + 36, top + 20);
             context.moveTo(left + 32, top + 20);
-            context.arc(left + 20, top + 20, 12, 0, 2 * Math.PI);
+            context.arc(left + 20, top + 20, 12, 0, TAU);
             context.stroke();
             context.closePath();
             break;
@@ -646,10 +649,10 @@ ready(function() {
       x.lineTo(600, 460);
       x.moveTo(440, 300);
       x.lineTo(760, 300);
-      x.moveTo(600 + 60 * Math.cos(loader.rad - Math.PI / 4), 300 + 60 * Math.sin(loader.rad - Math.PI / 4));
-      x.arc(600, 300, 60, loader.rad - Math.PI / 4, loader.rad + Math.PI / 4);
-      x.moveTo(600 + 120 * Math.cos(loader.spin - Math.PI / 4), 300 + 120 * Math.sin(loader.spin - Math.PI / 4));
-      x.arc(600, 300, 120, loader.spin - Math.PI / 4, loader.spin + Math.PI / 4);
+      x.moveTo(600 + 60 * Math.cos(loader.rad - PI / 4), 300 + 60 * Math.sin(loader.rad - PI / 4));
+      x.arc(600, 300, 60, loader.rad - PI / 4, loader.rad + PI / 4);
+      x.moveTo(600 + 120 * Math.cos(loader.spin - PI / 4), 300 + 120 * Math.sin(loader.spin - PI / 4));
+      x.arc(600, 300, 120, loader.spin - PI / 4, loader.spin + Math.PI / 4);
       x.stroke();
       x.closePath();
 
@@ -658,8 +661,8 @@ ready(function() {
       x.fill();
       x.closePath();
 
-      var spin = loader.spin + Math.PI / 36;
-      if (spin > 2 * Math.PI) {
+      var spin = loader.spin + PI / 36;
+      if (spin > 2 * PI) {
         spin = 0;
       }
       loader.spin = spin;
