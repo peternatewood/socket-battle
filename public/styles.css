@@ -115,6 +115,7 @@ a:visited {
   color: #FFF;
   font: bold 32px Arial, sans-serif;
   text-decoration: none;
+  outline: none;
   border-radius: 8px;
   padding: 8px 12px;
 }
