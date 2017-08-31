@@ -763,7 +763,7 @@ ready(function() {
       context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
     }
 
-    // Fire button
+    // Fire button background
     context.fillStyle = '#FF0';
     context.fillRect(520, 618, 160, 62);
     context.fillStyle = '#000';
@@ -795,22 +795,22 @@ ready(function() {
     context.lineTo(680, 649);
     context.closePath();
     context.fill();
-    context.fillStyle = '#AAA';
-    context.fillRect(574, 628, 100, 40);
+    // FIRE! text
     context.font = '32px Arial';
     context.textAlign = 'right';
     context.fillStyle = '#FFF';
-    context.strokeStyle = '#000';
-    context.lineWidth = 2;
-    context.strokeText('FIRE!', 667, 648);
-    context.fillText('FIRE!', 666, 649);
+    context.shadowBlur = 10;
+    context.shadowColor = '#000';
+    context.fillText('FIRE!', 670, 649);
+    context.shadowBlur = 0;
+    // Red button
     context.fillStyle = mouse.fire ? '#F88' : '#F00';
     context.beginPath();
-    context.arc(548, 649, 22, 0, TAU);
+    context.arc(550, 649, 22, 0, TAU);
     context.closePath();
     context.fill();
     context.beginPath();
-    context.arc(548, 649, 16, 0, TAU);
+    context.arc(550, 649, 16, 0, TAU);
     context.closePath();
     context.stroke();
 
