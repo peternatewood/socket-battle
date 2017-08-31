@@ -450,12 +450,6 @@ ready(function() {
   canvas.addEventListener('mousedown', function(event) {
     var x = event.layerX;
     var y = event.layerY;
-    if (mouse.fire) {
-      if (! searchingForGame && ships.every(isShipOnBoard)) {
-        socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
-        searchingForGame = true;
-      }
-    }
 
     if (isGameInProgress) {
       if (isOverTargetBoard(x, y)) {
@@ -466,16 +460,24 @@ ready(function() {
       }
     }
     else {
-      for (var i = 0; i < ships.length; i++) {
-        if (ships[i].isMouseOver(x, y)) {
-          if (event.button == 0) {
-            heldShip = i;
-            clearTiles(fleetBoard, ships[i]);
+      if (mouse.fire) {
+        if (! searchingForGame && ships.every(isShipOnBoard)) {
+          socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
+          searchingForGame = true;
+        }
+      }
+      else {
+        for (var i = 0; i < ships.length; i++) {
+          if (ships[i].isMouseOver(x, y)) {
+            if (event.button == 0) {
+              heldShip = i;
+              clearTiles(fleetBoard, ships[i]);
+            }
+            if (typeof heldShip === 'number' && event.button == 2) {
+              ships[heldShip].rotate();
+            }
+            break;
           }
-          if (typeof heldShip === 'number' && event.button == 2) {
-            ships[heldShip].rotate();
-          }
-          break;
         }
       }
     }
@@ -642,11 +644,35 @@ ready(function() {
       ships[i].render(context);
     }
 
-    // Target board
     if (isGameInProgress) {
       for (var i = 0; i < 144; i++) {
-        var left = 680 + 40 * (i % 12);
+        // Target board
+        var left = 40 + 40 * (i % 12);
         var top = 80 + 40 * (i / 12 >> 0);
+        switch (fleetBoard[i]) {
+          case 2:
+            context.fillStyle = '#FFF';
+            context.beginPath();
+            context.arc(left + 20, top + 20, 4, 0, TAU);
+            context.fill();
+            context.closePath();
+            context.strokeStyle = '#FFF';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.arc(left + 20, top + 20, 10, 0, TAU);
+            context.stroke();
+            context.closePath();
+            break;
+          case 3:
+            var radialGrad = context.createRadialGradient(left + 20, top + 20, 0, left + 20, top + 20, 20);
+            radialGrad.addColorStop(0, 'rgba(0,0,0,0.8)');
+            radialGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            context.fillStyle = radialGrad;
+            context.fillRect(left, top, 40, 40);
+            break;
+        }
+        // Fleet board hits/misses
+        left += 640;
         switch (targetBoard[i]) {
           case 1:
             context.strokeStyle = '#4F4';
