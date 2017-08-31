@@ -147,4 +147,5 @@ a:hover {
   position: relative;
   background: transparent;
   margin: 0 auto;
+  cursor: none;
 }

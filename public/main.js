@@ -111,11 +111,13 @@ ready(function() {
     socket.emit('signout', gameData.username);
     window.localStorage.removeItem('gameData');
 
+    var spinner = document.getElementById('spinner');
     var formTable = document.getElementById('form-table');
     var form = document.getElementById('form');
     var game = document.getElementById('gameboard');
     var signout = document.getElementById('signout-wrapper');
 
+    spinner.style.display = 'none';
     formTable.style.display = '';
     form.style.display = 'block';
     game.style.display = 'none';
@@ -747,6 +749,31 @@ ready(function() {
         loader.pingX = (450 + 300 * Math.random()) >> 0;
         loader.pingY = (150 + 300 * Math.random()) >> 0;
       }
+    }
+
+    // Mouse cursor
+    if (mouse.x >= 0 && mouse.y >= 0) {
+      var x = mouse.x;
+      var y = mouse.y;
+      context.fillStyle = '#FFF';
+      context.strokeStyle = '#000';
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(x - 1, y + 3);
+      context.arc(x, y, 3, PI * 0.75, PI * 1.75);
+      context.lineTo(x + 10, y + 6);
+      context.arc(x + 12, y + 3, 3, PI * 0.75, PI * 1.75);
+      context.arc(x + 18, y, 3, PI * 0.75, PI * 1.75);
+      context.arc(x + 24, y - 3, 3, PI * 0.75, PI * 1.75);
+      context.lineTo(x + 34, y + 11);
+      context.lineTo(x + 20, y + 24);
+      context.lineTo(x + 17, y + 21);
+      context.arc(x + 14, y + 18, 3, PI * 0.25, PI * 0.75);
+      context.lineTo(x + 6, y + 15);
+      context.arc(x + 9, y + 15, 3, PI * 0.75, PI * 1.375);
+      context.closePath();
+      context.fill();
+      context.stroke();
     }
 
     // Debug rendering
