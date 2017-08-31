@@ -501,6 +501,7 @@ ready(function() {
       radar.x = x;
       radar.y = y;
       radar.life = 60;
+      socket.emit('ping radar', { x: x, y: y });
     }
   });
   canvas.addEventListener('mouseup', function(event) {
@@ -556,6 +557,12 @@ ready(function() {
     mouse.over = false;
     mouse.x = -1;
     mouse.y = -1;
+  });
+
+  socket.on('radar blip', function(coords) {
+    radar.x = coords.x;
+    radar.y = coords.y;
+    radar.life = 60;
   });
 
   socket.on('joined game', function(response) {

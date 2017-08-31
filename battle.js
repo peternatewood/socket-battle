@@ -309,6 +309,10 @@ io.on('connection', function(socket) {
     }
   });
 
+  socket.on('ping radar', function(coords) {
+    socket.to(gameRoom).emit('radar blip', coords);
+  });
+
   socket.on('fire salvo', function(targetIndex) {
     var game = activeGames[gameRoom];
     if (game.turn == playerNum) {
