@@ -86,6 +86,26 @@ input[type="text"]:focus,
 input[type="password"]:focus {
   background: #FFF;
 }
+::-webkit-input-placeholder {
+  color: #678;
+  opacity: 0.8;
+}
+::-moz-placeholder {
+  color: #678;
+  opacity: 0.8;
+}
+:-moz-placeholder {
+  color: #678;
+  opacity: 0.8;
+}
+:-ms-input-placeholder {
+  color: #678;
+  opacity: 0.8;
+}
+::placeholder {
+  color: #678;
+  opacity: 0.8;
+}
 
 a,
 a:active,
