@@ -977,8 +977,8 @@ ready(function() {
       context.lineTo(x + 20, y + 24);
       context.lineTo(x + 17, y + 21);
       context.arc(x + 14, y + 18, 3, PI * 0.25, PI * 0.75);
-      context.lineTo(x + 6, y + 15);
       context.arc(x + 9, y + 15, 3, PI * 0.75, PI * 1.375);
+      context.lineTo(x + 12, y + 16);
       context.closePath();
       context.fill();
       context.stroke();
