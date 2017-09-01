@@ -49,7 +49,7 @@ ready(function() {
 
   var socket = io();
 
-  var isGameInProgress = false;
+  var isGameInProgress;
 
   var gameData = window.localStorage.getItem('gameData');
   if (gameData) {
@@ -119,8 +119,10 @@ ready(function() {
 
   function handleSignoutClick(event) {
     event.preventDefault();
+
     socket.emit('signout', gameData.username);
     window.localStorage.removeItem('gameData');
+    setupGame();
 
     var spinner = document.getElementById('spinner');
     var formTable = document.getElementById('form-table');
@@ -136,22 +138,10 @@ ready(function() {
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
-  var trayWidth = 500;
+  var trayWidth;
 
-  var fleetBoard = [
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0
-  ];
+  var fleetBoard = [];
+
   function clearTiles(board, ship) {
     var bounds = ship.getBounds();
     var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
@@ -188,20 +178,7 @@ ready(function() {
   }
 
   // 0: no action, 1: targetted, 2: miss, 3: hit
-  var targetBoard = [
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0
-  ];
+  var targetBoard = [];
   var targetIndex;
   function isOverTargetBoard(x, y) {
     return x >= 680 && x <= 1160 && y >= 80 && y <= 560;
@@ -407,15 +384,7 @@ ready(function() {
 
   var heldShip;
 
-  var ships = [
-    new Ship(740, 450, 6),
-    new Ship(780, 430, 5),
-    new Ship(820, 410, 4),
-    new Ship(860, 390, 3),
-    new Ship(900, 390, 3),
-    new Ship(940, 370, 2),
-    new Ship(980, 370, 2)
-  ];
+  var ships = [];
 
   function isShipOnBoard(ship) {
     return ship.onBoard;
@@ -429,7 +398,7 @@ ready(function() {
   };
 
   var searchingForGame = false;
-  var opponentName = 'Opponent';
+  var opponentName;
 
   var message = {
     content: '',
@@ -474,6 +443,53 @@ ready(function() {
     rad: 0,
     life: 0
   };
+
+  function setupGame() {
+    trayWidth = 500;
+    searchingForGame = false;
+    isGameInProgress = false;
+    opponentName = 'Opponent';
+
+    ships = [
+      new Ship(740, 450, 6),
+      new Ship(780, 430, 5),
+      new Ship(820, 410, 4),
+      new Ship(860, 390, 3),
+      new Ship(900, 390, 3),
+      new Ship(940, 370, 2),
+      new Ship(980, 370, 2)
+    ];
+
+    fleetBoard = [
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0
+    ];
+    targetBoard = [
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,0,0,0,0
+    ];
+  }
+  setupGame();
 
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
@@ -632,6 +648,10 @@ ready(function() {
     }
   });
 
+  socket.on('opponent signout', function() {
+    setMessage(message, opponentName + ' has quit!', true);
+    setupGame();
+  });
   socket.on('not your turn', function() {
     setMessage(message, "It's not your turn yet!", true);
   });
