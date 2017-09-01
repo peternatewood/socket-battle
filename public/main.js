@@ -587,7 +587,6 @@ ready(function() {
   });
 
   socket.on('game rejoined', function(response) {
-    console.log('Game rejoined', response);
     showGameboard();
     gameData = response.gameData;
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
@@ -618,8 +617,14 @@ ready(function() {
   });
 
   socket.on('not your turn', function() {
-    // TODO Render message, maybe animation
-    console.log('Not your turn');
+    var text = "It's not your turn yet!"
+    var length = text.length;
+
+    message.flash = true;
+    message.content = text;
+    message.length = length;
+    message.delay = 90;
+    message.cursor = length;
   });
   socket.on('tile already hit', function() {
     // TODO Render message, maybe animation
@@ -869,6 +874,9 @@ ready(function() {
         message.text = message.content;
       }
       message.delay--;
+      if (message.delay == 0) {
+        message.flash == false;
+      }
     }
     else if (message.cursor < message.length) {
       message.cursor += 0.5;
@@ -908,7 +916,7 @@ ready(function() {
     context.textAlign = 'left';
     context.fillText(message.text, 700, 649);
     if (message.cursorDelay > 48) {
-      context.fillText('_', 700 + 13 * (message.length > 0 + message.cursor), 649);
+      context.fillText('_', 700 + 14 * (message.cursor + 1), 649);
     }
 
     // Radar toy
