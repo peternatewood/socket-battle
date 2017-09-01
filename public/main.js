@@ -72,6 +72,17 @@ ready(function() {
   });
 
   // Signup/login form
+  function handleSignupClick(event) {
+    event.preventDefault();
+    var username = document.getElementById('username');
+    var password = document.getElementById('password');
+    var signupData = {
+      username: username.value,
+      password: password.value
+    };
+
+    socket.emit('signup', signupData);
+  }
   function handleFormSubmit(event) {
     event.preventDefault();
     var username = document.getElementById('username');
@@ -81,17 +92,10 @@ ready(function() {
       password: password.value
     };
 
-    var loginOrSignup = event.target.dataset.loginOrSignup;
-    if (loginOrSignup) {
-      socket.emit(loginOrSignup, signupData);
-    }
-    else {
-      socket.emit('login', signupData);
-    }
+    socket.emit('login', signupData);
   }
 
-  document.getElementById('signup').addEventListener('click', handleFormSubmit);
-  document.getElementById('login').addEventListener('click', handleFormSubmit);
+  document.getElementById('signup').addEventListener('click', handleSignupClick);
   document.getElementById('form').addEventListener('submit', handleFormSubmit);
 
   function handleFormSuccess(response) {

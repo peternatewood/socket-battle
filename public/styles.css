@@ -106,11 +106,16 @@ input[type="password"]:focus {
   color: #678;
   opacity: 0.8;
 }
+input[type="submit"] {
+  border: none;
+  cursor: pointer;
+}
 
 a,
 a:active,
 a:focus,
-a:visited {
+a:visited,
+input[type="submit"] {
   background: #06A;
   color: #FFF;
   font: bold 32px Arial, sans-serif;
@@ -119,7 +124,8 @@ a:visited {
   border-radius: 8px;
   padding: 8px 12px;
 }
-a:hover {
+a:hover,
+input[type="submit"]:hover {
   background: #027;
 }
 
