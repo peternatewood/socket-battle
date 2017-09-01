@@ -361,9 +361,10 @@ ready(function() {
     // Otherwise put back where it was
     this.x = this.oldX;
     this.y = this.oldY;
-    updateBoard(fleetBoard, this);
+    if (this.onBoard) {
+      updateBoard(fleetBoard, this);
+    }
     this.setRenderPoints();
-    this.onBoard = false;
   };
   Ship.prototype.isMouseOver = function(x, y) {
     var bounds = this.getBounds();
