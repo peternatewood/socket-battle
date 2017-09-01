@@ -555,6 +555,7 @@ ready(function() {
       radar.y = y;
       radar.life = 60;
       socket.emit('ping radar', { x: x, y: y });
+      playRadarPing();
     }
   });
   canvas.addEventListener('mouseup', function(event) {
@@ -629,6 +630,7 @@ ready(function() {
     radar.x = coords.x;
     radar.y = coords.y;
     radar.life = 60;
+    playRadarPing();
   });
 
   socket.on('joined game', function(response) {
@@ -1018,7 +1020,7 @@ ready(function() {
     context.lineTo(40 + 30 * Math.cos(radar.rad), 640 + 30 * Math.sin(radar.rad));
     context.closePath();
     context.stroke();
-
+    // Radar blip
     if (radar.life > 0) {
       context.fillStyle = '#4F4';
       context.beginPath();
