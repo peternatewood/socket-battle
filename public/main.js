@@ -904,8 +904,9 @@ ready(function() {
     context.font = '32px Arial';
     context.textAlign = 'right';
     context.fillStyle = '#FFF';
-    context.shadowBlur = 10;
+    context.shadowBlur = 8;
     context.shadowColor = '#000';
+    context.fillText('FIRE!', 670, 649);
     context.fillText('FIRE!', 670, 649);
     context.shadowBlur = 0;
     // Red button
