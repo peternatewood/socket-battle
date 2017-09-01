@@ -201,6 +201,11 @@ io.on('connection', function(socket) {
       isValidUser = false;
     }
 
+    if (data.username.length > 12) {
+      socket.emit('signup error', 'A username must be 12 characters or shorter');
+      isValidUser = false;
+    }
+
     if (isValidUser) {
       var token = generateToken();
       var password = passwordHash.generate(data.password);

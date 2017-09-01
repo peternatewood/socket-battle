@@ -421,7 +421,7 @@ ready(function() {
 
     if (flash) {
       message.delay = 90;
-      message.cursor = content.length;
+      message.cursor = Math.min(33, content.length);
     }
     else {
       message.delay = 0;
@@ -917,6 +917,9 @@ ready(function() {
     else if (message.cursor < message.length) {
       message.cursor += 0.5;
       message.text = message.content.slice(0, message.cursor >> 0);
+      if (message.cursor >= 34) {
+        message.cursor = 33;
+      }
     }
     else {
       if (message.cursorDelay == 0) {
