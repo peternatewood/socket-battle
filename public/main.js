@@ -233,7 +233,7 @@ ready(function() {
         this.verticalName = 'BATTLE';
         break;
       case 6:
-        this.name = 'Aircraft Carrier';
+        this.name = 'Carrier';
         this.horizontalName = 'AIRCRAFT CARRIER';
         this.verticalName = 'CARRIER';
         break;
@@ -950,9 +950,9 @@ ready(function() {
     context.fillStyle = '#4F4';
     context.font = '24px Courier';
     context.textAlign = 'left';
-    context.fillText(message.text, 700, 649);
+    context.fillText(message.text, 694, 649);
     if (message.cursorDelay > 48) {
-      context.fillText('_', 700 + 14 * (message.cursor + 1), 649);
+      context.fillText('_', 694 + 14 * (message.cursor + 1), 649);
     }
 
     // Radar toy
