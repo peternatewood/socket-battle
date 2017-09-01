@@ -340,8 +340,8 @@ ready(function() {
 
     return x >= bounds.l && x <= bounds.r && y >= bounds.t && y <= bounds.b;
   };
-  Ship.prototype.render = function(context) {
-    context.fillStyle = '#888';
+  Ship.prototype.render = function(context, mouseOver) {
+    context.fillStyle = mouseOver ? '#68A' : '#888';
     context.strokeStyle = '#CCC';
     context.lineWidth = 4;
 
@@ -383,6 +383,7 @@ ready(function() {
   }
 
   var mouse = {
+    shipIndex: -1,
     over: false,
     fire: false,
     x: -1,
@@ -521,6 +522,8 @@ ready(function() {
         if (! searchingForGame) {
           if (ships.every(isShipOnBoard)) {
             socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
+            mouse.shipIndex = -1;
+            mouse.fire = false;
             searchingForGame = true;
           }
           else {
@@ -589,6 +592,19 @@ ready(function() {
         }
         else if (mouse.over) {
           mouse.over = false;
+        }
+      }
+      else {
+        for (var i = 0; i < ships.length; i++) {
+          if (ships[i].isMouseOver(x, y)) {
+            if (mouse.shipIndex != i) {
+              mouse.shipIndex = i;
+            }
+            return;
+          }
+        }
+        if (mouse.shipIndex >= 0) {
+          mouse.shipIndex = -1;
         }
       }
 
@@ -771,7 +787,7 @@ ready(function() {
 
     // Ships
     for (var i = 0; i < ships.length; i++) {
-      ships[i].render(context);
+      ships[i].render(context, mouse.shipIndex == i);
     }
 
     if (isGameInProgress) {
@@ -1078,7 +1094,20 @@ ready(function() {
     if (mouse.x >= 0 && mouse.y >= 0) {
       var x = mouse.x;
       var y = mouse.y;
-      context.fillStyle = '#FFF';
+
+      if (mouse.shipIndex >= 0) {
+        context.fillStyle = '#ADF';
+      }
+      else if (mouse.over) {
+        context.fillStyle = '#AFA';
+      }
+      else if (mouse.fire) {
+        context.fillStyle = '#FDA';
+      }
+      else {
+        context.fillStyle = '#FFF';
+      }
+
       context.strokeStyle = '#000';
       context.lineWidth = 1;
       context.beginPath();
