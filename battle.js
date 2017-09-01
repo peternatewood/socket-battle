@@ -152,23 +152,25 @@ io.on('connection', function(socket) {
           };
           // Player is rejoining game
           var room = activeGames[data.room];
-          var index = data.playerNum - 1;
 
-          if (data.playerNum && data.room && room && room.players[index] == username) {
+          if (typeof data.playerNum == 'number' && data.room && room && room.players[data.playerNum] == username) {
+            playerNum = data.playerNum;
             gameRoom = data.room;
+
             gameData.playerNum = data.playerNum;
             gameData.room = data.room;
+
             var opponent = '';
             if (room.players.length == 2) {
-              opponent = room.players[data.playerNum == 1 ? 1 : 0];
+              opponent = room.players[(data.playerNum + 1) % 2];
             }
 
             var response = {
               inProgress: !room.isEmpty(),
               gameData: gameData,
-              ships: room.ships[index],
-              fleetBoard: room.fleetBoards[index],
-              targetBoard: room.targetBoards[index],
+              ships: room.ships[data.playerNum],
+              fleetBoard: room.fleetBoards[data.playerNum],
+              targetBoard: room.targetBoards[data.playerNum],
               opponent: opponent
             };
 
@@ -309,13 +311,13 @@ io.on('connection', function(socket) {
     if (typeof room == 'number') {
       room = 'game ' + room;
       activeGames[room] = new Game(username, data.fleetBoard, data.ships);
-      playerNum = 1;
+      playerNum = 0;
     }
     else {
       activeGames[room].players.push(username);
       activeGames[room].fleetBoards.push(data.fleetBoard);
       activeGames[room].ships.push(data.ships);
-      playerNum = 2;
+      playerNum = 1;
     }
 
     gameRoom = room;
@@ -323,8 +325,7 @@ io.on('connection', function(socket) {
     socket.emit('joined game', { room: room, playerNum: playerNum });
 
     if (!activeGames[room].isEmpty()) {
-      activeGames[room].turn = 1;
-      socket.emit('game ready', activeGames[room].players[playerNum == 1 ? 1 : 0]);
+      socket.emit('game ready', activeGames[room].players[(playerNum + 1) % 2]);
       socket.broadcast.to(room).emit('game ready', username);
       console.log('game ready', room, activeGames[room].players.join(' vs '));
     }
@@ -337,16 +338,18 @@ io.on('connection', function(socket) {
   socket.on('fire salvo', function(targetIndex) {
     var game = activeGames[gameRoom];
     if (game.turn == playerNum) {
-      var opponent = playerNum == 1 ? 1 : 0;
+      var opponent = (playerNum + 1) % 2;
       var tile = game.fleetBoards[opponent][targetIndex];
       switch (tile) {
         case 0:
-          tile = 2;
+          game.fleetBoards[opponent][targetIndex] = 2;
+          game.targetBoards[playerNum][targetIndex] = 2;
           socket.emit('salvo missed', targetIndex);
           socket.broadcast.to(gameRoom).emit('ships missed', targetIndex);
           break;
         case 1:
-          tile = 3;
+          game.fleetBoards[opponent][targetIndex] = 3;
+          game.targetBoards[playerNum][targetIndex] = 3;
           // Find hit ship and decrement life
           var ships = game.ships[opponent];
           var index = ships.findIndex(function(s) { return s.tiles.includes(targetIndex); });
@@ -374,7 +377,7 @@ io.on('connection', function(socket) {
           socket.emit('tile already hit');
           return; // So that we don't jump to the next turn
       }
-      game.turn = opponent + 1;
+      game.turn = (game.turn + 1) % 2;
     }
     else {
       socket.emit('not your turn');
