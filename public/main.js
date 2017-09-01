@@ -514,7 +514,12 @@ ready(function() {
         targetIndex = setTargetBoardTile(targetBoard, x, y);
       }
       else if (mouse.fire) {
-        socket.emit('fire salvo', targetIndex);
+        if (typeof targetIndex == 'number') {
+          socket.emit('fire salvo', targetIndex);
+        }
+        else {
+          setMessage(message, 'Please target a tile');
+        }
       }
     }
     else {
