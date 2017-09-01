@@ -432,6 +432,16 @@ ready(function() {
 
   var searchingForGame = false;
 
+  var message = {
+    content: '',
+    text: '',
+    length: 0,
+    cursor: 0,
+    cursorDelay: 0,
+    delay: 0,
+    flash: false
+  };
+
   var loader = {
     rad: 0,
     spin: Math.PI,
@@ -847,6 +857,59 @@ ready(function() {
     context.arc(550, 649, 16, 0, TAU);
     context.closePath();
     context.stroke();
+
+    // Message display
+    if (message.flash && message.delay > 0) {
+      if ((message.delay / 10 >> 0) % 2) {
+        if (message.text) {
+          message.text = '';
+        }
+      }
+      else if (message.text == '') {
+        message.text = message.content;
+      }
+      message.delay--;
+    }
+    else if (message.cursor < message.length) {
+      message.cursor += 0.5;
+      message.text = message.content.slice(0, message.cursor >> 0);
+    }
+    else {
+      if (message.cursorDelay == 0) {
+        message.cursorDelay = 96;
+      }
+      else {
+        message.cursorDelay--;
+      }
+    }
+
+    context.fillStyle = '#888';
+    context.beginPath();
+    context.moveTo(684, 622);
+    context.lineTo(680, 618);
+    context.lineTo(1200, 618);
+    context.lineTo(1200, 680);
+    context.lineTo(1196, 676);
+    context.closePath();
+    context.fill();
+    context.fillStyle = '#CCC';
+    context.beginPath();
+    context.moveTo(684, 622);
+    context.lineTo(680, 618);
+    context.lineTo(680, 680);
+    context.lineTo(1200, 680);
+    context.lineTo(1196, 676);
+    context.closePath();
+    context.fill();
+    context.fillStyle = '#030';
+    context.fillRect(684, 622, 512, 54);
+    context.fillStyle = '#4F4';
+    context.font = '24px Courier';
+    context.textAlign = 'left';
+    context.fillText(message.text, 700, 649);
+    if (message.cursorDelay > 48) {
+      context.fillText('_', 700 + 13 * (message.length > 0 + message.cursor), 649);
+    }
 
     // Radar toy
     var rad = radar.rad + PI / 72;
