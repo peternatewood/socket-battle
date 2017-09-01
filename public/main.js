@@ -439,6 +439,21 @@ ready(function() {
     delay: 0,
     flash: false
   };
+  function setMessage(message, content, flash) {
+    message.content = content;
+    message.length = content.length;
+    message.cursorDelay = 0;
+    message.flash = flash;
+
+    if (flash) {
+      message.delay = 90;
+      message.cursor = content.length;
+    }
+    else {
+      message.delay = 0;
+      message.cursor = 0;
+    }
+  }
 
   var loader = {
     rad: 0,
@@ -617,18 +632,10 @@ ready(function() {
   });
 
   socket.on('not your turn', function() {
-    var text = "It's not your turn yet!"
-    var length = text.length;
-
-    message.flash = true;
-    message.content = text;
-    message.length = length;
-    message.delay = 90;
-    message.cursor = length;
+    setMessage(message, "It's not your turn yet!", true);
   });
   socket.on('tile already hit', function() {
-    // TODO Render message, maybe animation
-    console.log('Tile already hit');
+    var text = "You've already hit this tile";
   });
 
   socket.on('salvo missed', function(index) {
@@ -875,7 +882,7 @@ ready(function() {
       }
       message.delay--;
       if (message.delay == 0) {
-        message.flash == false;
+        message.flash = false;
       }
     }
     else if (message.cursor < message.length) {
