@@ -214,9 +214,6 @@ ready(function() {
         return index;
       }
     }
-    else {
-      console.log('No such index', index, 'in target board');
-    }
   }
 
   // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
@@ -431,6 +428,7 @@ ready(function() {
   };
 
   var searchingForGame = false;
+  var opponentName = 'Opponent';
 
   var message = {
     content: '',
@@ -576,14 +574,13 @@ ready(function() {
   });
 
   socket.on('joined game', function(response) {
-    console.log('Welcome to', response.room, 'Player', response.playerNum);
     gameData.room = response.room;
     gameData.playerNum = response.playerNum;
     window.localStorage.setItem('gameData', JSON.stringify(gameData));
   });
 
-  socket.on('game ready', function() {
-    console.log('Game ready');
+  socket.on('game ready', function(opponent) {
+    opponentName = opponent;
     searchingForGame = false;
     isGameInProgress = true;
     trayWidth--;
@@ -594,6 +591,9 @@ ready(function() {
     showGameboard();
     gameData = response.gameData;
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
+    if (response.opponent) {
+      opponentName = response.opponent;
+    }
 
     // Update ships, fleet board, target board
     for (var i = 0; i < response.ships.length; i++) {
@@ -699,8 +699,8 @@ ready(function() {
     context.lineWidth = 1;
     context.strokeText('Your Fleet', 280, 20);
     context.fillText('Your Fleet', 280, 20);
-    context.strokeText("The Opponent's Fleet", 920, 20);
-    context.fillText("The Opponent's Fleet", 920, 20);
+    context.strokeText(opponentName, 920, 20);
+    context.fillText(opponentName, 920, 20);
 
     // Tray of ship pieces
     if (trayWidth > 0) {
