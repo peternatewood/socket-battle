@@ -96,6 +96,7 @@ ready(function() {
       token: response.token
     };
     window.localStorage.setItem('gameData', JSON.stringify(gameData));
+    setupGame();
 
     setTimeout(showGameboard, 400);
   }
