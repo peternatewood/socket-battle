@@ -679,19 +679,24 @@ ready(function() {
   });
 
   socket.on('salvo hit', function(response) {
-    // TODO Render message and animation
-    console.log('salvo hit', response.name);
     if (response.sunk) {
-      console.log('You sunk', response.name);
+      setMessage(message, opponentName + "'s " + response.name + ' sunk!', true);
     }
+    else {
+      setMessage(message, 'You hit a ' + response.name);
+    }
+
     targetIndex = null;
     targetBoard[response.index] = 3;
   });
   socket.on('ship hit', function(response) {
-    console.log('ships hit', response.name);
     if (response.sunk) {
-      console.log('Your', response.name, 'was sunk');
+      setMessage(message, opponentName + ' sunk your ' + response.name + '!', true);
     }
+    else {
+      setMessage(message, opponentName + ' hit your ' + response.name);
+    }
+
     fleetBoard[response.index] = 3;
   });
 
