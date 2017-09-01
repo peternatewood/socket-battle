@@ -518,9 +518,14 @@ ready(function() {
     }
     else {
       if (mouse.fire) {
-        if (! searchingForGame && ships.every(isShipOnBoard)) {
-          socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
-          searchingForGame = true;
+        if (! searchingForGame) {
+          if (ships.every(isShipOnBoard)) {
+            socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
+            searchingForGame = true;
+          }
+          else {
+            setMessage(message, 'Please place all your ships');
+          }
         }
       }
       else {
