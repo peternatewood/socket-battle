@@ -279,13 +279,16 @@ io.on('connection', function(socket) {
         throw err;
       }
       else {
-        if (activeGames[gameRoom].quit) {
-          delete activeGames[gameRoom];
+        if (activeGames[gameRoom]) {
+          if (activeGames[gameRoom].quit) {
+            delete activeGames[gameRoom];
+          }
+          else {
+            activeGames[gameRoom].quit = true;
+            socket.broadcast.to(gameRoom).emit('opponent signout');
+          }
         }
-        else {
-          activeGames[gameRoom].quit = true;
-          socket.broadcast.to(gameRoom).emit('opponent signout');
-        }
+
         socket.leave(gameRoom);
         loggedIn = false;
         username = null;
