@@ -1037,7 +1037,7 @@ ready(function() {
       context.textAlign = 'center';
       context.font = '32px Courier';
 
-      context.fillText('Searching for Partner...', 600, 60);
+      context.fillText('Searching for Opponent...', 600, 60);
 
       context.beginPath();
       context.moveTo(600, 300);
