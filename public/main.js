@@ -635,17 +635,16 @@ ready(function() {
     setMessage(message, "It's not your turn yet!", true);
   });
   socket.on('tile already hit', function() {
-    var text = "You've already hit this tile";
+    setMessage(message, "You've already hit this tile", true);
   });
 
   socket.on('salvo missed', function(index) {
-    // TODO Render message and animation
-    console.log('salvo missed', index);
+    setMessage(message, 'Your salvo missed');
     targetIndex = null;
     targetBoard[index] = 2;
   });
   socket.on('ships missed', function(index) {
-    console.log('ships missed', index);
+    setMessage(message, opponentName + "'s salvo missed");
     fleetBoard[index] = 2;
   });
 
