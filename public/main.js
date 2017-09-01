@@ -59,18 +59,6 @@ ready(function() {
     showForm();
   }
 
-  socket.on('token valid', function(response) {
-    if (response.success) {
-      showGameboard();
-      gameData = response.gameData;
-      window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
-    }
-    else {
-      showForm();
-      window.localStorage.removeItem('gameData');
-    }
-  });
-
   // Signup/login form
   function handleSignupClick(event) {
     event.preventDefault();
@@ -402,7 +390,7 @@ ready(function() {
   };
 
   var searchingForGame = false;
-  var opponentName;
+  var opponentName = 'Opponent';
 
   var message = {
     content: '',
@@ -452,7 +440,6 @@ ready(function() {
     trayWidth = 500;
     searchingForGame = false;
     isGameInProgress = false;
-    opponentName = 'Opponent';
 
     ships = [
       new Ship(740, 450, 6),
@@ -493,7 +480,20 @@ ready(function() {
       0,0,0,0,0,0,0,0,0,0,0,0
     ];
   }
-  setupGame();
+
+  socket.on('token valid', function(response) {
+    if (response.success) {
+      showGameboard();
+      gameData = response.gameData;
+      window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
+    }
+    else {
+      showForm();
+      window.localStorage.removeItem('gameData');
+    }
+
+    setupGame();
+  });
 
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
@@ -637,15 +637,15 @@ ready(function() {
 
     // Update ships, fleet board, target board
     for (var i = 0; i < response.ships.length; i++) {
-      ships[i].x = response.ships[i].x;
-      ships[i].y = response.ships[i].y;
-      ships[i].direction = response.ships[i].direction;
-      ships[i].onBoard = true;
-      ships[i].setRenderPoints();
+      var rShip = response.ships[i];
+      var ship = new Ship(rShip.x, rShip.y, rShip.size, rShip.direction);
+      ship.onBoard = true;
+      ship.setRenderPoints();
+      ships.push(ship);
     }
     for (var i = 0; i < 144; i++) {
-      fleetBoard[i] = response.fleetBoard[i];
-      targetBoard[i] = response.targetBoard[i];
+      fleetBoard.push(response.fleetBoard[i]);
+      targetBoard.push(response.targetBoard[i]);
     }
 
     if (response.inProgress) {
