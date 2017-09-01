@@ -158,13 +158,18 @@ io.on('connection', function(socket) {
             gameRoom = data.room;
             gameData.playerNum = data.playerNum;
             gameData.room = data.room;
+            var opponent = '';
+            if (room.players.length == 2) {
+              opponent = room.players[data.playerNum == 1 ? 1 : 0];
+            }
 
             var response = {
-              inProgress: !activeGames[data.room].isEmpty(),
+              inProgress: !room.isEmpty(),
               gameData: gameData,
               ships: room.ships[index],
               fleetBoard: room.fleetBoards[index],
-              targetBoard: room.targetBoards[index]
+              targetBoard: room.targetBoards[index],
+              opponent: opponent
             };
 
             socket.join(data.room);
@@ -304,7 +309,8 @@ io.on('connection', function(socket) {
 
     if (!activeGames[room].isEmpty()) {
       activeGames[room].turn = 1;
-      io.to(room).emit('game ready');
+      socket.emit('game ready', activeGames[room].players[playerNum == 1 ? 1 : 0]);
+      socket.broadcast.to(room).emit('game ready', username);
       console.log('game ready', room, activeGames[room].players.join(' vs '));
     }
   });
