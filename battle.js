@@ -222,7 +222,7 @@ io.on('connection', function(socket) {
 
       connection.query('INSERT INTO users SET ?', fields, function(err, results, fields) {
         if (err) {
-          throw err;
+          socket.emit('signup error', 'Signup error, please contact your administrator');
         }
         else {
           users[data.username] = {
@@ -263,7 +263,7 @@ io.on('connection', function(socket) {
 
         connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
           if (err) {
-            throw err;
+            socket.emit('login error', 'Login error, please contact your administrator');
           }
           else {
             user.token = token;
