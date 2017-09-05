@@ -183,6 +183,10 @@ ready(function() {
         board[index] = 1;
         return index;
       }
+      else if (board[index] == 1) {
+        board[index] = 0;
+        return null;
+      }
     }
   }
 
@@ -509,10 +513,11 @@ ready(function() {
 
     if (isGameInProgress) {
       if (isOverTargetBoard(x, y)) {
+        var newIndex = setTargetBoardTile(targetBoard, x, y);
         if (typeof targetIndex == 'number') {
           targetBoard[targetIndex] = 0;
         }
-        targetIndex = setTargetBoardTile(targetBoard, x, y);
+        targetIndex = newIndex;
       }
       else if (mouse.fire) {
         if (typeof targetIndex == 'number') {
