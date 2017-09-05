@@ -96,6 +96,7 @@ ready(function() {
       token: response.token
     };
     window.localStorage.setItem('gameData', JSON.stringify(gameData));
+    setupGame();
 
     setTimeout(showGameboard, 400);
   }
@@ -559,6 +560,7 @@ ready(function() {
       radar.y = y;
       radar.life = 60;
       socket.emit('ping radar', { x: x, y: y });
+      playRadarPing();
     }
   });
   canvas.addEventListener('mouseup', function(event) {
@@ -633,6 +635,7 @@ ready(function() {
     radar.x = coords.x;
     radar.y = coords.y;
     radar.life = 60;
+    playRadarPing();
   });
 
   socket.on('joined game', function(response) {
@@ -908,8 +911,9 @@ ready(function() {
     context.font = '32px Arial';
     context.textAlign = 'right';
     context.fillStyle = '#FFF';
-    context.shadowBlur = 10;
+    context.shadowBlur = 8;
     context.shadowColor = '#000';
+    context.fillText('FIRE!', 670, 649);
     context.fillText('FIRE!', 670, 649);
     context.shadowBlur = 0;
     // Red button
@@ -1021,7 +1025,7 @@ ready(function() {
     context.lineTo(40 + 30 * Math.cos(radar.rad), 640 + 30 * Math.sin(radar.rad));
     context.closePath();
     context.stroke();
-
+    // Radar blip
     if (radar.life > 0) {
       context.fillStyle = '#4F4';
       context.beginPath();
