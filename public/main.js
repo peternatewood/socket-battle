@@ -120,6 +120,7 @@ ready(function() {
     event.preventDefault();
 
     socket.emit('signout', gameData.username);
+    scene = 'menu';
     window.localStorage.removeItem('gameData');
     setupGame();
 
@@ -221,61 +222,70 @@ ready(function() {
     var x = event.layerX;
     var y = event.layerY;
 
-    if (isGameInProgress) {
-      if (isOverTargetBoard(x, y)) {
-        var newIndex = setTargetBoardTile(targetBoard, x, y);
-        if (typeof targetIndex == 'number') {
-          targetBoard[targetIndex] = 0;
+    switch (scene) {
+      case 'menu':
+        switch (mouse.overOption) {
+          case 0: scene = 'game'; break;
         }
-        targetIndex = newIndex;
-      }
-      else if (mouse.fire) {
-        if (typeof targetIndex == 'number') {
-          socket.emit('fire salvo', targetIndex);
+        break;
+      case 'game':
+        if (isGameInProgress) {
+          if (isOverTargetBoard(x, y)) {
+            var newIndex = setTargetBoardTile(targetBoard, x, y);
+            if (typeof targetIndex == 'number') {
+              targetBoard[targetIndex] = 0;
+            }
+            targetIndex = newIndex;
+          }
+          else if (mouse.fire) {
+            if (typeof targetIndex == 'number') {
+              socket.emit('fire salvo', targetIndex);
+            }
+            else {
+              setMessage(message, 'Please target a tile');
+            }
+          }
         }
         else {
-          setMessage(message, 'Please target a tile');
-        }
-      }
-    }
-    else {
-      if (mouse.fire) {
-        if (! searchingForGame) {
-          if (ships.every(isShipOnBoard)) {
-            socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
-            mouse.shipIndex = -1;
-            mouse.fire = false;
-            searchingForGame = true;
-          }
-          else {
-            setMessage(message, 'Please place all your ships');
-          }
-        }
-      }
-      else {
-        for (var i = 0; i < ships.length; i++) {
-          if (ships[i].isMouseOver(x, y)) {
-            if (event.button == 0) {
-              heldShip = i;
-              if (ships[i].onBoard) {
-                clearTiles(fleetBoard, ships[i]);
+          if (mouse.fire) {
+            if (! searchingForGame) {
+              if (ships.every(isShipOnBoard)) {
+                socket.emit('start game', { fleetBoard: fleetBoard, ships: ships });
+                mouse.shipIndex = -1;
+                mouse.fire = false;
+                searchingForGame = true;
+              }
+              else {
+                setMessage(message, 'Please place all your ships');
               }
             }
-            if (typeof heldShip === 'number' && event.button == 2) {
-              ships[heldShip].rotate();
+          }
+          else {
+            for (var i = 0; i < ships.length; i++) {
+              if (ships[i].isMouseOver(x, y)) {
+                if (event.button == 0) {
+                  heldShip = i;
+                  if (ships[i].onBoard) {
+                    clearTiles(fleetBoard, ships[i]);
+                  }
+                }
+                if (typeof heldShip === 'number' && event.button == 2) {
+                  ships[heldShip].rotate();
+                }
+                break;
+              }
             }
-            break;
           }
         }
-      }
-    }
 
-    if (!searchingForGame && x >= 6 && x <= 72 && y >= 606 && y <= 672) {
-      radar.x = x;
-      radar.y = y;
-      radar.life = 60;
-      socket.emit('ping radar', { x: x, y: y });
-      playRadarPing();
+        if (!searchingForGame && x >= 6 && x <= 72 && y >= 606 && y <= 672) {
+          radar.x = x;
+          radar.y = y;
+          radar.life = 60;
+          socket.emit('ping radar', { x: x, y: y });
+          playRadarPing();
+        }
+        break;
     }
   }
   function handleMouseUp(event) {
@@ -408,6 +418,7 @@ ready(function() {
   });
 
   socket.on('game rejoined', function(response) {
+    scene = 'game';
     showGameboard();
     gameData = response.gameData;
     window.localStorage.setItem('gameData', JSON.stringify(response.gameData));
