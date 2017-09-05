@@ -1,39 +1,52 @@
-function ready(fun) {
-  if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
-    fun();
-  }
-  else {
-    document.addEventListener('DOMContentLoaded', fun);
-  }
-}
-
-function showForm() {
-  var spinner = document.getElementById('spinner');
-  var form = document.getElementById('form');
-
-  spinner.style.display = 'none';
-  form.style.display = 'block';
-}
-
-function showGameboard() {
-  var form = document.getElementById('form-table');
-  var errors = document.getElementById('errors');
-  var game = document.getElementById('gameboard');
-  var signout = document.getElementById('signout-wrapper');
-  var username = document.getElementById('username');
-  var password = document.getElementById('password');
-
-  username.value = '';
-  password.value = '';
-  form.style.display = 'none';
-  errors.innerHTML = '';
-  game.style.display = 'table';
-  signout.style.display = 'block';
-}
-
 ready(function() {
+  var socket = io();
+
+  var trayWidth; // Unsigned integer 0..500
+  var heldShip, isGameInProgress, searchingForGame; // Booleans
+
   var debug = 0;
-  function handleKeyDown(e) {
+  var opponentName = 'Opponent';
+  var fleetBoard = [];
+  var ships = [];
+
+  var mouse = {
+    shipIndex: -1,
+    over: false,
+    fire: false,
+    x: -1,
+    y: -1
+  };
+
+  var message = {
+    content: '',
+    text: '',
+    length: 0,
+    cursor: 0,
+    cursorDelay: 0,
+    delay: 0,
+    flash: false
+  };
+
+  var loader = {
+    rad: 0,
+    spin: Math.PI,
+    x: 200,
+    y: 200,
+    targetX: 200,
+    targetY: 200,
+    pingX: 0,
+    pingY: 0,
+    pingS: 0
+  };
+
+  var radar = {
+    x: -1,
+    y: -1,
+    rad: 0,
+    life: 0
+  };
+
+  document.addEventListener('keydown', function(e) {
     if(!e.repeat && !e.altKey && !e.ctrlKey && !e.metaKey) {
       if (e.key == '`') {
         e.preventDefault();
@@ -44,12 +57,7 @@ ready(function() {
         ships[heldShip].rotate();
       }
     }
-  }
-  document.addEventListener('keydown', handleKeyDown);
-
-  var socket = io();
-
-  var isGameInProgress;
+  });
 
   var gameData = window.localStorage.getItem('gameData');
   if (gameData) {
@@ -103,10 +111,6 @@ ready(function() {
   socket.on('signup valid', handleFormSuccess);
   socket.on('login valid', handleFormSuccess);
 
-  function handleErrors(message) {
-    var errors = document.getElementById('errors');
-    errors.innerHTML = message;
-  }
   socket.on('login error', handleErrors);
   socket.on('signup error', handleErrors);
 
@@ -129,46 +133,8 @@ ready(function() {
     game.style.display = 'none';
     signout.style.display = 'none';
   }
+
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
-
-  var trayWidth;
-
-  var fleetBoard = [];
-
-  function clearTiles(board, ship) {
-    var bounds = ship.getBounds();
-    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
-    var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
-    var shipTail = shipHead + increment * ship.size;
-
-    for (var i = shipHead; i < shipTail; i += increment) {
-      if (board[i]) {
-        board[i] = 0;
-      }
-    }
-  }
-  // Returns true only if the ship is overlaying all empty tiles
-  function updateBoard(board, ship) {
-    var bounds = ship.getBounds();
-    var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
-    var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
-    var shipTail = shipHead + increment * ship.size;
-
-    var tiles = [];
-    for (var i = shipHead; i < shipTail; i += increment) {
-      // If tile is occupied by a ship
-      if (board[i]) {
-        return false;
-      }
-      tiles.push(i);
-    }
-    ship.tiles = tiles;
-
-    for (var i = 0; i < ship.size; i++) {
-      board[tiles[i]] = 1;
-    }
-    return true;
-  }
 
   // 0: no action, 1: targetted, 2: miss, 3: hit
   var targetBoard = [];
@@ -310,7 +276,7 @@ ready(function() {
       };
     }
   };
-  Ship.prototype.drop = function() {
+  Ship.prototype.drop = function(board) {
     // Slot into gameboard grid if within bounds
     if (this.x >= 40 && this.x <= 520 && this.y >= 80 && this.y <= 560) {
       var halfSize = (40 * this.size) / 2;
@@ -324,7 +290,7 @@ ready(function() {
         this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
       }
 
-      if (updateBoard(fleetBoard, this)) {
+      if (updateBoard(board, this)) {
         this.oldX = this.x;
         this.oldY = this.y;
         this.setRenderPoints();
@@ -336,7 +302,7 @@ ready(function() {
     this.x = this.oldX;
     this.y = this.oldY;
     if (this.onBoard) {
-      updateBoard(fleetBoard, this);
+      updateBoard(board, this);
     }
     this.setRenderPoints();
   };
@@ -379,68 +345,9 @@ ready(function() {
     }
   };
 
-  var heldShip;
-
-  var ships = [];
-
   function isShipOnBoard(ship) {
     return ship.onBoard;
   }
-
-  var mouse = {
-    shipIndex: -1,
-    over: false,
-    fire: false,
-    x: -1,
-    y: -1
-  };
-
-  var searchingForGame = false;
-  var opponentName = 'Opponent';
-
-  var message = {
-    content: '',
-    text: '',
-    length: 0,
-    cursor: 0,
-    cursorDelay: 0,
-    delay: 0,
-    flash: false
-  };
-  function setMessage(message, content, flash) {
-    message.content = content;
-    message.length = content.length;
-    message.cursorDelay = 0;
-    message.flash = flash;
-
-    if (flash) {
-      message.delay = 90;
-      message.cursor = Math.min(33, content.length);
-    }
-    else {
-      message.delay = 0;
-      message.cursor = 0;
-    }
-  }
-
-  var loader = {
-    rad: 0,
-    spin: Math.PI,
-    x: 200,
-    y: 200,
-    targetX: 200,
-    targetY: 200,
-    pingX: 0,
-    pingY: 0,
-    pingS: 0
-  };
-
-  var radar = {
-    x: -1,
-    y: -1,
-    rad: 0,
-    life: 0
-  };
 
   function setupGame() {
     trayWidth = 500;
@@ -501,13 +408,7 @@ ready(function() {
     setupGame();
   });
 
-  var canvas = document.getElementById('canvas');
-  // Intercept and stop right-click menu
-  canvas.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-  });
-  canvas.addEventListener('mousedown', function(event) {
+  function handleMouseDown(event) {
     var x = event.layerX;
     var y = event.layerY;
 
@@ -567,14 +468,14 @@ ready(function() {
       socket.emit('ping radar', { x: x, y: y });
       playRadarPing();
     }
-  });
-  canvas.addEventListener('mouseup', function(event) {
+  }
+  function handleMouseUp(event) {
     if (typeof heldShip === 'number' && event.button == 0) {
-      ships[heldShip].drop();
+      ships[heldShip].drop(fleetBoard);
       heldShip = null;
     }
-  });
-  canvas.addEventListener('mousemove', function(event) {
+  }
+  function handleMouseMove(event) {
     var x = event.layerX;
     var y = event.layerY;
     mouse.x = x;
@@ -629,19 +530,31 @@ ready(function() {
         mouse.fire = false;
       }
     }
-  });
-  canvas.addEventListener('mouseout', function(event) {
+  }
+  function handleMouseOut(event) {
     mouse.over = false;
     mouse.x = -1;
     mouse.y = -1;
-  });
+  }
 
-  socket.on('radar blip', function(coords) {
+  var canvas = document.getElementById('canvas');
+  // Intercept and stop right-click menu
+  canvas.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  canvas.addEventListener('mousedown', handleMouseDown);
+  canvas.addEventListener('mouseup', handleMouseUp);
+  canvas.addEventListener('mousemove', handleMouseMove);
+  canvas.addEventListener('mouseout', handleMouseOut);
+
+  function receiveRadarBlip(coords) {
     radar.x = coords.x;
     radar.y = coords.y;
     radar.life = 60;
     playRadarPing();
-  });
+  }
+  socket.on('radar blip', receiveRadarBlip);
 
   socket.on('joined game', function(response) {
     gameData.room = response.room;
