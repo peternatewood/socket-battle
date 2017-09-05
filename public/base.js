@@ -8,32 +8,21 @@ function ready(fun) {
 }
 
 function showForm() {
-  var spinner = document.getElementById('spinner');
-  var form = document.getElementById('form');
-
-  spinner.style.display = 'none';
-  form.style.display = 'block';
+  document.getElementById('spinner').style.display = 'none';
+  document.getElementById('form').style.display = 'block';
 }
 
 function showGameboard() {
-  var form = document.getElementById('form-table');
-  var errors = document.getElementById('errors');
-  var game = document.getElementById('gameboard');
-  var signout = document.getElementById('signout-wrapper');
-  var username = document.getElementById('username');
-  var password = document.getElementById('password');
-
-  username.value = '';
-  password.value = '';
-  form.style.display = 'none';
-  errors.innerHTML = '';
-  game.style.display = 'table';
-  signout.style.display = 'block';
+  document.getElementById('form-table').style.display = 'none';
+  document.getElementById('errors').innerHTML = '';
+  document.getElementById('gameboard').style.display = 'table';
+  document.getElementById('signout-wrapper').style.display = 'block';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
 }
 
 function handleErrors(message) {
-  var errors = document.getElementById('errors');
-  errors.innerHTML = message;
+  document.getElementById('errors').innerHTML = message;
 }
 
 function clearTiles(board, ship) {
