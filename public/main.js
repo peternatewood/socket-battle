@@ -20,9 +20,11 @@ ready(function() {
   };
 
   var shipToy = {
-    x: 800,
-    y: 200,
-    r: 1.5 * Math.PI
+    x: 960, y: 480,
+    mag: 0,
+    xVel: 0, yVel: 0,
+    r: 4,
+    move: false
   };
 
   var message = {
@@ -233,6 +235,9 @@ ready(function() {
         switch (mouse.overOption) {
           case 0: scene = 'game'; break;
         }
+        if (!shipToy.move) {
+          shipToy.move = true;
+        }
         break;
       case 'game':
         if (isGameInProgress) {
@@ -298,6 +303,10 @@ ready(function() {
     if (typeof heldShip === 'number' && event.button == 0) {
       ships[heldShip].drop(fleetBoard);
       heldShip = null;
+    }
+    if (shipToy.move) {
+      shipToy.move = false;
+      shipToy.mag = 0;
     }
   }
   function handleMouseMove(event) {
@@ -514,6 +523,101 @@ ready(function() {
 
     switch (scene) {
       case 'menu':
+        // Ship toy
+        if (shipToy.move && mouse.x >= 0 && mouse.y >= 0) {
+          var dir;
+          var targetR = (TAU + Math.atan2(mouse.y - shipToy.y, mouse.x - shipToy.x)) % TAU;
+          var diff = targetR - shipToy.r;
+
+          if (Math.abs(diff) > PI) {
+            dir = diff > 0 ? -1 : 1;
+          }
+          else if (Math.abs(diff) > 0.1) {
+            dir = diff > 0 ? 1 : -1;
+          }
+          else {
+            dir = 0;
+          }
+
+          if (shipToy.mag < 1) {
+            shipToy.mag += 0.1;
+          }
+
+          shipToy.r = (TAU + shipToy.r + dir * 0.01) % TAU;
+          shipToy.xVel = shipToy.mag * Math.cos(shipToy.r);
+          shipToy.yVel = shipToy.mag * Math.sin(shipToy.r);
+        }
+
+        if (shipToy.xVel != 0) {
+          var xVel = shipToy.xVel * 0.95;
+          if (xVel < 0.01 && xVel > -0.01) {
+            xVel = 0;
+          }
+          shipToy.xVel = xVel;
+          shipToy.y += shipToy.yVel;
+        }
+
+        if (shipToy.yVel != 0) {
+          var yVel = shipToy.yVel * 0.95;
+          if (yVel < 0.01 && yVel > -0.01) {
+            yVel = 0;
+          }
+          shipToy.yVel = yVel;
+          shipToy.x += shipToy.xVel;
+        }
+
+        context.lineWidth = 4;
+
+        if (shipToy.xVel != 0 || shipToy.yVel != 0) {
+          var mag = 24 * Math.sqrt(Math.pow(shipToy.xVel, 2) + Math.pow(shipToy.yVel, 2));
+          context.strokeStyle = '#FFF';
+
+          context.beginPath();
+          context.moveTo(shipToy.x - 56 * Math.cos(shipToy.r), shipToy.y - 56 * Math.sin(shipToy.r));
+          context.lineTo(shipToy.x - (68 + mag) * Math.cos(shipToy.r), shipToy.y - (68 + mag) * Math.sin(shipToy.r));
+          context.moveTo(shipToy.x - 64 * Math.cos(shipToy.r - 0.2), shipToy.y - 64 * Math.sin(shipToy.r - 0.2));
+          context.lineTo(shipToy.x - (66 + mag) * Math.cos(shipToy.r - 0.2), shipToy.y - (66 + mag) * Math.sin(shipToy.r - 0.2));
+          context.moveTo(shipToy.x - 64 * Math.cos(shipToy.r + 0.2), shipToy.y - 64 * Math.sin(shipToy.r + 0.2));
+          context.lineTo(shipToy.x - (66 + mag) * Math.cos(shipToy.r + 0.2), shipToy.y - (66 + mag) * Math.sin(shipToy.r + 0.2));
+          context.stroke();
+          context.closePath();
+        }
+
+        context.fillStyle = '#888';
+        context.strokeStyle = '#CCC';
+
+        context.beginPath();
+        context.moveTo(shipToy.x + 160 * Math.cos(shipToy.r), shipToy.y + 160 * Math.sin(shipToy.r));
+        context.lineTo(shipToy.x + 144 * Math.cos(shipToy.r + PI / 48), shipToy.y + 144 * Math.sin(shipToy.r + PI / 48));
+        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r + PI / 7), shipToy.y + 40 * Math.sin(shipToy.r + PI / 7));
+        context.lineTo(shipToy.x - 64 * Math.cos(shipToy.r - PI / 16), shipToy.y - 64 * Math.sin(shipToy.r - PI / 16));
+        context.lineTo(shipToy.x - 64 * Math.cos(shipToy.r + PI / 16), shipToy.y - 64 * Math.sin(shipToy.r + PI / 16));
+        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r - PI / 7), shipToy.y + 40 * Math.sin(shipToy.r - PI / 7));
+        context.lineTo(shipToy.x + 144 * Math.cos(shipToy.r - PI / 48), shipToy.y + 144 * Math.sin(shipToy.r - PI / 48));
+        context.closePath();
+
+        context.stroke();
+        context.fill();
+
+        context.beginPath();
+        context.moveTo(shipToy.x + 88 * Math.cos(shipToy.r + PI / 40), shipToy.y + 88 * Math.sin(shipToy.r + PI / 40));
+        context.lineTo(shipToy.x + 72 * Math.cos(shipToy.r + PI / 28), shipToy.y + 72 * Math.sin(shipToy.r + PI / 28));
+        context.lineTo(shipToy.x + 72 * Math.cos(shipToy.r - PI / 28), shipToy.y + 72 * Math.sin(shipToy.r - PI / 28));
+        context.lineTo(shipToy.x + 88 * Math.cos(shipToy.r - PI / 40), shipToy.y + 88 * Math.sin(shipToy.r - PI / 40));
+        context.closePath();
+
+        context.stroke();
+        context.fill();
+
+        context.fillStyle = '#333';
+        context.beginPath();
+        context.arc(shipToy.x + 24 * Math.cos(shipToy.r), shipToy.y + 24 * Math.sin(shipToy.r), 8, 0, TAU);
+        context.moveTo(shipToy.x - 8 * Math.cos(shipToy.r), shipToy.y - 8 * Math.sin(shipToy.r));
+        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 1.5 * PI, 3.5 * PI);
+        context.stroke();
+        context.fill();
+        context.closePath();
+
         // Title
         context.fillStyle = '#331';
         context.font = '120px Black Ops One, Georgia';
@@ -554,43 +658,6 @@ ready(function() {
         }
         context.fillText('Options', 120, 520);
         context.strokeText('Options', 120, 520);
-
-        // Ship toy
-        context.fillStyle = '#888';
-        context.strokeStyle = '#CCC';
-        context.lineWidth = 4;
-
-        context.beginPath();
-        context.moveTo(shipToy.x + 128 * Math.cos(shipToy.r), shipToy.y + 128 * Math.sin(shipToy.r));
-        context.lineTo(shipToy.x + 104 * Math.cos(shipToy.r + PI / 32), shipToy.y + 104 * Math.sin(shipToy.r + PI / 32));
-        context.lineTo(shipToy.x + 16 * Math.cos(shipToy.r + PI / 2), shipToy.y + 16 * Math.sin(shipToy.r + PI / 2));
-        context.lineTo(shipToy.x - 128 * Math.cos(shipToy.r - PI / 32), shipToy.y - 128 * Math.sin(shipToy.r - PI / 32));
-        context.lineTo(shipToy.x - 128 * Math.cos(shipToy.r + PI / 32), shipToy.y - 128 * Math.sin(shipToy.r + PI / 32));
-        context.lineTo(shipToy.x + 16 * Math.cos(shipToy.r - PI / 2), shipToy.y + 16 * Math.sin(shipToy.r - PI / 2));
-        context.lineTo(shipToy.x + 104 * Math.cos(shipToy.r - PI / 32), shipToy.y + 104 * Math.sin(shipToy.r - PI / 32));
-        context.closePath();
-
-        context.stroke();
-        context.fill();
-
-        context.beginPath();
-        context.moveTo(shipToy.x + 40 * Math.cos(shipToy.r + PI / 20), shipToy.y + 40 * Math.sin(shipToy.r + PI / 20));
-        context.lineTo(shipToy.x + 24 * Math.cos(shipToy.r + PI / 10), shipToy.y + 24 * Math.sin(shipToy.r + PI / 10));
-        context.lineTo(shipToy.x + 24 * Math.cos(shipToy.r - PI / 10), shipToy.y + 24 * Math.sin(shipToy.r - PI / 10));
-        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r - PI / 20), shipToy.y + 40 * Math.sin(shipToy.r - PI / 20));
-        context.closePath();
-
-        context.stroke();
-        context.fill();
-
-        context.fillStyle = '#333';
-        context.beginPath();
-        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.moveTo(shipToy.x - 56 * Math.cos(shipToy.r), shipToy.y - 56 * Math.sin(shipToy.r));
-        context.arc(shipToy.x - 64 * Math.cos(shipToy.r), shipToy.y - 64 * Math.sin(shipToy.r), 8, 1.5 * PI, 3.5 * PI);
-        context.stroke();
-        context.fill();
-        context.closePath();
         break;
       case 'game':
         // Draw grid lines and numbers/letters
@@ -1013,10 +1080,15 @@ ready(function() {
       if (typeof heldShip == 'number') {
         context.fillText('Ship: ' + ships[heldShip].x + ', ' + ships[heldShip].y, 8, 200);
       }
-      context.fillText('Mouse X:', 1032, 32);
-      context.fillText(mouse.x, 1132, 32);
-      context.fillText('Mouse Y:', 1032, 64);
-      context.fillText(mouse.y, 1132, 64);
+      // context.fillText('Mouse X:', 1032, 32);
+      // context.fillText(mouse.x, 1132, 32);
+      // context.fillText('Mouse Y:', 1032, 64);
+      // context.fillText(mouse.y, 1132, 64);
+
+      context.fillText('Ship Rad:', 1032, 32);
+      context.fillText(shipToy.r, 1132, 32);
+      context.fillText('Ship Target:', 1032, 64);
+      context.fillText(shipToy.targetR, 1132, 64);
     }
 
     // Pause recursion if the user leaves the tab
