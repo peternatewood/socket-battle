@@ -19,6 +19,12 @@ ready(function() {
     y: -1
   };
 
+  var shipToy = {
+    x: 800,
+    y: 200,
+    r: 1.5 * Math.PI
+  };
+
   var message = {
     content: '',
     text: '',
@@ -548,6 +554,43 @@ ready(function() {
         }
         context.fillText('Options', 120, 520);
         context.strokeText('Options', 120, 520);
+
+        // Ship toy
+        context.fillStyle = '#888';
+        context.strokeStyle = '#CCC';
+        context.lineWidth = 4;
+
+        context.beginPath();
+        context.moveTo(shipToy.x + 128 * Math.cos(shipToy.r), shipToy.y + 128 * Math.sin(shipToy.r));
+        context.lineTo(shipToy.x + 104 * Math.cos(shipToy.r + PI / 32), shipToy.y + 104 * Math.sin(shipToy.r + PI / 32));
+        context.lineTo(shipToy.x + 16 * Math.cos(shipToy.r + PI / 2), shipToy.y + 16 * Math.sin(shipToy.r + PI / 2));
+        context.lineTo(shipToy.x - 128 * Math.cos(shipToy.r - PI / 32), shipToy.y - 128 * Math.sin(shipToy.r - PI / 32));
+        context.lineTo(shipToy.x - 128 * Math.cos(shipToy.r + PI / 32), shipToy.y - 128 * Math.sin(shipToy.r + PI / 32));
+        context.lineTo(shipToy.x + 16 * Math.cos(shipToy.r - PI / 2), shipToy.y + 16 * Math.sin(shipToy.r - PI / 2));
+        context.lineTo(shipToy.x + 104 * Math.cos(shipToy.r - PI / 32), shipToy.y + 104 * Math.sin(shipToy.r - PI / 32));
+        context.closePath();
+
+        context.stroke();
+        context.fill();
+
+        context.beginPath();
+        context.moveTo(shipToy.x + 40 * Math.cos(shipToy.r + PI / 20), shipToy.y + 40 * Math.sin(shipToy.r + PI / 20));
+        context.lineTo(shipToy.x + 24 * Math.cos(shipToy.r + PI / 10), shipToy.y + 24 * Math.sin(shipToy.r + PI / 10));
+        context.lineTo(shipToy.x + 24 * Math.cos(shipToy.r - PI / 10), shipToy.y + 24 * Math.sin(shipToy.r - PI / 10));
+        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r - PI / 20), shipToy.y + 40 * Math.sin(shipToy.r - PI / 20));
+        context.closePath();
+
+        context.stroke();
+        context.fill();
+
+        context.fillStyle = '#333';
+        context.beginPath();
+        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 0, TAU);
+        context.moveTo(shipToy.x - 56 * Math.cos(shipToy.r), shipToy.y - 56 * Math.sin(shipToy.r));
+        context.arc(shipToy.x - 64 * Math.cos(shipToy.r), shipToy.y - 64 * Math.sin(shipToy.r), 8, 1.5 * PI, 3.5 * PI);
+        context.stroke();
+        context.fill();
+        context.closePath();
         break;
       case 'game':
         // Draw grid lines and numbers/letters

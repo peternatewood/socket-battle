@@ -128,6 +128,7 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log('user disconnected');
+    // TODO handle disconnect during game
   });
 
   socket.on('login token', function(data) {
