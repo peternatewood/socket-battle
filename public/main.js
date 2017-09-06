@@ -612,8 +612,12 @@ ready(function() {
         context.fillStyle = '#333';
         context.beginPath();
         context.arc(shipToy.x + 24 * Math.cos(shipToy.r), shipToy.y + 24 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.moveTo(shipToy.x - 8 * Math.cos(shipToy.r), shipToy.y - 8 * Math.sin(shipToy.r));
-        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 1.5 * PI, 3.5 * PI);
+        context.stroke();
+        context.fill();
+        context.closePath();
+
+        context.beginPath();
+        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 0, TAU);
         context.stroke();
         context.fill();
         context.closePath();
@@ -629,32 +633,32 @@ ready(function() {
         context.lineWidth = 2;
         context.font = '48px Audiowide, Arial';
         if (mouse.overOption == 0) {
-          context.fillStyle = '#DB4';
-          context.strokeStyle = '#A70';
+          context.fillStyle = '#DC4';
+          context.strokeStyle = '#A90';
         }
         else {
-          context.fillStyle = '#B94';
-          context.strokeStyle = '#850';
+          context.fillStyle = '#BA4';
+          context.strokeStyle = '#870';
         }
         context.fillText('Start Game', 120, 320);
         context.strokeText('Start Game', 120, 320);
         if (mouse.overOption == 1) {
-          context.fillStyle = '#DB4';
-          context.strokeStyle = '#A70';
+          context.fillStyle = '#DC4';
+          context.strokeStyle = '#A90';
         }
         else {
-          context.fillStyle = '#B94';
-          context.strokeStyle = '#850';
+          context.fillStyle = '#BA4';
+          context.strokeStyle = '#870';
         }
         context.fillText('Tournament', 120, 420);
         context.strokeText('Tournament', 120, 420);
         if (mouse.overOption == 2) {
-          context.fillStyle = '#DB4';
-          context.strokeStyle = '#A70';
+          context.fillStyle = '#DC4';
+          context.strokeStyle = '#A90';
         }
         else {
-          context.fillStyle = '#B94';
-          context.strokeStyle = '#850';
+          context.fillStyle = '#BA4';
+          context.strokeStyle = '#870';
         }
         context.fillText('Options', 120, 520);
         context.strokeText('Options', 120, 520);
