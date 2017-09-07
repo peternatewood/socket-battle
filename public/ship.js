@@ -30,7 +30,11 @@ var Ship = function(x, y, size, rad) {
 Ship.prototype.tiles = [];
 Ship.prototype.onBoard = false;
 Ship.prototype.rotate = function() {
-  this.targetRad = this.rad + PI / 2;
+  var rad = this.targetRad + PI / 2;
+  if (rad > TAU) {
+    rad -= TAU;
+  }
+  this.targetRad = rad;
   startTone(audio, 256, 'sawtooth', 0, 0.2);
   startTone(audio, 384, 'sawtooth', 0, 0.2);
 };
