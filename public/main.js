@@ -406,10 +406,12 @@ ready(function() {
           if (x >= 520 && x <= 680 && y >= 618 && y <= 680) {
             if (!mouse.fire) {
               mouse.fire = true;
+              startTone(audio, 64, 'square', 0, 0.4);
             }
           }
           else if (mouse.fire) {
             mouse.fire = false;
+            startTone(audio, 32, 'square', 0, 0.2);
           }
         }
         break;
