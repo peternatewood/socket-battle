@@ -115,6 +115,8 @@ ready(function() {
     window.localStorage.setItem('gameData', JSON.stringify(gameData));
     setupGame();
 
+    startTone(audio, 330, 'sine', 0, 0.15);
+    startTone(audio, 440, 'sine', 0.15, 0.3);
     setTimeout(showGameboard, 400);
   }
   socket.on('signup valid', handleFormSuccess);
@@ -292,8 +294,8 @@ ready(function() {
                   if (ships[i].onBoard) {
                     clearTiles(fleetBoard, ships[i]);
                   }
-                  startTone(audio, 192, 'square', 0.2);
-                  startTone(audio, 288, 'square', 0.2);
+                  startTone(audio, 192, 'square', 0, 0.2);
+                  startTone(audio, 288, 'square', 0, 0.2);
                 }
                 if (typeof heldShip === 'number' && event.button == 2) {
                   ships[heldShip].rotate();
@@ -309,7 +311,7 @@ ready(function() {
           radar.y = y;
           radar.life = 60;
           socket.emit('ping radar', { x: x, y: y });
-          startTone(audio, 440, 'triangle', 0.2);
+          startTone(audio, 440, 'triangle', 0, 0.2);
         }
         break;
     }
@@ -337,19 +339,19 @@ ready(function() {
           if (y <= 400) {
             if (mouse.overOption != 0) {
               mouse.overOption = 0;
-              startTone(audio, 128, 'triangle', 0.2);
+              startTone(audio, 128, 'triangle', 0, 0.2);
             }
           }
           else if (y <= 500) {
             if (mouse.overOption != 1) {
               mouse.overOption = 1;
-              startTone(audio, 128, 'triangle', 0.2);
+              startTone(audio, 128, 'triangle', 0, 0.2);
             }
           }
           else if (y <= 600) {
             if (mouse.overOption != 2) {
               mouse.overOption = 2;
-              startTone(audio, 128, 'triangle', 0.2);
+              startTone(audio, 128, 'triangle', 0, 0.2);
             }
           }
           else if (mouse.overOption >= 0) {
@@ -391,7 +393,7 @@ ready(function() {
               if (ships[i].isMouseOver(x, y)) {
                 if (mouse.shipIndex != i) {
                   mouse.shipIndex = i;
-                  startTone(audio, 256 - 16 * ships[i].size, 'sine', 0.2);
+                  startTone(audio, 256 - 16 * ships[i].size, 'sine', 0, 0.2);
                 }
                 return;
               }
@@ -440,7 +442,7 @@ ready(function() {
     radar.x = coords.x;
     radar.y = coords.y;
     radar.life = 60;
-    startTone(audio, 880, 'triangle', 0.2);
+    startTone(audio, 880, 'triangle', 0, 0.2);
   }
   socket.on('radar blip', receiveRadarBlip);
 

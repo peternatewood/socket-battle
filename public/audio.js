@@ -6,7 +6,7 @@ else if (typeof webkitAudioContext != 'undefined') {
   audio = new webkitAudioContext;
 }
 
-function startTone(audio, freq, type, stop) {
+function startTone(audio, freq, type, start, stop) {
   // In case webAudio is not supported
   if (! audio) {
     return;
@@ -30,6 +30,10 @@ function startTone(audio, freq, type, stop) {
     var type = osc.type;
   }
 
+  if (typeof start != 'number') {
+    var start = 0;
+  }
+
   var gainMod;
   switch (type) {
     case 'sine': gainMod = stop ? 2 : 4; break;
@@ -42,8 +46,8 @@ function startTone(audio, freq, type, stop) {
   osc.connect(gain);
 
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(Math.pow(1.05, freq / -20) / gainMod, time + 0.01);
-  osc.start(time);
+  gain.gain.linearRampToValueAtTime(Math.pow(1.05, freq / -20) / gainMod, time + start + 0.01);
+  osc.start(time + start);
 
   if (stop) {
     gain.gain.linearRampToValueAtTime(0, time + stop);
