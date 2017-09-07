@@ -24,7 +24,7 @@ ready(function() {
     mag: 0,
     xVel: 0, yVel: 0,
     r: 4,
-    move: false
+    move: false,
   };
 
   var message = {
@@ -237,6 +237,10 @@ ready(function() {
         }
         if (!shipToy.move) {
           shipToy.move = true;
+          shipToy.sound = [
+            startTone(audio, 54, 'square'),
+            startTone(audio, 108, 'square')
+          ];
         }
         break;
       case 'game':
@@ -308,6 +312,7 @@ ready(function() {
     if (shipToy.move) {
       shipToy.move = false;
       shipToy.mag = 0;
+      stopTone(audio, shipToy.sound);
     }
   }
   function handleMouseMove(event) {
@@ -395,6 +400,12 @@ ready(function() {
     mouse.over = false;
     mouse.x = -1;
     mouse.y = -1;
+
+    if (shipToy.move) {
+      shipToy.move = false;
+      shipToy.mag = 0;
+      stopTone(audio, shipToy.sound);
+    }
   }
 
   var canvas = document.getElementById('canvas');
