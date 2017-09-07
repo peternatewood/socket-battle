@@ -11,9 +11,11 @@ var Ship = function(x, y, size, rad) {
 
   this.size = size;
   this.life = size;
-  this.rad = rad || 1.5 * PI;
-  this.targetRad = rad || 1.5 * PI;
-  this.oldRad = rad || 1.5 * PI;
+
+  var shipRad = typeof rad == 'number' ? rad : 1.5 * PI;
+  this.rad = shipRad;
+  this.targetRad = shipRad;
+  this.oldRad = shipRad;
 
   switch (size) {
     case 2: this.name = 'Patrol Boat'; break;
