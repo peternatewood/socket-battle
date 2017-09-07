@@ -389,6 +389,7 @@ ready(function() {
               if (ships[i].isMouseOver(x, y)) {
                 if (mouse.shipIndex != i) {
                   mouse.shipIndex = i;
+                  startTone(audio, 256 - 16 * ships[i].size, 'sine', 0.2);
                 }
                 return;
               }
