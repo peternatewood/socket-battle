@@ -292,6 +292,8 @@ ready(function() {
                   if (ships[i].onBoard) {
                     clearTiles(fleetBoard, ships[i]);
                   }
+                  startTone(audio, 192, 'square', 0.2);
+                  startTone(audio, 288, 'square', 0.2);
                 }
                 if (typeof heldShip === 'number' && event.button == 2) {
                   ships[heldShip].rotate();

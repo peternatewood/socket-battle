@@ -70,6 +70,8 @@ Ship.prototype.drop = function(board) {
       this.oldX = this.x;
       this.oldY = this.y;
       this.onBoard = true;
+      startTone(audio, 384, 'square', 0.2);
+      startTone(audio, 576, 'square', 0.2);
       return;
     }
   }
@@ -81,6 +83,8 @@ Ship.prototype.drop = function(board) {
   if (this.onBoard) {
     updateBoard(board, this);
   }
+  startTone(audio, 96, 'square', 0.2);
+  startTone(audio, 144, 'square', 0.2);
 };
 Ship.prototype.isMouseOver = function(x, y) {
   var bounds = this.getBounds();
