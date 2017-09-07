@@ -295,7 +295,7 @@ ready(function() {
           radar.y = y;
           radar.life = 60;
           socket.emit('ping radar', { x: x, y: y });
-          playRadarPing();
+          playTone(audio, 440, 'triangle');
         }
         break;
     }
@@ -412,7 +412,7 @@ ready(function() {
     radar.x = coords.x;
     radar.y = coords.y;
     radar.life = 60;
-    playRadarPing();
+    playTone(audio, 880, 'triangle');
   }
   socket.on('radar blip', receiveRadarBlip);
 
