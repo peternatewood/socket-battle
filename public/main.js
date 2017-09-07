@@ -335,16 +335,19 @@ ready(function() {
           if (y <= 400) {
             if (mouse.overOption != 0) {
               mouse.overOption = 0;
+              startTone(audio, 128, 'triangle', 0.2);
             }
           }
           else if (y <= 500) {
             if (mouse.overOption != 1) {
               mouse.overOption = 1;
+              startTone(audio, 128, 'triangle', 0.2);
             }
           }
           else if (y <= 600) {
             if (mouse.overOption != 2) {
               mouse.overOption = 2;
+              startTone(audio, 128, 'triangle', 0.2);
             }
           }
           else if (mouse.overOption >= 0) {
