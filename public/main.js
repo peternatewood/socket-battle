@@ -441,7 +441,7 @@ ready(function() {
     // Update ships, fleet board, target board
     for (var i = 0; i < response.ships.length; i++) {
       var rShip = response.ships[i];
-      var ship = new Ship(rShip.x, rShip.y, rShip.size, rShip.direction);
+      var ship = new Ship(rShip.x, rShip.y, rShip.size, rShip.rad);
       ship.onBoard = true;
       ships.push(ship);
     }
