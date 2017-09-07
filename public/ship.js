@@ -31,6 +31,8 @@ Ship.prototype.tiles = [];
 Ship.prototype.onBoard = false;
 Ship.prototype.rotate = function() {
   this.targetRad = this.rad + PI / 2;
+  startTone(audio, 256, 'sawtooth', 0.2);
+  startTone(audio, 384, 'sawtooth', 0.2);
 };
 Ship.prototype.getBounds = function() {
   var halfSize = (40 * this.size) / 2;
