@@ -1,6 +1,17 @@
-var audio = new AudioContext || new webkitAudioContext;
+var audio;
+if (typeof AudioContext != 'undefined') {
+  audio = new AudioContext;
+}
+else if (typeof webkitAudioContext != 'undefined') {
+  audio = new webkitAudioContext;
+}
 
 function startTone(audio, freq, type, stop) {
+  // In case webAudio is not supported
+  if (! audio) {
+    return;
+  }
+
   var osc = audio.createOscillator();
   var gain = audio.createGain();
   var time = audio.currentTime;
@@ -44,6 +55,11 @@ function startTone(audio, freq, type, stop) {
 }
 
 function stopTone(audio, tone) {
+  // In case webAudio is not supported
+  if (! audio) {
+    return;
+  }
+
   var time = audio.currentTime;
 
   if (tone instanceof Array) {
