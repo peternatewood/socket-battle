@@ -168,6 +168,7 @@ ready(function() {
 
   function setupGame() {
     trayWidth = 500;
+    gameOver = 0;
     searchingForGame = false;
     isGameInProgress = false;
 
@@ -248,7 +249,8 @@ ready(function() {
         break;
       case 'game':
         if (gameOver) {
-          // Provide new game/menu button
+          setupGame();
+          scene = 'menu';
         }
         else if (isGameInProgress) {
           if (isOverTargetBoard(x, y)) {
@@ -523,9 +525,13 @@ ready(function() {
   });
 
   socket.on('winner', function(opponent) {
+    mouse.over = false;
+    mouse.fire = false;
     gameOver = 1;
   });
   socket.on('loser', function(opponent) {
+    mouse.over = false;
+    mouse.fire = false;
     gameOver = -1;
   });
 
