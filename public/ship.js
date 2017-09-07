@@ -12,6 +12,8 @@ var Ship = function(x, y, size, rad) {
   this.size = size;
   this.life = size;
   this.rad = rad || 1.5 * PI;
+  this.targetRad = rad || 1.5 * PI;
+  this.oldRad = rad || 1.5 * PI;
 
   switch (size) {
     case 2: this.name = 'Patrol Boat'; break;
@@ -26,7 +28,7 @@ var Ship = function(x, y, size, rad) {
 Ship.prototype.tiles = [];
 Ship.prototype.onBoard = false;
 Ship.prototype.rotate = function() {
-  this.rad = (TAU + this.rad + PI / 2) % TAU;
+  this.targetRad = this.rad + PI / 2;
 };
 Ship.prototype.getBounds = function() {
   var halfSize = (40 * this.size) / 2;
@@ -72,6 +74,8 @@ Ship.prototype.drop = function(board) {
   // Otherwise put back where it was
   this.x = this.oldX;
   this.y = this.oldY;
+  this.rad = this.oldRad;
+  this.targetRad = this.oldRad;
   if (this.onBoard) {
     updateBoard(board, this);
   }

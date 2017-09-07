@@ -276,6 +276,7 @@ ready(function() {
               if (ships[i].isMouseOver(x, y)) {
                 if (event.button == 0) {
                   heldShip = i;
+                  ships[i].oldRad = ships[i].rad;
                   if (ships[i].onBoard) {
                     clearTiles(fleetBoard, ships[i]);
                   }
@@ -716,6 +717,18 @@ ready(function() {
 
         // Ships
         for (var i = 0; i < ships.length; i++) {
+          var radDiff = ships[i].targetRad - ships[i].rad;
+          if (radDiff) {
+            if (radDiff > 0.26) {
+              ships[i].rad = (TAU + ships[i].rad + 0.26) % TAU;
+            }
+            else {
+              ships[i].rad = (TAU + ships[i].targetRad) % TAU;
+              if (ships[i].targetRad > 5) {
+                ships[i].targetRad = 0;
+              }
+            }
+          }
           ships[i].render(context, mouse.shipIndex == i);
         }
 
