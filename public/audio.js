@@ -1,6 +1,6 @@
 var audio = new AudioContext || new webkitAudioContext;
 
-function playTone(audio, freq, type) {
+function startTone(audio, freq, type, stop) {
   var osc = audio.createOscillator();
   var gain = audio.createGain();
   var time = audio.currentTime;
@@ -32,7 +32,13 @@ function playTone(audio, freq, type) {
 
   gain.gain.setValueAtTime(0, time);
   gain.gain.linearRampToValueAtTime(Math.pow(1.05, freq / -20) / gainMod, time + 0.01);
-  gain.gain.linearRampToValueAtTime(0, time + 0.2);
   osc.start(time);
-  osc.stop(time + 0.2);
+
+  if (stop) {
+    gain.gain.linearRampToValueAtTime(0, time + stop);
+    osc.stop(time + stop);
+  }
+  else {
+    return { osc: osc, gain: gain };
+  }
 }
