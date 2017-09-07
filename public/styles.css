@@ -4,8 +4,13 @@ body {
   margin: 0;
 }
 
+.hide {
+  position: absolute;
+  right: -999em;
+  overflow: hidden;
+}
+
 header {
-  display: none;
   position: absolute;
   top: 0;
   right: 0;
@@ -65,10 +70,6 @@ table {
   -webkit-animation: spin 1600ms infinite 400ms;
   -moz-animation: spin 1600ms infinite 400ms;
   animation: spin 1600ms infinite 400ms;
-}
-
-#form {
-  display: none;
 }
 
 input[type="text"],
@@ -139,12 +140,7 @@ input[type="submit"]:hover {
   color: #4EE;
 }
 
-#signup-form {
-  display: none;
-}
-
 #gameboard {
-  display: none;
   width: 1200px;
 }
 

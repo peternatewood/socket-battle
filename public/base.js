@@ -8,15 +8,15 @@ function ready(fun) {
 }
 
 function showForm() {
-  document.getElementById('spinner').style.display = 'none';
-  document.getElementById('form').style.display = 'block';
+  document.getElementById('spinner').className = 'hide';
+  document.getElementById('form').className = '';
 }
 
 function showGameboard() {
-  document.getElementById('form-table').style.display = 'none';
+  document.getElementById('form-table').className = 'hide';
   document.getElementById('errors').innerHTML = '';
-  document.getElementById('gameboard').style.display = 'table';
-  document.getElementById('signout-wrapper').style.display = 'block';
+  document.getElementById('gameboard').className = '';
+  document.getElementById('signout-wrapper').className = '';
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
 }

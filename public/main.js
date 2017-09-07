@@ -137,11 +137,11 @@ ready(function() {
     var game = document.getElementById('gameboard');
     var signout = document.getElementById('signout-wrapper');
 
-    spinner.style.display = 'none';
-    formTable.style.display = '';
-    form.style.display = 'block';
-    game.style.display = 'none';
-    signout.style.display = 'none';
+    spinner.className = 'hide';
+    formTable.className = '';
+    form.className = '';
+    game.className = 'hide';
+    signout.className = 'hide';
   }
 
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
