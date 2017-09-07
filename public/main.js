@@ -700,6 +700,12 @@ ready(function() {
           context.fillText("Click the FIRE! button when you're", 1220 - trayWidth, 260);
           context.fillText("ready to start!", 1220 - trayWidth, 300);
 
+          context.fillText('Patrol Boats', 1510 - trayWidth, 390);
+          context.fillText('Submarines', 1420 - trayWidth, 430);
+          context.fillText('Destroyer', 1340 - trayWidth, 470);
+          context.fillText('Battleship', 1300 - trayWidth, 510);
+          context.fillText('Aircraft Carrier', 1260 - trayWidth, 550);
+
           if (trayWidth < 500) {
             trayWidth -= 8;
           }
