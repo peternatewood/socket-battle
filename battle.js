@@ -166,6 +166,7 @@ io.on('connection', function(socket) {
             var opponent = '';
             if (room.players.length == 2) {
               opponent = room.players[(data.playerNum + 1) % 2];
+              socket.broadcast.to(gameRoom).emit('opponent rejoined');
             }
 
             var response = {

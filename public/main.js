@@ -2,7 +2,7 @@ ready(function() {
   var socket = io();
 
   var trayWidth; // Unsigned integer 0..500
-  var heldShip, isGameInProgress, searchingForGame; // Booleans
+  var heldShip, isGameInProgress, searchingForGame, opponentDisconnected; // Booleans
 
   var debug = 0;
   var gameOver = 0;
@@ -452,8 +452,15 @@ ready(function() {
 
   function handleOpponentDisconnect() {
     setMessage(message, opponentName + ' disconnected', true);
+    opponentDisconnected = true;
   }
   socket.on('opponent disconnected', handleOpponentDisconnect);
+
+  function handleOpponentRejoin() {
+    setMessage(message, opponentName + ' rejoined the game');
+    opponentDisconnected = false;
+  }
+  socket.on('opponent rejoined', handleOpponentRejoin);
 
   socket.on('joined game', function(response) {
     gameData.room = response.room;
