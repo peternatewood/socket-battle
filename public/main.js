@@ -43,9 +43,11 @@ ready(function() {
     y: 200,
     targetX: 200,
     targetY: 200,
+    showPing: false,
     pingX: 0,
     pingY: 0,
-    pingS: 0
+    pingS: 0,
+    pingR: 0
   };
 
   var radar = {
@@ -991,7 +993,8 @@ ready(function() {
           else if (yDist) {
             loader.y = loader.targetY;
           }
-          loader.rad = Math.atan2(loader.y - 300, loader.x - 600);
+          var mag = Math.max(160, Math.sqrt(Math.pow(loader.x - 600, 2) + Math.pow(loader.y - 340, 2)));
+          loader.rad = Math.atan2(loader.y - 340, loader.x - 600);
 
           context.fillStyle = 'rgba(0,0,0,0.6)';
           context.fillRect(0, 0, 1200, 680);
@@ -1005,23 +1008,25 @@ ready(function() {
           context.fillText('Searching for Opponent...', 600, 60);
 
           context.beginPath();
-          context.moveTo(600, 300);
-          context.lineTo(loader.x, loader.y);
-          context.moveTo(600, 140);
-          context.lineTo(600, 460);
-          context.moveTo(440, 300);
-          context.lineTo(760, 300);
-          context.moveTo(600 + 60 * Math.cos(loader.rad - PI / 4), 300 + 60 * Math.sin(loader.rad - PI / 4));
-          context.arc(600, 300, 60, loader.rad - PI / 4, loader.rad + PI / 4);
-          context.moveTo(600 + 120 * Math.cos(loader.spin - PI / 4), 300 + 120 * Math.sin(loader.spin - PI / 4));
-          context.arc(600, 300, 120, loader.spin - PI / 4, loader.spin + Math.PI / 4);
+          context.moveTo(600, 340);
+          context.lineTo(600 + mag * Math.cos(loader.rad), 340 + mag * Math.sin(loader.rad));
+          context.moveTo(600, 180);
+          context.lineTo(600, 500);
+          context.moveTo(440, 340);
+          context.lineTo(760, 340);
+          context.moveTo(600 + 60 * Math.cos(loader.rad - PI / 4), 340 + 60 * Math.sin(loader.rad - PI / 4));
+          context.arc(600, 340, 60, loader.rad - PI / 4, loader.rad + PI / 4);
+          context.moveTo(600 + 120 * Math.cos(loader.spin - PI / 4), 340 + 120 * Math.sin(loader.spin - PI / 4));
+          context.arc(600, 340, 120, loader.spin - PI / 4, loader.spin + Math.PI / 4);
           context.stroke();
           context.closePath();
 
-          context.beginPath();
-          context.arc(loader.pingX, loader.pingY, loader.pingS / 10, 0, 2 * Math.PI);
-          context.fill();
-          context.closePath();
+          if (loader.showPing) {
+            context.beginPath();
+            context.arc(loader.pingX, loader.pingY, loader.pingS / 10, 0, 2 * Math.PI);
+            context.fill();
+            context.closePath();
+          }
 
           var spin = loader.spin + PI / 36;
           if (spin > TAU) {
@@ -1029,13 +1034,22 @@ ready(function() {
           }
           loader.spin = spin;
 
-          if (loader.pingS) {
-            loader.pingS--;
+          if (loader.pingS > 0) {
+            if (loader.showPing) {
+              loader.pingS--;
+            }
           }
           else {
             loader.pingS = 90;
-            loader.pingX = (450 + 300 * Math.random()) >> 0;
-            loader.pingY = (150 + 300 * Math.random()) >> 0;
+            loader.pingX = (490 + 300 * Math.random()) >> 0;
+            loader.pingY = (190 + 300 * Math.random()) >> 0;
+            loader.pingR = Math.atan2(loader.pingY - 300, loader.pingX - 600);
+            loader.showPing = false;
+          }
+
+          if (!loader.showPing && Math.abs(loader.pingR - loader.rad) < 0.1) {
+            startTone(audio, 440, 'triangle', 0, 0.2);
+            loader.showPing = true;
           }
         }
 
