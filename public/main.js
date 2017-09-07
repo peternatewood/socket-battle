@@ -5,6 +5,7 @@ ready(function() {
   var heldShip, isGameInProgress, searchingForGame; // Booleans
 
   var debug = 0;
+  var gameOver = 0;
   var scene = 'menu';
   var opponentName = 'Opponent';
   var fleetBoard = [];
@@ -246,7 +247,10 @@ ready(function() {
         }
         break;
       case 'game':
-        if (isGameInProgress) {
+        if (gameOver) {
+          // Provide new game/menu button
+        }
+        else if (isGameInProgress) {
           if (isOverTargetBoard(x, y)) {
             var newIndex = setTargetBoardTile(targetBoard, x, y);
             if (typeof targetIndex == 'number') {
@@ -350,7 +354,10 @@ ready(function() {
         }
         break;
       case 'game':
-        if (searchingForGame) {
+        if (gameOver) {
+          // Highlight new game/menu button
+        }
+        else if (searchingForGame) {
           loader.targetX = x;
           loader.targetY = y;
         }
@@ -1007,6 +1014,35 @@ ready(function() {
             loader.pingS = 90;
             loader.pingX = (450 + 300 * Math.random()) >> 0;
             loader.pingY = (150 + 300 * Math.random()) >> 0;
+          }
+        }
+
+        // Game Over message
+        if (gameOver) {
+          context.fillStyle = 'rgba(255,255,255,0.7)';
+          context.fillRect(0, 0, 1200, 680);
+
+          context.lineWidth = 2;
+          context.font = '120px Black Ops One, Georgia';
+          context.textAlign = 'center';
+
+          // Winner
+          if (gameOver > 0) {
+            context.fillStyle = '#4CD';
+            context.strokeStyle = '#09A';
+            context.fillText('You defeated', 600, 300);
+            context.strokeText('You defeated', 600, 300);
+            context.fillText(opponentName, 600, 420);
+            context.strokeText(opponentName, 600, 420);
+          }
+          // Loser
+          else {
+            context.fillStyle = '#DC4';
+            context.strokeStyle = '#A90';
+            context.fillText('You lost to', 600, 300);
+            context.strokeText('You lost to', 600, 300);
+            context.fillText(opponentName, 600, 420);
+            context.strokeText(opponentName, 600, 420);
           }
         }
         break;
