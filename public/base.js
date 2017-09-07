@@ -27,7 +27,7 @@ function handleErrors(message) {
 
 function clearTiles(board, ship) {
   var bounds = ship.getBounds();
-  var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
+  var increment = ship.rad == 0 || ship.rad == PI ? 1 : 12;
   var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
   var shipTail = shipHead + increment * ship.size;
 
@@ -41,7 +41,7 @@ function clearTiles(board, ship) {
 // Returns true only if the ship is overlaying all empty tiles
 function updateBoard(board, ship) {
   var bounds = ship.getBounds();
-  var increment = ship.direction == 'west' || ship.direction == 'east' ? 1 : 12;
+  var increment = ship.rad == 0 || ship.rad == PI ? 1 : 12;
   var shipHead = (bounds.l - 40) / 40 + 12 * (bounds.t - 80) / 40;
   var shipTail = shipHead + increment * ship.size;
 
