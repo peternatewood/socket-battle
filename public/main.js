@@ -978,18 +978,18 @@ ready(function() {
         // Loader toy
         if (searchingForGame) {
           var xDist = loader.targetX - loader.x;
-          if (xDist >> 0 >= 8) {
+          if (xDist >> 0 >= 2) {
             loader.x += Math.max(1, xDist / 12 >> 0);
           }
           else if (xDist) {
-            loader.x += xDist;
+            loader.x = loader.targetX;
           }
           var yDist = loader.targetY - loader.y;
-          if (yDist >> 0 >= 8) {
+          if (yDist >> 0 >= 2) {
             loader.y += Math.max(1, yDist / 12 >> 0);
           }
           else if (yDist) {
-            loader.y += yDist;
+            loader.y = loader.targetY;
           }
           loader.rad = Math.atan2(loader.y - 300, loader.x - 600);
 
