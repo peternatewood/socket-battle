@@ -2,6 +2,7 @@ body {
   background: #0AE;
   text-align: center;
   margin: 0;
+  overflow: hidden;
 }
 
 .hide {
