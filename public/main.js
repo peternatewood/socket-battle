@@ -19,13 +19,11 @@ ready(function() {
     y: -1
   };
 
-  var shipToy = {
-    x: 960, y: 480,
-    mag: 0,
-    xVel: 0, yVel: 0,
-    r: 4,
-    move: false,
-  };
+  var shipToy = new Ship(960, 480, 2 + (5 * Math.random() >> 0));
+  shipToy.mag = 0;
+  shipToy.move = false;
+  shipToy.xVel = 0;
+  shipToy.yVel = 0;
 
   var message = {
     content: '',
@@ -234,13 +232,17 @@ ready(function() {
       case 'menu':
         switch (mouse.overOption) {
           case 0: scene = 'game'; break;
-        }
-        if (!shipToy.move) {
-          shipToy.move = true;
-          shipToy.sound = [
-            startTone(audio, 54, 'square'),
-            startTone(audio, 108, 'square')
-          ];
+          case 1: break;
+          case 2: break;
+          default:
+            if (!shipToy.move) {
+              shipToy.move = true;
+              shipToy.sound = [
+                startTone(audio, 54, 'square'),
+                startTone(audio, 108, 'square')
+              ];
+            }
+            break;
         }
         break;
       case 'game':
@@ -534,7 +536,7 @@ ready(function() {
         if (shipToy.move && mouse.x >= 0 && mouse.y >= 0) {
           var dir;
           var targetR = (TAU + Math.atan2(mouse.y - shipToy.y, mouse.x - shipToy.x)) % TAU;
-          var diff = targetR - shipToy.r;
+          var diff = targetR - shipToy.rad;
 
           if (Math.abs(diff) > PI) {
             dir = diff > 0 ? -1 : 1;
@@ -550,9 +552,9 @@ ready(function() {
             shipToy.mag += 0.1;
           }
 
-          shipToy.r = (TAU + shipToy.r + dir * 0.01) % TAU;
-          shipToy.xVel = shipToy.mag * Math.cos(shipToy.r);
-          shipToy.yVel = shipToy.mag * Math.sin(shipToy.r);
+          shipToy.rad = (TAU + shipToy.rad + dir * 0.01) % TAU;
+          shipToy.xVel = shipToy.mag * Math.cos(shipToy.rad);
+          shipToy.yVel = shipToy.mag * Math.sin(shipToy.rad);
         }
 
         if (shipToy.xVel != 0) {
@@ -577,57 +579,21 @@ ready(function() {
 
         if (shipToy.xVel != 0 || shipToy.yVel != 0) {
           var mag = 24 * Math.sqrt(Math.pow(shipToy.xVel, 2) + Math.pow(shipToy.yVel, 2));
+          var halfSize = 40 * (shipToy.size / 2);
           context.strokeStyle = '#FFF';
 
           context.beginPath();
-          context.moveTo(shipToy.x - 56 * Math.cos(shipToy.r), shipToy.y - 56 * Math.sin(shipToy.r));
-          context.lineTo(shipToy.x - (68 + mag) * Math.cos(shipToy.r), shipToy.y - (68 + mag) * Math.sin(shipToy.r));
-          context.moveTo(shipToy.x - 64 * Math.cos(shipToy.r - 0.2), shipToy.y - 64 * Math.sin(shipToy.r - 0.2));
-          context.lineTo(shipToy.x - (66 + mag) * Math.cos(shipToy.r - 0.2), shipToy.y - (66 + mag) * Math.sin(shipToy.r - 0.2));
-          context.moveTo(shipToy.x - 64 * Math.cos(shipToy.r + 0.2), shipToy.y - 64 * Math.sin(shipToy.r + 0.2));
-          context.lineTo(shipToy.x - (66 + mag) * Math.cos(shipToy.r + 0.2), shipToy.y - (66 + mag) * Math.sin(shipToy.r + 0.2));
+          context.moveTo(shipToy.x - (halfSize - 8) * Math.cos(shipToy.rad), shipToy.y - (halfSize - 8) * Math.sin(shipToy.rad));
+          context.lineTo(shipToy.x - (halfSize + mag) * Math.cos(shipToy.rad), shipToy.y - (halfSize + mag) * Math.sin(shipToy.rad));
+          context.moveTo(shipToy.x - (halfSize - 12) * Math.cos(shipToy.rad - 0.16), shipToy.y - (halfSize - 12) * Math.sin(shipToy.rad - 0.16));
+          context.lineTo(shipToy.x - (halfSize + mag) * Math.cos(shipToy.rad - 0.16), shipToy.y - (halfSize + mag) * Math.sin(shipToy.rad - 0.16));
+          context.moveTo(shipToy.x - (halfSize - 12) * Math.cos(shipToy.rad + 0.16), shipToy.y - (halfSize - 12) * Math.sin(shipToy.rad + 0.16));
+          context.lineTo(shipToy.x - (halfSize + mag) * Math.cos(shipToy.rad + 0.16), shipToy.y - (halfSize + mag) * Math.sin(shipToy.rad + 0.16));
           context.stroke();
           context.closePath();
         }
 
-        context.fillStyle = '#888';
-        context.strokeStyle = '#CCC';
-
-        context.beginPath();
-        context.moveTo(shipToy.x + 160 * Math.cos(shipToy.r), shipToy.y + 160 * Math.sin(shipToy.r));
-        context.lineTo(shipToy.x + 144 * Math.cos(shipToy.r + PI / 48), shipToy.y + 144 * Math.sin(shipToy.r + PI / 48));
-        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r + PI / 7), shipToy.y + 40 * Math.sin(shipToy.r + PI / 7));
-        context.lineTo(shipToy.x - 64 * Math.cos(shipToy.r - PI / 16), shipToy.y - 64 * Math.sin(shipToy.r - PI / 16));
-        context.lineTo(shipToy.x - 64 * Math.cos(shipToy.r + PI / 16), shipToy.y - 64 * Math.sin(shipToy.r + PI / 16));
-        context.lineTo(shipToy.x + 40 * Math.cos(shipToy.r - PI / 7), shipToy.y + 40 * Math.sin(shipToy.r - PI / 7));
-        context.lineTo(shipToy.x + 144 * Math.cos(shipToy.r - PI / 48), shipToy.y + 144 * Math.sin(shipToy.r - PI / 48));
-        context.closePath();
-
-        context.fill();
-        context.stroke();
-
-        context.fillStyle = '#CCC';
-        context.beginPath();
-        context.moveTo(shipToy.x + 88 * Math.cos(shipToy.r + PI / 40), shipToy.y + 88 * Math.sin(shipToy.r + PI / 40));
-        context.lineTo(shipToy.x + 72 * Math.cos(shipToy.r + PI / 28), shipToy.y + 72 * Math.sin(shipToy.r + PI / 28));
-        context.lineTo(shipToy.x + 72 * Math.cos(shipToy.r - PI / 28), shipToy.y + 72 * Math.sin(shipToy.r - PI / 28));
-        context.lineTo(shipToy.x + 88 * Math.cos(shipToy.r - PI / 40), shipToy.y + 88 * Math.sin(shipToy.r - PI / 40));
-        context.closePath();
-
-        context.fill();
-
-        context.fillStyle = '#333';
-        context.beginPath();
-        context.arc(shipToy.x + 24 * Math.cos(shipToy.r), shipToy.y + 24 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.fill();
-        context.stroke();
-        context.closePath();
-
-        context.beginPath();
-        context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.fill();
-        context.stroke();
-        context.closePath();
+        shipToy.render(context);
 
         // Title
         context.fillStyle = '#331';
@@ -1109,7 +1075,7 @@ ready(function() {
       // context.fillText(mouse.y, 1132, 64);
 
       context.fillText('Ship Rad:', 1032, 32);
-      context.fillText(shipToy.r, 1132, 32);
+      context.fillText(shipToy.rad, 1132, 32);
       context.fillText('Ship Target:', 1032, 64);
       context.fillText(shipToy.targetR, 1132, 64);
 
