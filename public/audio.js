@@ -21,10 +21,10 @@ function startTone(audio, freq, type, stop) {
 
   var gainMod;
   switch (type) {
-    case 'sine': gainMod = 2; break;
-    case 'triangle': gainMod = 2; break;
-    case 'sawtooth': gainMod = 4; break;
-    case 'square': gainMod = 5; break;
+    case 'sine': gainMod = stop ? 2 : 4; break;
+    case 'triangle': gainMod = stop ? 2 : 5; break;
+    case 'sawtooth': gainMod = stop ? 5 : 20; break;
+    case 'square': gainMod = stop ? 6 : 22; break;
   }
 
   gain.connect(audio.destination);
@@ -40,5 +40,20 @@ function startTone(audio, freq, type, stop) {
   }
   else {
     return { osc: osc, gain: gain };
+  }
+}
+
+function stopTone(audio, tone) {
+  var time = audio.currentTime;
+
+  if (tone instanceof Array) {
+    for (var i = 0; i < tone.length; i++) {
+      tone[i].gain.gain.linearRampToValueAtTime(0, time + 0.2);
+      tone[i].osc.stop(time + 0.2);
+    }
+  }
+  else {
+    tone.gain.gain.linearRampToValueAtTime(0, time + 0.2);
+    tone.osc.stop(time + 0.2);
   }
 }
