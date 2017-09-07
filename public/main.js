@@ -238,8 +238,8 @@ ready(function() {
             if (!shipToy.move) {
               shipToy.move = true;
               shipToy.sound = [
-                startTone(audio, 54, 'square'),
-                startTone(audio, 108, 'square')
+                startTone(audio, 54 + 8 * (6 - shipToy.size), 'square'),
+                startTone(audio, 2 * (54 + 8 * (6 - shipToy.size)), 'square')
               ];
             }
             break;
