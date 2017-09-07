@@ -450,6 +450,11 @@ ready(function() {
   }
   socket.on('radar blip', receiveRadarBlip);
 
+  function handleOpponentDisconnect() {
+    setMessage(message, opponentName + ' disconnected', true);
+  }
+  socket.on('opponent disconnected', handleOpponentDisconnect);
+
   socket.on('joined game', function(response) {
     gameData.room = response.room;
     gameData.playerNum = response.playerNum;

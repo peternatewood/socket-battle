@@ -128,7 +128,10 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     console.log('user disconnected');
-    // TODO handle disconnect during game
+    // Handle disconnect during game
+    if (gameRoom) {
+      socket.broadcast.to(gameRoom).emit('opponent disconnected');
+    }
   });
 
   socket.on('login token', function(data) {
@@ -138,7 +141,6 @@ io.on('connection', function(socket) {
       loggedIn = true;
       username = data.username;
       var token = generateToken();
-      console.log('user logging in', activeGames);
 
       connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
         if (err) {
@@ -146,7 +148,7 @@ io.on('connection', function(socket) {
         }
         else {
           user.token = token;
-          console.log(username, 'logged in');
+
           var gameData = {
             username: data.username,
             token: token
@@ -176,9 +178,11 @@ io.on('connection', function(socket) {
             };
 
             socket.join(data.room);
+            console.log(username, 'rejoined game', gameRoom);
             socket.emit('game rejoined', response);
           }
           else {
+            console.log(username, 'logged in');
             socket.emit('token valid', { success: true, gameData: gameData });
           }
         }
