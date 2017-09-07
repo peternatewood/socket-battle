@@ -16,7 +16,8 @@ function showGameboard() {
   document.getElementById('form-table').className = 'hide';
   document.getElementById('errors').innerHTML = '';
   document.getElementById('gameboard').className = '';
-  document.getElementById('signout-wrapper').className = '';
+  document.getElementById('signout').className = '';
+  document.getElementById('menu').className = '';
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
 }

@@ -139,13 +139,15 @@ ready(function() {
     var formTable = document.getElementById('form-table');
     var form = document.getElementById('form');
     var game = document.getElementById('gameboard');
-    var signout = document.getElementById('signout-wrapper');
+    var signout = document.getElementById('signout');
+    var menu = document.getElementById('menu');
 
     spinner.className = 'hide';
     formTable.className = '';
     form.className = '';
     game.className = 'hide';
     signout.className = 'hide';
+    menu.className = 'hide';
   }
 
   document.getElementById('signout').addEventListener('click', handleSignoutClick);

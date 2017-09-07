@@ -8,20 +8,28 @@ body {
 .hide {
   position: absolute;
   right: -999em;
-  overflow: hidden;
 }
 
-header {
+#menu,
+#signout {
   position: absolute;
+  font-size: 18px;
   top: 0;
-  right: 0;
   z-index: 1;
 }
-
+#menu {
+  border-radius: 0 0 8px 0;
+  left: 0;
+}
+#menu.hide {
+  left: unset;
+}
 #signout {
-  display: block;
-  font-size: 18px;
   border-radius: 0 0 0 8px;
+  right: 0;
+}
+#signout.hide {
+  right: -999em;
 }
 
 table {
