@@ -523,10 +523,10 @@ ready(function() {
   });
 
   socket.on('winner', function(opponent) {
-    console.log('You beat', opponent);
+    gameOver = 1;
   });
   socket.on('loser', function(opponent) {
-    console.log(opponent, 'beat you');
+    gameOver = -1;
   });
 
   function step(t) {
