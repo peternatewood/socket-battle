@@ -276,6 +276,7 @@ ready(function() {
               if (ships[i].isMouseOver(x, y)) {
                 if (event.button == 0) {
                   heldShip = i;
+                  ships[i].oldRad = ships[i].rad;
                   if (ships[i].onBoard) {
                     clearTiles(fleetBoard, ships[i]);
                   }
@@ -353,10 +354,6 @@ ready(function() {
 
             ships[heldShip].x += xDist;
             ships[heldShip].y += yDist;
-            for (var i = 0; i < 10; i += 2) {
-              ships[heldShip].renderPoints[i] += xDist;
-              ships[heldShip].renderPoints[i + 1] += yDist;
-            }
           }
           else if (isGameInProgress) {
             if (isOverTargetBoard(x, y)) {
@@ -444,9 +441,8 @@ ready(function() {
     // Update ships, fleet board, target board
     for (var i = 0; i < response.ships.length; i++) {
       var rShip = response.ships[i];
-      var ship = new Ship(rShip.x, rShip.y, rShip.size, rShip.direction);
+      var ship = new Ship(rShip.x, rShip.y, rShip.size, rShip.rad);
       ship.onBoard = true;
-      ship.setRenderPoints();
       ships.push(ship);
     }
     for (var i = 0; i < 144; i++) {
@@ -596,9 +592,10 @@ ready(function() {
         context.lineTo(shipToy.x + 144 * Math.cos(shipToy.r - PI / 48), shipToy.y + 144 * Math.sin(shipToy.r - PI / 48));
         context.closePath();
 
-        context.stroke();
         context.fill();
+        context.stroke();
 
+        context.fillStyle = '#CCC';
         context.beginPath();
         context.moveTo(shipToy.x + 88 * Math.cos(shipToy.r + PI / 40), shipToy.y + 88 * Math.sin(shipToy.r + PI / 40));
         context.lineTo(shipToy.x + 72 * Math.cos(shipToy.r + PI / 28), shipToy.y + 72 * Math.sin(shipToy.r + PI / 28));
@@ -606,20 +603,19 @@ ready(function() {
         context.lineTo(shipToy.x + 88 * Math.cos(shipToy.r - PI / 40), shipToy.y + 88 * Math.sin(shipToy.r - PI / 40));
         context.closePath();
 
-        context.stroke();
         context.fill();
 
         context.fillStyle = '#333';
         context.beginPath();
         context.arc(shipToy.x + 24 * Math.cos(shipToy.r), shipToy.y + 24 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.stroke();
         context.fill();
+        context.stroke();
         context.closePath();
 
         context.beginPath();
         context.arc(shipToy.x - 16 * Math.cos(shipToy.r), shipToy.y - 16 * Math.sin(shipToy.r), 8, 0, TAU);
-        context.stroke();
         context.fill();
+        context.stroke();
         context.closePath();
 
         // Title
@@ -721,6 +717,18 @@ ready(function() {
 
         // Ships
         for (var i = 0; i < ships.length; i++) {
+          var radDiff = ships[i].targetRad - ships[i].rad;
+          if (radDiff) {
+            if (radDiff > 0.26) {
+              ships[i].rad = (TAU + ships[i].rad + 0.26) % TAU;
+            }
+            else {
+              ships[i].rad = (TAU + ships[i].targetRad) % TAU;
+              if (ships[i].targetRad > 5) {
+                ships[i].targetRad = 0;
+              }
+            }
+          }
           ships[i].render(context, mouse.shipIndex == i);
         }
 
@@ -1093,6 +1101,14 @@ ready(function() {
       context.fillText(shipToy.r, 1132, 32);
       context.fillText('Ship Target:', 1032, 64);
       context.fillText(shipToy.targetR, 1132, 64);
+
+      context.strokeStyle = '#000';
+      context.lineWidth = 2;
+      for (var row = 0; row < 6; row++) {
+        for (var col = 0; col < 7; col++) {
+          context.strokeRect(720 + 40 * col, 330 + 40 * row, 40, 40);
+        }
+      }
     }
 
     // Pause recursion if the user leaves the tab
