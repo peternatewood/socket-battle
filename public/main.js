@@ -38,6 +38,11 @@ ready(function() {
     name: ''
   };
 
+  var targetMiss = {
+    tile: -1,
+    life: 0
+  };
+
   var targetHit = {
     sunk: false,
     tile: -1,
@@ -557,9 +562,10 @@ ready(function() {
   });
 
   socket.on('salvo missed', function(index) {
-    setMessage(message, 'Your salvo missed');
-    targetIndex = null;
-    targetBoard[index] = 2;
+    targetMiss.tile = index;
+    targetMiss.life = 180;
+
+    playFireSound(audio);
   });
   socket.on('ships missed', function(index) {
     splash.tile = index;
@@ -877,11 +883,12 @@ ready(function() {
           if (shipExplosion.life == 60) {
             if (shipExplosion.sunk) {
               setMessage(message, opponentName + ' sunk your ' + shipExplosion.name + '!', true);
+              playShipSunkSound(audio);
             }
             else {
               setMessage(message, opponentName + ' hit your ' + shipExplosion.name);
+              playShipHitSound(audio);
             }
-            playShipHitSound(audio);
           }
 
           if (shipExplosion.life > 20 && shipExplosion.life < 60) {
@@ -942,7 +949,7 @@ ready(function() {
           }
         }
 
-        // Animate target board hit flash
+        // Flash target board hit
         if (targetHit.tile >= 0) {
           var targetX = 700 + 40 * (targetHit.tile % 12);
           var targetY = 100 + 40 * (targetHit.tile / 12 >> 0);
@@ -955,9 +962,21 @@ ready(function() {
             targetBoard[targetHit.tile] = 0;
             if (targetHit.sunk) {
               setMessage(message, opponentName + "'s " + targetHit.name + ' sunk!', true);
+              startTone(audio, 360, 'sawtooth', 0, 0.12);
+              startTone(audio, 270, 'sawtooth', 0, 0.12);
+              startTone(audio, 270, 'sawtooth', 0.12, 0.24);
+              startTone(audio, 180, 'sawtooth', 0.12, 0.24);
+              startTone(audio, 360, 'sawtooth', 0.24, 0.36);
+              startTone(audio, 270, 'sawtooth', 0.24, 0.36);
+              startTone(audio, 540, 'sawtooth', 0.36, 1);
+              startTone(audio, 360, 'sawtooth', 0.36, 1);
             }
             else {
               setMessage(message, 'You hit a ' + targetHit.name);
+              startTone(audio, 360, 'sawtooth', 0, 0.1);
+              startTone(audio, 270, 'sawtooth', 0, 0.1);
+              startTone(audio, 360, 'sawtooth', 0.15, 0.7);
+              startTone(audio, 270, 'sawtooth', 0.15, 0.7);
             }
           }
 
@@ -977,6 +996,41 @@ ready(function() {
           else {
             targetBoard[targetHit.tile] = 3;
             targetHit.tile = -1;
+          }
+        }
+
+        // Flash target board miss
+        if (targetMiss.tile >= 0) {
+          var targetX = 700 + 40 * (targetMiss.tile % 12);
+          var targetY = 100 + 40 * (targetMiss.tile / 12 >> 0);
+
+          context.strokeStyle = '#EEE';
+          context.lineWidth = 4;
+
+          if (targetMiss.life == 60) {
+            targetIndex = null;
+            targetBoard[targetMiss.tile] = 0;
+            setMessage(message, 'Your salvo missed');
+            startTone(audio, 256, 'sawtooth', 0, 0.2);
+            startTone(audio, 100, 'sawtooth', 0.15, 0.7);
+          }
+
+          if (targetMiss.life <= 60 && (targetMiss.life / 10 >> 0) % 2 == 0) {
+            context.beginPath();
+            context.moveTo(targetX - 12, targetY - 12);
+            context.lineTo(targetX + 12, targetY + 12);
+            context.moveTo(targetX - 12, targetY + 12);
+            context.lineTo(targetX + 12, targetY - 12);
+            context.stroke();
+            context.closePath();
+          }
+
+          if (targetMiss.life > 0) {
+            targetMiss.life--;
+          }
+          else {
+            targetBoard[targetMiss.tile] = 2;
+            targetMiss.tile = -1;
           }
         }
 
