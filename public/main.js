@@ -26,6 +26,11 @@ ready(function() {
   shipToy.xVel = 0;
   shipToy.yVel = 0;
 
+  var splash = {
+    tile: -1,
+    life: 0
+  };
+
   var shipExplosion = {
     sunk: false,
     tile: -1,
@@ -550,8 +555,10 @@ ready(function() {
     targetBoard[index] = 2;
   });
   socket.on('ships missed', function(index) {
-    setMessage(message, opponentName + "'s salvo missed");
-    fleetBoard[index] = 2;
+    splash.tile = index;
+    splash.life = 180;
+
+    playFireSound(audio);
   });
 
   socket.on('salvo hit', function(response) {
@@ -854,7 +861,8 @@ ready(function() {
           context.fillStyle = 'rgba(0,0,0,0.2)';
           context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
         }
-        // Explosion animation
+
+        // Animate explosion
         if (shipExplosion.tile >= 0) {
           var expX = 60 + 40 * (shipExplosion.tile % 12);
           var expY = 100 + 40 * (shipExplosion.tile / 12 >> 0);
@@ -892,6 +900,41 @@ ready(function() {
             else {
               setMessage(message, opponentName + ' hit your ' + shipExplosion.name);
             }
+          }
+        }
+
+        // Animate splash
+        if (splash.tile >= 0) {
+          var spX = 60 + 40 * (splash.tile % 12);
+          var spY = 100 + 40 * (splash.tile / 12 >> 0);
+
+          context.strokeStyle = '#FFF';
+          context.lineWidth = 2;
+
+          if (splash.life == 60) {
+            playSplashSound(audio);
+          }
+
+          if (splash.life > 30 && splash.life < 60) {
+            context.beginPath();
+            context.arc(spX, spY, 40 - (2 * splash.life / 3), 0, TAU);
+            context.stroke();
+            context.closePath();
+          }
+          if (splash.life > 15 && splash.life < 45) {
+            context.beginPath();
+            context.arc(spX, spY, 30 - (2 * splash.life / 3), 0, TAU);
+            context.stroke();
+            context.closePath();
+          }
+
+          if (splash.life > 0) {
+            splash.life--;
+          }
+          else {
+            fleetBoard[splash.tile] = 2;
+            splash.tile = -1;
+            setMessage(message, opponentName + "'s salvo missed");
           }
         }
 
