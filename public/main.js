@@ -38,6 +38,13 @@ ready(function() {
     name: ''
   };
 
+  var targetHit = {
+    sunk: false,
+    tile: -1,
+    life: 0,
+    name: ''
+  };
+
   var message = {
     content: '',
     text: '',
@@ -562,15 +569,12 @@ ready(function() {
   });
 
   socket.on('salvo hit', function(response) {
-    if (response.sunk) {
-      setMessage(message, opponentName + "'s " + response.name + ' sunk!', true);
-    }
-    else {
-      setMessage(message, 'You hit a ' + response.name);
-    }
+    targetHit.tile = response.index;
+    targetHit.sunk = response.sunk;
+    targetHit.name = response.name;
+    targetHit.life = 180;
 
-    targetIndex = null;
-    targetBoard[response.index] = 3;
+    playFireSound(audio);
   });
   socket.on('ship hit', function(response) {
     shipExplosion.tile = response.index;
@@ -862,7 +866,7 @@ ready(function() {
           context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
         }
 
-        // Animate explosion
+        // Animate fleet board explosion
         if (shipExplosion.tile >= 0) {
           var expX = 60 + 40 * (shipExplosion.tile % 12);
           var expY = 100 + 40 * (shipExplosion.tile / 12 >> 0);
@@ -903,7 +907,7 @@ ready(function() {
           }
         }
 
-        // Animate splash
+        // Animate fleet board splash
         if (splash.tile >= 0) {
           var spX = 60 + 40 * (splash.tile % 12);
           var spY = 100 + 40 * (splash.tile / 12 >> 0);
@@ -935,6 +939,44 @@ ready(function() {
             fleetBoard[splash.tile] = 2;
             splash.tile = -1;
             setMessage(message, opponentName + "'s salvo missed");
+          }
+        }
+
+        // Animate target board hit flash
+        if (targetHit.tile >= 0) {
+          var targetX = 700 + 40 * (targetHit.tile % 12);
+          var targetY = 100 + 40 * (targetHit.tile / 12 >> 0);
+
+          context.strokeStyle = '#F00';
+          context.lineWidth = 4;
+
+          if (targetHit.life == 60) {
+            targetIndex = null;
+          }
+
+          if (targetHit.life <= 60 && (targetHit.life / 10 >> 0) % 2 == 0) {
+            context.beginPath();
+            context.moveTo(targetX - 12, targetY - 12);
+            context.lineTo(targetX + 12, targetY + 12);
+            context.moveTo(targetX - 12, targetY + 12);
+            context.lineTo(targetX + 12, targetY - 12);
+            context.stroke();
+            context.closePath();
+          }
+
+          if (targetHit.life > 0) {
+            targetHit.life--;
+          }
+          else {
+            if (targetHit.sunk) {
+              setMessage(message, opponentName + "'s " + targetHit.name + ' sunk!', true);
+            }
+            else {
+              setMessage(message, 'You hit a ' + targetHit.name);
+            }
+
+            targetBoard[targetHit.tile] = 3;
+            targetHit.tile = -1;
           }
         }
 
