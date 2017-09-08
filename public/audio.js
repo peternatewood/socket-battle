@@ -119,10 +119,10 @@ function playShipHitSound(audio) {
   osc.type = 'square';
 
   gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(Math.pow(1.05, 96 / -20) / 2, time + 0.01);
+  gain.gain.linearRampToValueAtTime(Math.pow(1.05, 96 / -20) / 4, time + 0.01);
 
-  gain.gain.setValueAtTime(Math.pow(1.05, 80 / -20) / 2, time + 0.15);
-  gain.gain.exponentialRampToValueAtTime(Math.pow(1.05, 50 / -20) / 2, time + 0.7);
+  gain.gain.setValueAtTime(Math.pow(1.05, 80 / -20) / 4, time + 0.15);
+  gain.gain.exponentialRampToValueAtTime(Math.pow(1.05, 50 / -20) / 4, time + 0.7);
   gain.gain.linearRampToValueAtTime(0, time + 1);
 
   osc.frequency.setValueAtTime(96, time);
@@ -131,6 +131,44 @@ function playShipHitSound(audio) {
 
   osc.start(time);
   osc.stop(time + 0.71);
+}
+
+function playShipSunkSound(audio) {
+  // In case webAudio is not supported
+  if (! audio) {
+    return;
+  }
+
+  var osc = audio.createOscillator();
+  var osc2 = audio.createOscillator();
+  var gain = audio.createGain();
+  var gain2 = audio.createGain();
+  var time = audio.currentTime;
+
+  osc.frequency.setValueAtTime(52, time);
+  osc2.frequency.setValueAtTime(64, time);
+
+  osc.type = 'square';
+  osc2.type = 'sawtooth';
+
+  gain.connect(audio.destination);
+  gain2.connect(audio.destination);
+  osc.connect(gain);
+  osc2.connect(gain);
+
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(Math.pow(1.05, 52 / -20) / 4, time + 0.01);
+  gain.gain.linearRampToValueAtTime(0, time + 1);
+
+  gain2.gain.setValueAtTime(0, time);
+  gain2.gain.linearRampToValueAtTime(Math.pow(1.05, 64 / -20) / 4, time + 0.01);
+  gain2.gain.linearRampToValueAtTime(0, time + 1);
+
+  osc.start(time);
+  osc2.start(time);
+
+  osc.stop(time + 1);
+  osc2.stop(time + 1);
 }
 
 function playSplashSound(audio) {
