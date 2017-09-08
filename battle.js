@@ -112,6 +112,14 @@ function getEmptyRoom(games) {
   }
   return roomNum;
 }
+function deleteGameRoom(room) {
+  activeGames[room].turn = null;
+  activeGames[room].players = null;
+  activeGames[room].fleetBoards = null;
+  activeGames[room].targetBoards = null;
+  activeGames[room].ships = null;
+  delete activeGames[room];
+}
 
 function generateToken() {
   return passwordHash.generate(Date.now().toString());
@@ -341,7 +349,7 @@ io.on('connection', function(socket) {
     if (gameRoom) {
       socket.leave(gameRoom);
       socket.broadcast.to(gameRoom).emit('opponent quit');
-      delete activeGames[gameRoom];
+      deleteGameRoom(gameRoom);
       gameRoom = null;
       playerNum = null;
     }
@@ -383,10 +391,9 @@ io.on('connection', function(socket) {
           if (game.fleetBoards[opponent].every(function(tile) { return tile != 1 })) {
             socket.emit('winner', game.players[opponent]);
             socket.broadcast.to(gameRoom).emit('loser', username);
-            // Clean up game-related data
-            delete activeGames[gameRoom];
-            playerNum = null;
+            deleteGameRoom(gameRoom);
             gameRoom = null;
+            playerNum = null;
           }
           break;
         default:

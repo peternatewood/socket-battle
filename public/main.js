@@ -301,6 +301,7 @@ ready(function() {
       case 'game':
         if (gameOver) {
           setupGame();
+          socket.emit('quit to menu');
           scene = 'menu';
         }
         else if (isGameInProgress) {
