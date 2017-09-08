@@ -35,8 +35,8 @@ Ship.prototype.rotate = function() {
     rad -= TAU;
   }
   this.targetRad = rad;
-  startTone(audio, 256, 'sawtooth', 0, 0.2);
-  startTone(audio, 384, 'sawtooth', 0, 0.2);
+  startTone(audio, 256, 'square', 0, 0.12);
+  startTone(audio, 384, 'square', 0.12, 0.24);
 };
 Ship.prototype.getBounds = function() {
   var halfSize = (40 * this.size) / 2;
