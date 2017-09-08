@@ -1,3 +1,18 @@
+var backgroundColors = [
+  '#0AE', '#A0E', '#EA0', '#6C6', '#CC6', '#C66'
+];
+var gameboardColors = [
+  '#0CE', '#C0F', '#FC0', '#0E0', '#EE0', '#E00'
+];
+var shipColors = [
+  '#CCC', '#888', '#68A',
+  '#9CC', '#488', '#68A',
+  '#C9C', '#848', '#68A',
+  '#CC9', '#884', '#68A',
+  '#AAC', '#668', '#68A',
+  '#CAA', '#866', '#68A'
+];
+
 function ready(fun) {
   if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
     fun();
