@@ -875,6 +875,12 @@ ready(function() {
           context.lineWidth = 2;
 
           if (shipExplosion.life == 60) {
+            if (shipExplosion.sunk) {
+              setMessage(message, opponentName + ' sunk your ' + shipExplosion.name + '!', true);
+            }
+            else {
+              setMessage(message, opponentName + ' hit your ' + shipExplosion.name);
+            }
             playShipHitSound(audio);
           }
 
@@ -898,12 +904,6 @@ ready(function() {
           else {
             fleetBoard[shipExplosion.tile] = 3;
             shipExplosion.tile = -1;
-            if (shipExplosion.sunk) {
-              setMessage(message, opponentName + ' sunk your ' + shipExplosion.name + '!', true);
-            }
-            else {
-              setMessage(message, opponentName + ' hit your ' + shipExplosion.name);
-            }
           }
         }
 
@@ -916,6 +916,7 @@ ready(function() {
           context.lineWidth = 2;
 
           if (splash.life == 60) {
+            setMessage(message, opponentName + "'s salvo missed");
             playSplashSound(audio);
           }
 
@@ -938,7 +939,6 @@ ready(function() {
           else {
             fleetBoard[splash.tile] = 2;
             splash.tile = -1;
-            setMessage(message, opponentName + "'s salvo missed");
           }
         }
 
@@ -952,6 +952,13 @@ ready(function() {
 
           if (targetHit.life == 60) {
             targetIndex = null;
+            targetBoard[targetHit.tile] = 0;
+            if (targetHit.sunk) {
+              setMessage(message, opponentName + "'s " + targetHit.name + ' sunk!', true);
+            }
+            else {
+              setMessage(message, 'You hit a ' + targetHit.name);
+            }
           }
 
           if (targetHit.life <= 60 && (targetHit.life / 10 >> 0) % 2 == 0) {
@@ -968,13 +975,6 @@ ready(function() {
             targetHit.life--;
           }
           else {
-            if (targetHit.sunk) {
-              setMessage(message, opponentName + "'s " + targetHit.name + ' sunk!', true);
-            }
-            else {
-              setMessage(message, 'You hit a ' + targetHit.name);
-            }
-
             targetBoard[targetHit.tile] = 3;
             targetHit.tile = -1;
           }
