@@ -77,3 +77,28 @@ function stopTone(audio, tone) {
     tone.osc.stop(time + 0.2);
   }
 }
+
+function playFireSound(audio) {
+  // In case webAudio is not supported
+  if (! audio) {
+    return;
+  }
+
+  var osc = audio.createOscillator();
+  var gain = audio.createGain();
+  var time = audio.currentTime;
+
+  gain.connect(audio.destination);
+  osc.connect(gain);
+
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(Math.pow(1.05, 880 / -20) / 2, time + 0.01);
+  gain.gain.exponentialRampToValueAtTime(Math.pow(1.05, 660 / -20) / 2, time + 1.99);
+  gain.gain.linearRampToValueAtTime(0, time + 2);
+
+  osc.frequency.setValueAtTime(880, time);
+  osc.frequency.exponentialRampToValueAtTime(660, time + 1.99);
+
+  osc.start(time);
+  osc.stop(time + 2)
+}
