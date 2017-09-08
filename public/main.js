@@ -5,7 +5,8 @@ ready(function() {
   var heldShip, isGameInProgress, searchingForGame, opponentDisconnected; // Booleans
 
   var debug = 0;
-  var gameOver = 0;
+  var winner = 0;
+  var gameOver = false;
   var scene = 'menu';
   var opponentName = 'Opponent';
   var fleetBoard = [];
@@ -217,7 +218,8 @@ ready(function() {
 
   function setupGame() {
     trayWidth = 500;
-    gameOver = 0;
+    gameOver = false;
+    winner = 0;
     searchingForGame = false;
     isGameInProgress = false;
 
@@ -458,7 +460,6 @@ ready(function() {
           }
           else if (mouse.fire) {
             mouse.fire = false;
-            startTone(audio, 32, 'square', 0, 0.2);
           }
         }
         break;
@@ -592,14 +593,10 @@ ready(function() {
   });
 
   socket.on('winner', function(opponent) {
-    mouse.over = false;
-    mouse.fire = false;
-    gameOver = 1;
+    winner = 1;
   });
   socket.on('loser', function(opponent) {
-    mouse.over = false;
-    mouse.fire = false;
-    gameOver = -1;
+    winner = -1;
   });
 
   function step(t) {
@@ -911,6 +908,11 @@ ready(function() {
           else {
             fleetBoard[shipExplosion.tile] = 3;
             shipExplosion.tile = -1;
+            if (winner) {
+              mouse.over = false;
+              mouse.fire = false;
+              gameOver = true;
+            }
           }
         }
 
@@ -996,6 +998,11 @@ ready(function() {
           else {
             targetBoard[targetHit.tile] = 3;
             targetHit.tile = -1;
+            if (winner) {
+              mouse.over = false;
+              mouse.fire = false;
+              gameOver = true;
+            }
           }
         }
 
@@ -1280,7 +1287,7 @@ ready(function() {
           context.textAlign = 'center';
 
           // Winner
-          if (gameOver > 0) {
+          if (winner > 0) {
             context.fillStyle = '#4CD';
             context.strokeStyle = '#09A';
             context.fillText('You defeated', 600, 300);
