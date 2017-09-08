@@ -100,5 +100,35 @@ function playFireSound(audio) {
   osc.frequency.exponentialRampToValueAtTime(660, time + 1.99);
 
   osc.start(time);
-  osc.stop(time + 2)
+  osc.stop(time + 2);
+}
+
+function playShipHitSound(audio) {
+  // In case webAudio is not supported
+  if (! audio) {
+    return;
+  }
+
+  var osc = audio.createOscillator();
+  var gain = audio.createGain();
+  var time = audio.currentTime;
+
+  gain.connect(audio.destination);
+  osc.connect(gain);
+
+  osc.type = 'square';
+
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(Math.pow(1.05, 96 / -20) / 2, time + 0.01);
+
+  gain.gain.setValueAtTime(Math.pow(1.05, 80 / -20) / 2, time + 0.15);
+  gain.gain.exponentialRampToValueAtTime(Math.pow(1.05, 50 / -20) / 2, time + 0.7);
+  gain.gain.linearRampToValueAtTime(0, time + 1);
+
+  osc.frequency.setValueAtTime(96, time);
+  osc.frequency.setValueAtTime(80, time + 0.15);
+  osc.frequency.exponentialRampToValueAtTime(50, time + 0.7);
+
+  osc.start(time);
+  osc.stop(time + 0.71);
 }
