@@ -7,6 +7,7 @@ ready(function() {
   var debug = 0;
   var winner = 0;
   var gameOver = false;
+  var allowFiring = true;
   var scene = 'menu';
   var opponentName = 'Opponent';
   var fleetBoard = [];
@@ -312,8 +313,9 @@ ready(function() {
             }
             targetIndex = newIndex;
           }
-          else if (mouse.fire) {
+          else if (mouse.fire && allowFiring) {
             if (typeof targetIndex == 'number') {
+              allowFiring = false;
               socket.emit('fire salvo', targetIndex);
             }
             else {
@@ -456,7 +458,9 @@ ready(function() {
           if (x >= 520 && x <= 680 && y >= 618 && y <= 680) {
             if (!mouse.fire) {
               mouse.fire = true;
-              startTone(audio, 64, 'square', 0, 0.4);
+              if (allowFiring) {
+                startTone(audio, 64, 'square', 0, 0.4);
+              }
             }
           }
           else if (mouse.fire) {
@@ -557,9 +561,11 @@ ready(function() {
     setupGame();
   });
   socket.on('not your turn', function() {
+    allowFiring = true;
     setMessage(message, "It's not your turn yet!", true);
   });
   socket.on('tile already hit', function() {
+    allowFiring = true;
     setMessage(message, "You've already hit this tile", true);
   });
 
@@ -570,6 +576,7 @@ ready(function() {
     playFireSound(audio);
   });
   socket.on('ships missed', function(index) {
+    allowFiring = false;
     splash.tile = index;
     splash.life = 180;
 
@@ -585,6 +592,7 @@ ready(function() {
     playFireSound(audio);
   });
   socket.on('ship hit', function(response) {
+    allowFiring = false;
     shipExplosion.tile = response.index;
     shipExplosion.sunk = response.sunk;
     shipExplosion.name = response.name;
@@ -907,6 +915,7 @@ ready(function() {
             shipExplosion.life--;
           }
           else {
+            allowFiring = true;
             fleetBoard[shipExplosion.tile] = 3;
             shipExplosion.tile = -1;
             if (winner) {
@@ -947,6 +956,7 @@ ready(function() {
             splash.life--;
           }
           else {
+            allowFiring = true;
             fleetBoard[splash.tile] = 2;
             splash.tile = -1;
           }
@@ -997,6 +1007,7 @@ ready(function() {
             targetHit.life--;
           }
           else {
+            allowFiring = true;
             targetBoard[targetHit.tile] = 3;
             targetHit.tile = -1;
             if (winner) {
@@ -1037,6 +1048,7 @@ ready(function() {
             targetMiss.life--;
           }
           else {
+            allowFiring = true;
             targetBoard[targetMiss.tile] = 2;
             targetMiss.tile = -1;
           }
@@ -1084,7 +1096,7 @@ ready(function() {
         context.fillText('FIRE!', 670, 649);
         context.shadowBlur = 0;
         // Red button
-        context.fillStyle = mouse.fire ? '#F88' : '#F00';
+        context.fillStyle = mouse.fire && allowFiring ? '#F88' : '#F00';
         context.beginPath();
         context.arc(550, 649, 22, 0, TAU);
         context.closePath();
@@ -1095,6 +1107,11 @@ ready(function() {
         context.arc(550, 649, 16, 0, TAU);
         context.closePath();
         context.stroke();
+        // Overlay if firing is not allowed
+        if (!allowFiring) {
+          context.fillStyle = 'rgba(0,0,0,0.4)';
+          context.fillRect(520, 618, 160, 62);
+        }
 
         // Message display
         if (message.flash && message.delay > 0) {
