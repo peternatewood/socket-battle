@@ -95,6 +95,11 @@ Game.prototype.targetBoards = [
   ]
 ];
 Game.prototype.turn = 0;
+Game.prototype.addPlayer = function(username, fleetBoard, ships) {
+  this.players.push(username);
+  this.fleetBoards.push(fleetBoard);
+  this.ships.push(ships);
+};
 Game.prototype.isEmpty = function() {
   return this.players.length < 2;
 }
@@ -328,9 +333,7 @@ io.on('connection', function(socket) {
       playerNum = 0;
     }
     else {
-      activeGames[room].players.push(username);
-      activeGames[room].fleetBoards.push(data.fleetBoard);
-      activeGames[room].ships.push(data.ships);
+      activeGames[room].addPlayer(username, data.fleetBoard, data.ships);
       playerNum = 1;
     }
 
