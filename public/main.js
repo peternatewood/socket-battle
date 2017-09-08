@@ -432,6 +432,29 @@ ready(function() {
         }
         break;
       case 'options':
+        // context.fillRect(48 + 60 * i, 192, 40, 40);
+        // context.strokeRect(48 + 60 * i, 352, 40, 40);
+        // context.fillRect(48 + 20 * i, 512, 40, 40);
+
+        if (y >= 182 && y <= 242) {
+          if (x >= 38 && x <= 408) {
+            if (overRow != 0) {
+              overRow = 0;
+            }
+            var option = ((x - 48) / 60) >> 0;
+            if (overOption != option) {
+              overOption = option;
+            }
+          }
+          else if (overOption >= 0) {
+            overOption = -1;
+          }
+        }
+        else if (y >= 342 && y <= 402) {}
+        else if (y >= 502 && y <= 562) {}
+        else if (overRow >= 0) {
+          overRow = -1;
+        }
         break;
       case 'game':
         if (gameOver) {
@@ -756,12 +779,12 @@ ready(function() {
         context.fillText('Background Color', 40, 128);
         context.strokeText('Background Color', 40, 128);
 
-        context.strokeStyle = '#000';
         context.lineWidth = 4;
         context.lineJoin = 'round';
         for (var i = 0; i < backgroundColors.length; i++) {
           context.fillStyle = backgroundColors[i];
           context.fillRect(48 + 60 * i, 192, 40, 40);
+          context.strokeStyle = overRow == 0 && i == overOption ? '#888' : '#000';
           context.strokeRect(48 + 60 * i, 192, 40, 40);
         }
         // Gameboard color options
