@@ -26,6 +26,13 @@ ready(function() {
   shipToy.xVel = 0;
   shipToy.yVel = 0;
 
+  var shipExplosion = {
+    sunk: false,
+    tile: -1,
+    life: 0,
+    name: ''
+  };
+
   var message = {
     content: '',
     text: '',
@@ -559,14 +566,12 @@ ready(function() {
     targetBoard[response.index] = 3;
   });
   socket.on('ship hit', function(response) {
-    if (response.sunk) {
-      setMessage(message, opponentName + ' sunk your ' + response.name + '!', true);
-    }
-    else {
-      setMessage(message, opponentName + ' hit your ' + response.name);
-    }
+    shipExplosion.tile = response.index;
+    shipExplosion.sunk = response.sunk;
+    shipExplosion.name = response.name;
+    shipExplosion.life = 180;
 
-    fleetBoard[response.index] = 3;
+    playFireSound(audio);
   });
 
   socket.on('winner', function(opponent) {
@@ -848,6 +853,46 @@ ready(function() {
         if (mouse.over) {
           context.fillStyle = 'rgba(0,0,0,0.2)';
           context.fillRect(40 * (mouse.x / 40 >> 0), 40 * (mouse.y / 40 >> 0), 40, 40);
+        }
+        // Explosion animation
+        if (shipExplosion.tile >= 0) {
+          var expX = 60 + 40 * (shipExplosion.tile % 12);
+          var expY = 100 + 40 * (shipExplosion.tile / 12 >> 0);
+
+          context.strokeStyle = '#740';
+          context.lineWidth = 2;
+
+          if (shipExplosion.life == 60) {
+            playShipHitSound(audio);
+          }
+
+          if (shipExplosion.life > 20 && shipExplosion.life < 60) {
+            context.beginPath();
+            context.arc(expX, expY, 30 - (shipExplosion.life / 2), 0, TAU);
+            context.stroke();
+            context.closePath();
+          }
+
+          if (shipExplosion.life < 40) {
+            context.beginPath();
+            context.arc(expX, expY, 20 - (shipExplosion.life / 2), 0, TAU);
+            context.stroke();
+            context.closePath();
+          }
+
+          if (shipExplosion.life > 0) {
+            shipExplosion.life--;
+          }
+          else {
+            fleetBoard[shipExplosion.tile] = 3;
+            shipExplosion.tile = -1;
+            if (shipExplosion.sunk) {
+              setMessage(message, opponentName + ' sunk your ' + shipExplosion.name + '!', true);
+            }
+            else {
+              setMessage(message, opponentName + ' hit your ' + shipExplosion.name);
+            }
+          }
         }
 
         // Fire button background
