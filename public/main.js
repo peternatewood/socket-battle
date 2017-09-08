@@ -127,6 +127,26 @@ ready(function() {
   socket.on('login error', handleErrors);
   socket.on('signup error', handleErrors);
 
+  function quitGame() {
+    socket.emit('quit to menu');
+    scene = 'menu';
+    delete gameData.playerNum;
+    delete gameData.room;
+    window.localStorage.setItem('gameData', JSON.stringify(gameData));
+    setupGame();
+  }
+
+  function handleMenuClick(event) {
+    event.preventDefault();
+    quitGame();
+  }
+  document.getElementById('menu').addEventListener('click', handleMenuClick);
+
+  socket.on('opponent quit', function() {
+    setMessage(message, opponentName + ' quit the game', true);
+    setTimeout(quitGame, 600);
+  });
+
   function handleSignoutClick(event) {
     event.preventDefault();
 
@@ -149,7 +169,6 @@ ready(function() {
     signout.className = 'hide';
     menu.className = 'hide';
   }
-
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
   // 0: no action, 1: targetted, 2: miss, 3: hit

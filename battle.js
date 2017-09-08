@@ -337,6 +337,16 @@ io.on('connection', function(socket) {
     }
   });
 
+  socket.on('quit to menu', function() {
+    if (gameRoom) {
+      socket.leave(gameRoom);
+      socket.broadcast.to(gameRoom).emit('opponent quit');
+      delete activeGames[gameRoom];
+      gameRoom = null;
+      playerNum = null;
+    }
+  });
+
   socket.on('ping radar', function(coords) {
     socket.to(gameRoom).emit('radar blip', coords);
   });
