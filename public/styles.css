@@ -47,19 +47,23 @@ table {
 }
 
 #spinner {
-  position: relative;
-  background: none;
+  position: absolute;
+  background: inherit;
   border: 8px solid #FFF;
   border-radius: 100%;
+  margin: -48px auto 0;
   width: 96px;
   height: 96px;
+  top: 50%;
+  left: 0;
+  right: 0;
   box-sizing: border-box;
 }
 #spinner:before,
 #spinner:after {
   content: '';
   position: absolute;
-  background: #0AE;
+  background: inherit;
   width: 48px;
   height: 96px;
   top: -8px;
