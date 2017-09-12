@@ -6,9 +6,13 @@ else if (typeof webkitAudioContext != 'undefined') {
   audio = new webkitAudioContext;
 }
 
+if (typeof audio != 'undefined') {
+  audio.mute = false;
+}
+
 function startTone(audio, freq, type, start, stop) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
@@ -59,8 +63,8 @@ function startTone(audio, freq, type, start, stop) {
 }
 
 function stopTone(audio, tone) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
@@ -79,8 +83,8 @@ function stopTone(audio, tone) {
 }
 
 function playFireSound(audio) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
@@ -104,8 +108,8 @@ function playFireSound(audio) {
 }
 
 function playShipHitSound(audio) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
@@ -134,8 +138,8 @@ function playShipHitSound(audio) {
 }
 
 function playShipSunkSound(audio) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
@@ -172,8 +176,8 @@ function playShipSunkSound(audio) {
 }
 
 function playSplashSound(audio) {
-  // In case webAudio is not supported
-  if (! audio) {
+  // In case webAudio is not supported or mute is active
+  if (! audio || audio.mute) {
     return;
   }
 
