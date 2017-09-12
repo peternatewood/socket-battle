@@ -16,11 +16,11 @@ ready(function() {
   var ships = [];
 
   var optionShips = [
-    new Ship(440, 532, 2, 5.49),
-    new Ship(500, 532, 3, 5.49),
-    new Ship(560, 532, 4, 5.49),
-    new Ship(620, 532, 5, 5.49),
-    new Ship(680, 532, 6, 5.49)
+    new Ship(460, 532, 2, 5.49),
+    new Ship(520, 532, 3, 5.49),
+    new Ship(580, 532, 4, 5.49),
+    new Ship(640, 532, 5, 5.49),
+    new Ship(700, 532, 6, 5.49)
   ];
 
   var mouse = {
@@ -128,10 +128,30 @@ ready(function() {
   else {
     options = JSON.parse(options);
   }
+  audio.mute = options.mute;
+  document.body.style.background = backgroundColors[options.background];
+  document.getElementById('canvas').style.background = gameboardColors[options.gameboard];
+  Ship.setColors(shipColors, options.ships);
+
   // If no option name provided, just save all options in local storage
   function updateOptions(name, value) {
     if (name && typeof options[name] != 'undefined') {
       options[name] = value;
+
+      switch (name) {
+        case 'mute':
+          audio.mute = value;
+          break;
+        case 'background':
+          document.body.style.background = backgroundColors[overOption];
+          break;
+        case 'gameboard':
+          document.getElementById('canvas').style.background = gameboardColors[overOption];
+          break;
+        case 'ships':
+          Ship.setColors(shipColors, options.ships);
+          break;
+      }
     }
     window.localStorage.setItem('options', JSON.stringify(options));
   }
@@ -336,14 +356,12 @@ ready(function() {
           case 0:
             if (overOption >= 0) {
               options.background = overOption;
-              document.body.style.background = backgroundColors[overOption];
               updateOptions('background', overOption);
             }
             break;
           case 1:
             if (overOption >= 0) {
               options.gameboard = overOption;
-              document.getElementById('canvas').style.background = gameboardColors[overOption];
               updateOptions('gameboard', overOption);
             }
             break;
@@ -829,7 +847,7 @@ ready(function() {
 
           if (overRow < 3) {
             if (overOption >= 0) {
-              context.fillRect(20, 116 + 160 * overRow, 600, 132);
+              context.fillRect(20, 116 + 160 * overRow, overRow < 2 ? 540 : 400, 132);
             }
           }
           else {
