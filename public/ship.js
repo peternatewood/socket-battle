@@ -27,6 +27,12 @@ var Ship = function(x, y, size, rad) {
 
   return this;
 }
+Ship.colors = ['', '', ''];
+Ship.setColors = function(colors, option) {
+  for (var i = 0; i < 3; i++) {
+    this.colors[i] = colors[3 * option + i];
+  }
+};
 Ship.prototype.tiles = [];
 Ship.prototype.onBoard = false;
 Ship.prototype.rotate = function() {
@@ -98,8 +104,8 @@ Ship.prototype.isMouseOver = function(x, y) {
   return x >= bounds.l && x <= bounds.r && y >= bounds.t && y <= bounds.b;
 };
 Ship.prototype.render = function(context, mouseOver) {
-  context.fillStyle = mouseOver ? '#68A' : '#888';
-  context.strokeStyle = '#CCC';
+  context.fillStyle = mouseOver ? Ship.colors[2] : Ship.colors[1];
+  context.strokeStyle = Ship.colors[0];
   context.lineWidth = 4;
 
   switch (this.size) {
@@ -116,7 +122,7 @@ Ship.prototype.render = function(context, mouseOver) {
       context.fill();
       context.stroke();
 
-      context.fillStyle = '#CCC';
+      context.fillStyle = Ship.colors[0];
       context.beginPath();
       context.moveTo(this.x + 6 * Math.cos(this.rad + 1.57), this.y + 6 * Math.sin(this.rad + 1.57));
       context.lineTo(this.x + 18 * Math.cos(this.rad + 0.25), this.y + 18 * Math.sin(this.rad + 0.25));
@@ -139,7 +145,7 @@ Ship.prototype.render = function(context, mouseOver) {
       context.fill();
       context.stroke();
 
-      context.fillStyle = '#CCC';
+      context.fillStyle = Ship.colors[0];
       context.beginPath();
       context.moveTo(this.x + 34 * Math.cos(this.rad), this.y + 34 * Math.sin(this.rad));
       context.lineTo(this.x + 30 * Math.cos(this.rad + PI / 24), this.y + 30 * Math.sin(this.rad + PI / 24));
@@ -166,7 +172,7 @@ Ship.prototype.render = function(context, mouseOver) {
       context.fill();
       context.stroke();
 
-      context.fillStyle = '#CCC';
+      context.fillStyle = Ship.colors[0];
       context.beginPath();
       context.moveTo(this.x + 52 * Math.cos(this.rad + 0.05), this.y + 52 * Math.sin(this.rad + 0.05));
       context.lineTo(this.x + 32 * Math.cos(this.rad + 0.15), this.y + 32 * Math.sin(this.rad + 0.15));
@@ -201,7 +207,7 @@ Ship.prototype.render = function(context, mouseOver) {
       context.fill();
       context.stroke();
 
-      context.fillStyle = '#CCC';
+      context.fillStyle = Ship.colors[0];
       context.beginPath();
       context.moveTo(this.x + 64 * Math.cos(this.rad + 0.03), this.y + 64 * Math.sin(this.rad + 0.03));
       context.lineTo(this.x + 52 * Math.cos(this.rad + 0.05), this.y + 52 * Math.sin(this.rad + 0.05));
@@ -264,7 +270,7 @@ Ship.prototype.render = function(context, mouseOver) {
       context.stroke();
       context.closePath();
 
-      context.fillStyle = '#CCC';
+      context.fillStyle = Ship.colors[0];
       context.beginPath();
       context.moveTo(this.x - 27.4 * Math.cos(this.rad + 0.45), this.y - 27.4 * Math.sin(this.rad + 0.45));
       context.lineTo(this.x - 25 * Math.cos(this.rad), this.y - 25 * Math.sin(this.rad));
