@@ -10,6 +10,7 @@ ready(function() {
   var overRow = -1;
   var gameOver = false;
   var allowFiring = true;
+  var previousScene = '';
   var scene = 'menu';
   var opponentName = 'Opponent';
   var fleetBoard = [];
@@ -217,8 +218,8 @@ ready(function() {
   function handleBackClick(event) {
     event.preventDefault();
     if (scene == 'options') {
-      if (searchingForGame || isGameInProgress) {
-        scene = 'game';
+      if (previousScene) {
+        scene = previousScene;
       }
       else {
         scene = 'menu';
@@ -235,6 +236,7 @@ ready(function() {
 
   function handleOptionsClick(event) {
     event.preventDefault();
+    previousScene = scene;
     scene = 'options';
   }
   document.getElementById('options').addEventListener('click', handleOptionsClick);
