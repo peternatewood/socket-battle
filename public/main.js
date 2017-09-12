@@ -129,8 +129,8 @@ ready(function() {
     options = JSON.parse(options);
   }
   audio.mute = options.mute;
-  document.body.style.background = backgroundColors[options.background];
-  document.getElementById('canvas').style.background = gameboardColors[options.gameboard];
+  document.body.style['background-color'] = backgroundColors[options.background];
+  document.getElementById('canvas').style['background-color'] = gameboardColors[options.gameboard];
   Ship.setColors(shipColors, options.ships);
 
   // If no option name provided, just save all options in local storage
@@ -143,10 +143,10 @@ ready(function() {
           audio.mute = value;
           break;
         case 'background':
-          document.body.style.background = backgroundColors[overOption];
+          document.body.style['background-color'] = backgroundColors[overOption];
           break;
         case 'gameboard':
-          document.getElementById('canvas').style.background = gameboardColors[overOption];
+          document.getElementById('canvas').style['background-color'] = gameboardColors[overOption];
           break;
         case 'ships':
           Ship.setColors(shipColors, options.ships);

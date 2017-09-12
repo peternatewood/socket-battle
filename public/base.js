@@ -2,7 +2,7 @@ var backgroundColors = [
   '#0AE', '#A0E', '#EA0', '#6C6', '#CC6', '#C66'
 ];
 var gameboardColors = [
-  '#0CE', '#C0F', '#FC0', '#0E0', '#EE0', '#E00'
+  '#0CE', '#ACE', '#C60', '#0DC', '#CA9', '#9AC'
 ];
 var shipColors = [
   '#CCC', '#888', '#68A',

@@ -160,7 +160,7 @@ input[type="submit"]:hover {
 #canvas {
   display: block;
   position: relative;
-  background: #0CE;
+  background-color: #0CE;
   border: 4px solid #333;
   border-radius: 4px;
   margin: 0 auto;
