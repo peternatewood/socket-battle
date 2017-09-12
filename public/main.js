@@ -15,6 +15,14 @@ ready(function() {
   var fleetBoard = [];
   var ships = [];
 
+  var optionShips = [
+    new Ship(440, 532, 2, 5.49),
+    new Ship(500, 532, 3, 5.49),
+    new Ship(560, 532, 4, 5.49),
+    new Ship(620, 532, 5, 5.49),
+    new Ship(680, 532, 6, 5.49)
+  ];
+
   var mouse = {
     shipIndex: -1,
     overOption: -1,
@@ -478,13 +486,8 @@ ready(function() {
           }
         }
         else if (y >= 182 && y <= 242) {
-          if (x >= 38 && x <= 408) {
-            if (overRow != 0) {
-              overRow = 0;
-            }
-          }
-          else if (overOption >= 0) {
-            overOption = -1;
+          if (overRow != 0) {
+            overRow = 0;
           }
         }
         else if (y >= 342 && y <= 402) {
@@ -501,11 +504,14 @@ ready(function() {
           overRow = -1;
         }
 
-        if (overRow >= 0) {
+        if (overRow >= 0 && x >= 38 && x <= 408) {
           var option = ((x - 48) / 60) >> 0;
           if (overOption != option) {
             overOption = option;
           }
+        }
+        else if (overOption >= 0) {
+          overOption = -1;
         }
         break;
       case 'game':
@@ -822,10 +828,12 @@ ready(function() {
           context.fillStyle = 'rgba(255, 255, 255, 0.4)';
 
           if (overRow < 3) {
-            context.fillRect(20, 116 + 160 * overRow, 600, 132);
+            if (overOption >= 0) {
+              context.fillRect(20, 116 + 160 * overRow, 600, 132);
+            }
           }
           else {
-            context.fillRect(720, 120, 480, 55);
+            context.fillRect(720, 110, 480, 75);
           }
         }
 
@@ -883,6 +891,10 @@ ready(function() {
           context.strokeStyle = shipColors[3 * i];
           context.fillRect(48 + 60 * i, 512, 40, 40);
           context.strokeRect(48 + 60 * i, 512, 40, 40);
+        }
+        // Example ships
+        for (var i = 0; i < 5; i++) {
+          optionShips[i].render(context);
         }
 
         // Mute
