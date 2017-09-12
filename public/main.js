@@ -115,10 +115,17 @@ ready(function() {
       ships: 0
     };
 
-    window.localStorage.setItem('options', JSON.stringify(options));
+    updateOptions();
   }
   else {
     options = JSON.parse(options);
+  }
+  // If no option name provided, just save all options in local storage
+  function updateOptions(name, value) {
+    if (name && typeof options[name] != 'undefined') {
+      options[name] = value;
+    }
+    window.localStorage.setItem('options', JSON.stringify(options));
   }
 
   // Signup/login form
@@ -317,6 +324,32 @@ ready(function() {
         }
         break;
       case 'options':
+        switch (overRow) {
+          case 0:
+            if (overOption >= 0) {
+              options.background = overOption;
+              document.body.style.background = backgroundColors[overOption];
+              updateOptions('background', overOption);
+            }
+            break;
+          case 1:
+            if (overOption >= 0) {
+              options.gameboard = overOption;
+              document.getElementById('canvas').style.background = gameboardColors[overOption];
+              updateOptions('gameboard', overOption);
+            }
+            break;
+          case 2:
+            if (overOption >= 0) {
+              options.ships = overOption;
+              updateOptions('ships', overOption);
+            }
+            break;
+          case 3:
+            options.mute = !options.mute;
+            updateOptions('mute', options.mute);
+            break;
+        }
         break;
       case 'game':
         if (gameOver) {
