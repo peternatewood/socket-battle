@@ -214,11 +214,30 @@ ready(function() {
     setupGame();
   }
 
+  function handleBackClick(event) {
+    event.preventDefault();
+    if (scene == 'options') {
+      if (searchingForGame || isGameInProgress) {
+        scene = 'game';
+      }
+      else {
+        scene = 'menu';
+      }
+    }
+  }
+  document.getElementById('back').addEventListener('click', handleBackClick);
+
   function handleMenuClick(event) {
     event.preventDefault();
     quitGame();
   }
   document.getElementById('menu').addEventListener('click', handleMenuClick);
+
+  function handleOptionsClick(event) {
+    event.preventDefault();
+    scene = 'options';
+  }
+  document.getElementById('options').addEventListener('click', handleOptionsClick);
 
   socket.on('opponent quit', function() {
     setMessage(message, opponentName + ' quit the game', true);
@@ -237,15 +256,13 @@ ready(function() {
     var formTable = document.getElementById('form-table');
     var form = document.getElementById('form');
     var game = document.getElementById('gameboard');
-    var signout = document.getElementById('signout');
-    var menu = document.getElementById('menu');
+    var nav = document.getElementById('nav');
 
     spinner.className = 'hide';
     formTable.className = '';
     form.className = '';
     game.className = 'hide';
-    signout.className = 'hide';
-    menu.className = 'hide';
+    nav.className = 'hide';
   }
   document.getElementById('signout').addEventListener('click', handleSignoutClick);
 
