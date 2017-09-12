@@ -316,6 +316,8 @@ ready(function() {
             break;
         }
         break;
+      case 'options':
+        break;
       case 'game':
         if (gameOver) {
           setupGame();
@@ -432,28 +434,45 @@ ready(function() {
         }
         break;
       case 'options':
-        // context.fillRect(48 + 60 * i, 192, 40, 40);
-        // context.strokeRect(48 + 60 * i, 352, 40, 40);
-        // context.fillRect(48 + 20 * i, 512, 40, 40);
-
-        if (y >= 182 && y <= 242) {
+        if (y >= 128 && y <= 182) {
+          if (x >= 720 && x <= 1200) {
+            if (overRow != 3) {
+              overRow = 3;
+            }
+          }
+          else if (overRow >= 0) {
+            overRow = -1;
+          }
+        }
+        else if (y >= 182 && y <= 242) {
           if (x >= 38 && x <= 408) {
             if (overRow != 0) {
               overRow = 0;
-            }
-            var option = ((x - 48) / 60) >> 0;
-            if (overOption != option) {
-              overOption = option;
             }
           }
           else if (overOption >= 0) {
             overOption = -1;
           }
         }
-        else if (y >= 342 && y <= 402) {}
-        else if (y >= 502 && y <= 562) {}
+        else if (y >= 342 && y <= 402) {
+          if (overRow != 1) {
+            overRow = 1;
+          }
+        }
+        else if (y >= 502 && y <= 562) {
+          if (overRow != 2) {
+            overRow = 2;
+          }
+        }
         else if (overRow >= 0) {
           overRow = -1;
+        }
+
+        if (overRow >= 0) {
+          var option = ((x - 48) / 60) >> 0;
+          if (overOption != option) {
+            overOption = option;
+          }
         }
         break;
       case 'game':
@@ -765,6 +784,18 @@ ready(function() {
         context.strokeText('Options', 120, 520);
         break;
       case 'options':
+        // Hover rectangles
+        if (overRow >= 0) {
+          context.fillStyle = 'rgba(255, 255, 255, 0.4)';
+
+          if (overRow < 3) {
+            context.fillRect(20, 116 + 160 * overRow, 600, 132);
+          }
+          else {
+            context.fillRect(720, 120, 480, 55);
+          }
+        }
+
         // Background color options
         context.font = '48px Audiowide, Arial';
         context.textAlign = 'left';
@@ -784,7 +815,7 @@ ready(function() {
         for (var i = 0; i < backgroundColors.length; i++) {
           context.fillStyle = backgroundColors[i];
           context.fillRect(48 + 60 * i, 192, 40, 40);
-          context.strokeStyle = overRow == 0 && i == overOption ? '#888' : '#000';
+          context.strokeStyle = overRow == 0 && i == overOption ? '#555' : '#000';
           context.strokeRect(48 + 60 * i, 192, 40, 40);
         }
         // Gameboard color options
@@ -795,12 +826,12 @@ ready(function() {
         context.fillText('Gameboard Color', 40, 288);
         context.strokeText('Gameboard Color', 40, 288);
 
-        context.strokeStyle = '#000';
         context.lineWidth = 4;
-        context.lineJoin = 'round'
+        context.lineJoin = 'round';
         for (var i = 0; i < gameboardColors.length; i++) {
           context.fillStyle = gameboardColors[i];
           context.fillRect(48 + 60 * i, 352, 40, 40);
+          context.strokeStyle = overRow == 1 && i == overOption ? '#555' : '#000';
           context.strokeRect(48 + 60 * i, 352, 40, 40);
         }
         // Ship color options
@@ -812,16 +843,46 @@ ready(function() {
         context.strokeText('Ships Color', 40, 448);
 
         context.lineWidth = 4;
-        context.lineJoin = 'round'
-        for (var i = 0; i < shipColors.length; i += 3) {
+        context.lineJoin = 'round';
+        for (var i = 0; i < shipColors.length / 3; i++) {
           // Use hover color when hovering
-          context.fillStyle = shipColors[i + 1];
-          context.strokeStyle = shipColors[i];
-          context.fillRect(48 + 20 * i, 512, 40, 40);
-          context.strokeRect(48 + 20 * i, 512, 40, 40);
+          context.fillStyle = overRow == 2 && i == overOption ? shipColors[3 * i + 2] : shipColors[3 * i + 1];
+          context.strokeStyle = shipColors[3 * i];
+          context.fillRect(48 + 60 * i, 512, 40, 40);
+          context.strokeRect(48 + 60 * i, 512, 40, 40);
         }
 
+        // Mute
         context.lineJoin = 'miter';
+        context.fillStyle = '#331';
+        context.strokeStyle = '#777';
+        context.lineWidth = 2;
+        context.fillText('Mute Sounds', 824, 128);
+        context.strokeText('Mute Sounds', 824, 128);
+
+        context.fillStyle = '#331';
+        context.beginPath();
+        context.moveTo(736, 138);
+        context.lineTo(746, 138);
+        context.arc(736, 148, 30, -0.7, 0.7);
+        context.lineTo(746, 158);
+        context.lineTo(736, 158);
+        context.closePath();
+        context.fill();
+        context.stroke();
+
+        if (!options.mute) {
+          context.lineWidth = 4;
+          context.beginPath();
+          context.arc(736, 148, 40, -0.6, 0.6);
+          context.stroke();
+          context.closePath();
+
+          context.beginPath();
+          context.arc(736, 148, 52, -0.6, 0.6);
+          context.stroke();
+          context.closePath();
+        }
         break;
       case 'game':
         // Draw grid lines and numbers/letters
