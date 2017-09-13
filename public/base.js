@@ -1,3 +1,6 @@
+const PI = Math.PI;
+const TAU = 2 * PI;
+
 var backgroundColors = [
   '#0AE', '#A0E', '#EA0', '#6C6', '#CC6', '#C66'
 ];

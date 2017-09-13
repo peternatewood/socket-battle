@@ -1,6 +1,3 @@
-const PI = Math.PI;
-const TAU = 2 * PI;
-
 // Ships: Carrier (6), Battleship (5), 2 Destroyers (4), 2 Submarines (3), 2 Patrol Boats (2)
 var Ship = function(x, y, size, rad) {
   // Center

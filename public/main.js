@@ -748,9 +748,6 @@ ready(function() {
   function step(t) {
     var context = document.getElementById('canvas').getContext('2d');
 
-    var PI = Math.PI;
-    var TAU = 2 * PI;
-
     context.clearRect(0, 0, 1200, 680);
 
     switch (scene) {
