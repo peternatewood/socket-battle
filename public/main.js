@@ -566,6 +566,7 @@ ready(function() {
 
             ships[heldShip].x += xDist;
             ships[heldShip].y += yDist;
+            ships[heldShip].setTiles();
           }
           else if (isGameInProgress) {
             if (isOverTargetBoard(x, y)) {
@@ -1037,6 +1038,14 @@ ready(function() {
               if (ships[i].targetRad > 5) {
                 ships[i].targetRad = 0;
               }
+            }
+            ships[i].setTiles();
+          }
+          if (heldShip == i) {
+            context.fillStyle = 'rgba(0,0,0,0.2)';
+            var tileX, tileY;
+            for (var l = 0; l < ships[i].size; l++) {
+              context.fillRect(40 + 40 * (ships[i].tiles[l] % 12), 80 + 40 * (ships[i].tiles[l] / 12 >> 0), 40, 40);
             }
           }
           ships[i].render(context, mouse.shipIndex == i);
@@ -1623,16 +1632,25 @@ ready(function() {
       }
       if (typeof heldShip == 'number') {
         context.fillText('Ship: ' + ships[heldShip].x + ', ' + ships[heldShip].y, 8, 200);
+        context.fillText('Ship Tiles:', 1032, 32);
+        for (var i = 0; i < ships[heldShip].size; i++) {
+          if (typeof ships[heldShip].tiles[i] == 'number') {
+            context.fillText(ships[heldShip].tiles[i], 1032, 64 + i * 32);
+          }
+          else {
+            break;
+          }
+        }
       }
       // context.fillText('Mouse X:', 1032, 32);
       // context.fillText(mouse.x, 1132, 32);
       // context.fillText('Mouse Y:', 1032, 64);
       // context.fillText(mouse.y, 1132, 64);
 
-      context.fillText('Ship Rad:', 1032, 32);
-      context.fillText(shipToy.rad, 1132, 32);
-      context.fillText('Ship Target:', 1032, 64);
-      context.fillText(shipToy.targetR, 1132, 64);
+      // context.fillText('Ship Rad:', 1032, 32);
+      // context.fillText(shipToy.rad, 1132, 32);
+      // context.fillText('Ship Target:', 1032, 64);
+      // context.fillText(shipToy.targetR, 1132, 64);
 
       context.strokeStyle = '#000';
       context.lineWidth = 2;
