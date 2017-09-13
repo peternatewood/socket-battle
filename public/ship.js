@@ -41,6 +41,39 @@ Ship.prototype.rotate = function() {
   startTone(audio, 256, 'square', 0, 0.12);
   startTone(audio, 384, 'square', 0.12, 0.24);
 };
+Ship.prototype.setTiles = function() {
+  var halfSize = (40 * this.size) / 2;
+  var bounds = this.getBounds();
+
+  if (bounds.l >= 20 && bounds.r < 540 && bounds.t >= 60 && bounds.b < 580) {
+    var col, row, head, tileMax, increment;
+
+    if (this.rad < PI / 2 || (this.rad >= PI && this.rad < 1.5 * PI)) {
+      increment = 1;
+      col = ((this.x - 20 - halfSize) / 40) >> 0;
+      row = ((this.y - 80) / 40) >> 0;
+      tileMax = 12 - col;
+    }
+    else {
+      increment = 12;
+      col = ((this.x - 40) / 40) >> 0;
+      row = ((this.y - 60 - halfSize) / 40) >> 0;
+      tileMax = 12 - row;
+    }
+
+    head = col + 12 * row;
+    tilesOnBoard = tileMax >= this.size ? this.size : this.size - tileMax;
+
+    var tiles = [];
+    for (var i = 0; i < tilesOnBoard; i++) {
+      tiles.push(head + (i * increment));
+    }
+    this.tiles = tiles;
+  }
+  else {
+    this.tiles = [];
+  }
+};
 Ship.prototype.getBounds = function() {
   var halfSize = (40 * this.size) / 2;
 
@@ -67,12 +100,12 @@ Ship.prototype.drop = function(board) {
     var halfSize = (40 * this.size) / 2;
 
     if (this.rad == 0 || this.rad == PI) {
-      this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * (this.x / 40 >> 0) + ((this.size % 2) * 20)));
+      this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * ((this.x + 20) / 40 >> 0) + ((this.size % 2) * 20)));
       this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
     }
     else {
       this.x = Math.min(500, Math.max(60, 40 * (this.x / 40 >> 0) + 20));
-      this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * (this.y / 40 >> 0) + ((this.size % 2) * 20)));
+      this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * ((this.y + 20) / 40 >> 0) + ((this.size % 2) * 20)));
     }
 
     if (updateBoard(board, this)) {
