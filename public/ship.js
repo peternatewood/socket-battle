@@ -31,6 +31,7 @@ Ship.setColors = function(colors, option) {
   }
 };
 Ship.prototype.tiles = [];
+Ship.prototype.oldTiles = [];
 Ship.prototype.onBoard = false;
 Ship.prototype.rotate = function() {
   var rad = this.targetRad + PI / 2;
@@ -100,12 +101,12 @@ Ship.prototype.drop = function(board) {
     var halfSize = (40 * this.size) / 2;
 
     if (this.rad == 0 || this.rad == PI) {
-      this.x = Math.min(520 - halfSize, Math.max(40 + halfSize, 40 * ((this.x + 20) / 40 >> 0) + ((this.size % 2) * 20)));
-      this.y = Math.min(540, Math.max(60, 40 * (this.y / 40 >> 0) + 20));
+      this.x = 40 + 40 * (this.tiles[0] % 12) + halfSize;
+      this.y = 80 + 40 * (this.tiles[0] / 12 >> 0) + 20;
     }
     else {
-      this.x = Math.min(500, Math.max(60, 40 * (this.x / 40 >> 0) + 20));
-      this.y = Math.min(560 - halfSize, Math.max(80 + halfSize, 40 * ((this.y + 20) / 40 >> 0) + ((this.size % 2) * 20)));
+      this.x = 40 + 40 * (this.tiles[0] % 12) + 20;
+      this.y = 80 + 40 * (this.tiles[0] / 12 >> 0) + halfSize;
     }
 
     if (updateBoard(board, this)) {
@@ -122,6 +123,7 @@ Ship.prototype.drop = function(board) {
   this.y = this.oldY;
   this.rad = this.oldRad;
   this.targetRad = this.oldRad;
+  this.tiles = this.oldTiles;
   if (this.onBoard) {
     updateBoard(board, this);
   }

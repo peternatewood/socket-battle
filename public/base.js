@@ -64,7 +64,7 @@ function updateBoard(board, ship) {
     if (typeof ship.tiles[i] != 'number' || board[ship.tiles[i]]) {
       return false;
     }
-    tiles.push(i);
+    tiles.push(ship.tiles[i]);
   }
 
   for (var i = 0; i < ship.size; i++) {

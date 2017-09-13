@@ -440,6 +440,7 @@ ready(function() {
                 if (event.button == 0) {
                   heldShip = i;
                   ships[i].oldRad = ships[i].rad;
+                  ships[i].oldTiles = ships[i].tiles;
                   if (ships[i].onBoard) {
                     clearTiles(fleetBoard, ships[i]);
                   }
