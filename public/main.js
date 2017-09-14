@@ -16,6 +16,9 @@ ready(function() {
   var fleetBoard = [];
   var ships = [];
 
+  // Prerenders
+  var title = document.getElementById('title');
+
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
     new Ship(520, 532, 3, 5.49),
@@ -818,11 +821,7 @@ ready(function() {
         shipToy.render(context);
 
         // Title
-        context.fillStyle = '#331';
-        context.font = '120px Black Ops One, Georgia';
-        context.textAlign = 'left';
-        context.textBaseline = 'top';
-        context.fillText('Sea Battle', 64, 80);
+        context.drawImage(title, 64, 80);
 
         // Menu options
         context.lineWidth = 2;
