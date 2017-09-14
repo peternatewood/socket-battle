@@ -18,6 +18,7 @@ ready(function() {
 
   // Prerenders
   var title = document.getElementById('title');
+  var fireButton = document.getElementById('fire-button');
 
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
@@ -1305,46 +1306,7 @@ ready(function() {
         }
 
         // Fire button background
-        context.fillStyle = '#FF0';
-        context.fillRect(520, 618, 160, 62);
-        context.fillStyle = '#000';
-        context.beginPath();
-        context.moveTo(520, 649);
-        context.lineTo(535, 618);
-        context.lineTo(550, 618);
-        context.lineTo(520, 680);
-        context.closePath();
-        context.fill();
-        context.beginPath();
-        context.moveTo(552, 680);
-        context.lineTo(582, 618);
-        context.lineTo(597, 618);
-        context.lineTo(567, 680);
-        context.closePath();
-        context.fill();
-        context.beginPath();
-        context.moveTo(603, 680);
-        context.lineTo(633, 618);
-        context.lineTo(648, 618);
-        context.lineTo(618, 680);
-        context.closePath();
-        context.fill();
-        context.beginPath();
-        context.moveTo(680, 618);
-        context.lineTo(650, 680);
-        context.lineTo(665, 680);
-        context.lineTo(680, 649);
-        context.closePath();
-        context.fill();
-        // FIRE! text
-        context.font = '32px Audiowide, Arial';
-        context.textAlign = 'right';
-        context.fillStyle = '#FFF';
-        context.shadowBlur = 8;
-        context.shadowColor = '#000';
-        context.fillText('FIRE!', 670, 649);
-        context.fillText('FIRE!', 670, 649);
-        context.shadowBlur = 0;
+        context.drawImage(fireButton, 520, 618);
         // Red button
         context.fillStyle = mouse.fire && allowFiring ? '#F88' : '#F00';
         context.beginPath();
