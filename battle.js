@@ -25,7 +25,7 @@ app.get('/battle', function(request, response) {
 // Database connection
 var databaseType = process.env.DB_TYPE || 'postgres';
 
-var dbCredentials = {
+var dbCredentials = process.env.DATABASE_URL || {
   host      : process.env.DB_HOST     || 'localhost',
   user      : process.env.DB_USER     || 'root',
   password  : process.env.DB_PASSWORD || 'root',
