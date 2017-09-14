@@ -31,7 +31,7 @@ var dbCredentials = {
   password  : process.env.DB_PASSWORD || 'root',
   database  : process.env.DB_NAME     || 'socket_battle'
 };
-var connection = require('./database_connection.js')(dbCredentials);
+var connection = require('./database_connection.js')(dbCredentials, databaseType);
 
 var users = {};
 
