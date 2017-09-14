@@ -1,4 +1,4 @@
-# <a href="https://still-falls-22958.herokuapp.com/" target="_blank">Socket IO Sea Battle</a>
+<a href="https://still-falls-22958.herokuapp.com/"># Socket IO Sea Battle</a>
 
 Two-player board game adaptation utilizing socket io.
 
