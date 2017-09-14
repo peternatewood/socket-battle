@@ -6,7 +6,6 @@ var path = require('path');
 var passwordHash = require('password-hash');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var mysql = require('mysql');
 
 server.listen(PORT, function() {
   console.log('Server listening at port %d', PORT);
@@ -24,29 +23,19 @@ app.get('/battle', function(request, response) {
 });
 
 // Database connection
+var databaseType = process.env.DB_TYPE || 'postgres';
+
 var dbCredentials = {
   host      : process.env.DB_HOST     || 'localhost',
   user      : process.env.DB_USER     || 'root',
   password  : process.env.DB_PASSWORD || 'root',
   database  : process.env.DB_NAME     || 'socket_battle'
 };
-var connection = mysql.createConnection(dbCredentials);
-
-try {
-  connection.connect();
-}
-catch (err) {
-  console.error('Database connection error', err, dbCredentials);
-  // TODO what to do if the database won't connect?
-}
+var connection = require('./database_connection.js')(dbCredentials, databaseType);
 
 var users = {};
 
-connection.query('SELECT username, password_hash, token FROM users', function(err, rows, fields) {
-  if (err) {
-    throw err;
-  }
-
+connection.getUsers(function(rows) {
   for (var i = 0; i < rows.length; i++) {
     u = rows[i];
     users[u.username] = {
@@ -118,12 +107,14 @@ function getEmptyRoom(games) {
   return roomNum;
 }
 function deleteGameRoom(room) {
-  activeGames[room].turn = null;
-  activeGames[room].players = null;
-  activeGames[room].fleetBoards = null;
-  activeGames[room].targetBoards = null;
-  activeGames[room].ships = null;
-  delete activeGames[room];
+  if (activeGames[room]) {
+    activeGames[room].turn = null;
+    activeGames[room].players = null;
+    activeGames[room].fleetBoards = null;
+    activeGames[room].targetBoards = null;
+    activeGames[room].ships = null;
+    delete activeGames[room];
+  }
 }
 
 function generateToken() {
@@ -155,50 +146,45 @@ io.on('connection', function(socket) {
       username = data.username;
       var token = generateToken();
 
-      connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
-        if (err) {
-          throw err;
+      connection.loginUser(username, function() {
+        user.token = token;
+
+        var gameData = {
+          username: data.username,
+          token: token
+        };
+        // Player is rejoining game
+        var room = activeGames[data.room];
+
+        if (typeof data.playerNum == 'number' && data.room && room && room.players[data.playerNum] == username) {
+          playerNum = data.playerNum;
+          gameRoom = data.room;
+
+          gameData.playerNum = data.playerNum;
+          gameData.room = data.room;
+
+          var opponent = '';
+          if (room.players.length == 2) {
+            opponent = room.players[(data.playerNum + 1) % 2];
+            socket.broadcast.to(gameRoom).emit('opponent rejoined');
+          }
+
+          var response = {
+            inProgress: !room.isEmpty(),
+            gameData: gameData,
+            ships: room.ships[data.playerNum],
+            fleetBoard: room.fleetBoards[data.playerNum],
+            targetBoard: room.targetBoards[data.playerNum],
+            opponent: opponent
+          };
+
+          socket.join(data.room);
+          console.log(username, 'rejoined game', gameRoom);
+          socket.emit('game rejoined', response);
         }
         else {
-          user.token = token;
-
-          var gameData = {
-            username: data.username,
-            token: token
-          };
-          // Player is rejoining game
-          var room = activeGames[data.room];
-
-          if (typeof data.playerNum == 'number' && data.room && room && room.players[data.playerNum] == username) {
-            playerNum = data.playerNum;
-            gameRoom = data.room;
-
-            gameData.playerNum = data.playerNum;
-            gameData.room = data.room;
-
-            var opponent = '';
-            if (room.players.length == 2) {
-              opponent = room.players[(data.playerNum + 1) % 2];
-              socket.broadcast.to(gameRoom).emit('opponent rejoined');
-            }
-
-            var response = {
-              inProgress: !room.isEmpty(),
-              gameData: gameData,
-              ships: room.ships[data.playerNum],
-              fleetBoard: room.fleetBoards[data.playerNum],
-              targetBoard: room.targetBoards[data.playerNum],
-              opponent: opponent
-            };
-
-            socket.join(data.room);
-            console.log(username, 'rejoined game', gameRoom);
-            socket.emit('game rejoined', response);
-          }
-          else {
-            console.log(username, 'logged in');
-            socket.emit('token valid', { success: true, gameData: gameData });
-          }
+          console.log(username, 'logged in');
+          socket.emit('token valid', { success: true, gameData: gameData });
         }
       });
     }
@@ -239,26 +225,21 @@ io.on('connection', function(socket) {
         updated_at: new Date()
       };
 
-      connection.query('INSERT INTO users SET ?', fields, function(err, results, fields) {
-        if (err) {
-          socket.emit('signup error', 'Signup error, please contact your administrator');
-        }
-        else {
-          users[data.username] = {
-            passwordHash: password,
-            token: token
-          };
+      connection.createUser(fields, function() {
+        users[data.username] = {
+          passwordHash: password,
+          token: token
+        };
 
-          loggedIn = true;
-          username = data.username;
+        loggedIn = true;
+        username = data.username;
 
-          var response = {
-            message: 'Welcome ' + data.username,
-            username: data.username,
-            token: token
-          };
-          socket.emit('signup valid', response);
-        }
+        var response = {
+          message: 'Welcome ' + data.username,
+          username: data.username,
+          token: token
+        };
+        socket.emit('signup valid', response);
       });
     }
   });
@@ -280,46 +261,36 @@ io.on('connection', function(socket) {
 
         var token = generateToken();
 
-        connection.query('UPDATE users SET token = ? WHERE username = ?', [token, data.username], function(err, results, fields) {
-          if (err) {
-            socket.emit('login error', 'Login error, please contact your administrator');
-          }
-          else {
-            user.token = token;
+        connection.loginUser(token, username, function() {
+          user.token = token;
 
-            var response = {
-              message: 'Welcome ' + data.username,
-              username: data.username,
-              token: token
-            };
-            socket.emit('login valid', response);
-          }
+          var response = {
+            message: 'Welcome ' + data.username,
+            username: data.username,
+            token: token
+          };
+          socket.emit('login valid', response);
         });
       }
     }
   });
 
-  socket.on('signout', function(username) {
-    connection.query('UPDATE users SET token = NULL WHERE username = ?', username, function(err, results, fields) {
-      if (err) {
-        throw err;
-      }
-      else {
-        if (activeGames[gameRoom]) {
-          if (activeGames[gameRoom].quit) {
-            delete activeGames[gameRoom];
-          }
-          else {
-            activeGames[gameRoom].quit = true;
-            socket.broadcast.to(gameRoom).emit('opponent signout');
-          }
+  socket.on('signout', function(name) {
+    connection.signoutUser(name, function() {
+      if (activeGames[gameRoom]) {
+        if (activeGames[gameRoom].quit) {
+          delete activeGames[gameRoom];
         }
-
-        socket.leave(gameRoom);
-        loggedIn = false;
-        username = null;
-        gameRoom = null;
+        else {
+          activeGames[gameRoom].quit = true;
+          socket.broadcast.to(gameRoom).emit('opponent signout');
+        }
       }
+
+      socket.leave(gameRoom);
+      loggedIn = false;
+      username = null;
+      gameRoom = null;
     });
   });
 

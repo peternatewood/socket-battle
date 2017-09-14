@@ -7,7 +7,14 @@ body {
 
 .hide {
   position: absolute;
-  right: -999em;
+  padding: 0 !important;
+  margin: -1px !important;
+  width: 1px !important;
+  height: 1px !important;
+  left: 0 !important;
+  right: 0 !important;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
 }
 
 #nav {
@@ -16,9 +23,6 @@ body {
   top: 0;
   right: 0;
   z-index: 1;
-}
-#nav.hide {
-  right: -999em;
 }
 
 #nav a {
