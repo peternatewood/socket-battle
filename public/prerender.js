@@ -6,6 +6,32 @@ function prerender() {
   title.textAlign = 'left';
   title.fillText('Sea Battle', -7, 86);
 
+  var menu = document.getElementById('menu-text').getContext('2d');
+
+  menu.lineWidth = 2;
+  menu.font = '48px Audiowide, Arial';
+  menu.textAlign = 'left';
+
+  menu.fillStyle = '#BA4';
+  menu.strokeStyle = '#870';
+
+  menu.fillText('Start Game', 0, 37);
+  menu.strokeText('Start Game', 0, 37);
+  menu.fillText('Tournament', 306, 37);
+  menu.strokeText('Tournament', 306, 37);
+  menu.fillText('Options', 628, 37);
+  menu.strokeText('Options', 628, 37);
+
+  menu.fillStyle = '#DC4';
+  menu.strokeStyle = '#A90';
+
+  menu.fillText('Start Game', 0, 83);
+  menu.strokeText('Start Game', 0, 83);
+  menu.fillText('Tournament', 306, 83);
+  menu.strokeText('Tournament', 306, 83);
+  menu.fillText('Options', 628, 83);
+  menu.strokeText('Options', 628, 83);
+
   var fireButton = document.getElementById('fire-button').getContext('2d');
 
   // Fire button background

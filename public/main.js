@@ -26,6 +26,7 @@ ready(function() {
 
   // Prerenders
   var title = document.getElementById('title');
+  var menuText = document.getElementById('menu-text');
   var fireButton = document.getElementById('fire-button');
   var messageCanvas = document.getElementById('message');
   var directions = document.getElementById('directions');
@@ -837,39 +838,9 @@ ready(function() {
         context.drawImage(title, 64, 80);
 
         // Menu options
-        context.lineWidth = 2;
-        context.font = '48px Audiowide, Arial';
-        context.textAlign = 'left';
-        if (mouse.overOption == 0) {
-          context.fillStyle = '#DC4';
-          context.strokeStyle = '#A90';
-        }
-        else {
-          context.fillStyle = '#BA4';
-          context.strokeStyle = '#870';
-        }
-        context.fillText('Start Game', 120, 352);
-        context.strokeText('Start Game', 120, 352);
-        if (mouse.overOption == 1) {
-          context.fillStyle = '#DC4';
-          context.strokeStyle = '#A90';
-        }
-        else {
-          context.fillStyle = '#BA4';
-          context.strokeStyle = '#870';
-        }
-        context.fillText('Tournament', 120, 452);
-        context.strokeText('Tournament', 120, 452);
-        if (mouse.overOption == 2) {
-          context.fillStyle = '#DC4';
-          context.strokeStyle = '#A90';
-        }
-        else {
-          context.fillStyle = '#BA4';
-          context.strokeStyle = '#870';
-        }
-        context.fillText('Options', 120, 552);
-        context.strokeText('Options', 120, 552);
+        context.drawImage(menuText, 0, mouse.overOption == 0 ? 46 : 0, 306, 46, 120, 316, 306, 46);
+        context.drawImage(menuText, 306, mouse.overOption == 1 ? 46 : 0, 322, 46, 120, 416, 322, 46);
+        context.drawImage(menuText, 628, mouse.overOption == 2 ? 46 : 0, 208, 46, 120, 516, 208, 46);
         break;
       case 'options':
         // Hover rectangles
