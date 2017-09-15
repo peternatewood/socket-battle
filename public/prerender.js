@@ -41,7 +41,7 @@ ready(function() {
   fireButton.closePath();
   fireButton.fill();
   // FIRE! text
-  fireButton.font = '32px Audiowide, Arial';
+  fireButton.font = '32px Audiowide';
   fireButton.textAlign = 'right';
   fireButton.fillStyle = '#FFF';
   fireButton.shadowBlur = 8;
@@ -49,10 +49,27 @@ ready(function() {
   fireButton.fillText('FIRE!', 150, 41);
   fireButton.fillText('FIRE!', 150, 41);
 
+  var directions = document.getElementById('directions').getContext('2d');
+
+  directions.font = '24px Audiowide';
+  directions.textAlign = 'left';
+  directions.fillStyle = '#000';
+  directions.fillText('Click and drag to place your ships!', 0, 19);
+  directions.fillText('Rotate a grabbed ship with', 0, 79);
+  directions.fillText('the right mouse button or spacebar', 0, 119);
+  directions.fillText("Click the FIRE! button when you're", 0, 179);
+  directions.fillText("ready to start!", 0, 219);
+
+  directions.fillText('Patrol Boats', 298, 309);
+  directions.fillText('Submarines', 208, 349);
+  directions.fillText('Destroyer', 128, 389);
+  directions.fillText('Battleship', 88, 429);
+  directions.fillText('Aircraft Carrier', 48, 469);
+
   var message = document.getElementById('message').getContext('2d');
   // Set state now rather than later
   message.fillStyle = '#4F4';
-  message.font = '24px Roboto Mono, Courier';
+  message.font = '24px Roboto Mono';
   message.textAlign = 'left';
   message.textBaseline = 'middle';
 });

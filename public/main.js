@@ -20,6 +20,7 @@ ready(function() {
   var title = document.getElementById('title');
   var fireButton = document.getElementById('fire-button');
   var messageCanvas = document.getElementById('message');
+  var directions = document.getElementById('directions');
 
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
@@ -1010,19 +1011,7 @@ ready(function() {
           context.fillRect(1200 - trayWidth, 60, trayWidth, 520);
           context.strokeRect(1200 - trayWidth, 60, trayWidth + 4, 520);
 
-          context.fillStyle = '#000';
-          context.textAlign = 'left';
-          context.fillText('Click and drag to place your ships!', 1220 - trayWidth, 100);
-          context.fillText('Rotate a grabbed ship with', 1220 - trayWidth, 160);
-          context.fillText('the right mouse button or spacebar', 1220 - trayWidth, 200);
-          context.fillText("Click the FIRE! button when you're", 1220 - trayWidth, 260);
-          context.fillText("ready to start!", 1220 - trayWidth, 300);
-
-          context.fillText('Patrol Boats', 1510 - trayWidth, 390);
-          context.fillText('Submarines', 1420 - trayWidth, 430);
-          context.fillText('Destroyer', 1340 - trayWidth, 470);
-          context.fillText('Battleship', 1300 - trayWidth, 510);
-          context.fillText('Aircraft Carrier', 1260 - trayWidth, 550);
+          context.drawImage(directions, 1212 - trayWidth, 80);
 
           if (trayWidth < 500) {
             trayWidth -= 8;
