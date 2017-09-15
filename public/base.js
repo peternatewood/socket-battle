@@ -74,7 +74,14 @@ function updateBoard(board, ship) {
 }
 
 function setMessage(message, content, flash) {
-  message.content = content;
+  var context = document.getElementById('message').getContext('2d');
+
+  context.clearRect(0, 0, 492, 54);
+  context.fillStyle = '#4F4';
+  context.font = '24px Roboto Mono, Courier';
+  context.textAlign = 'left';
+  context.fillText(content, 0, 0);
+
   message.length = content.length;
   message.cursorDelay = 0;
   message.flash = flash;
@@ -82,9 +89,13 @@ function setMessage(message, content, flash) {
   if (flash) {
     message.delay = 90;
     message.cursor = Math.min(33, content.length);
+    message.cursorX = 694 + 14 * (message.cursor + 1);
+    message.width = Math.min(492, message.length * 15);
   }
   else {
     message.delay = 0;
     message.cursor = 0;
+    message.cursorX = 694;
+    message.width = 0;
   }
 }

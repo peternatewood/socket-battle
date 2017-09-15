@@ -19,6 +19,7 @@ ready(function() {
   // Prerenders
   var title = document.getElementById('title');
   var fireButton = document.getElementById('fire-button');
+  var messageCanvas = document.getElementById('message');
 
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
@@ -68,10 +69,10 @@ ready(function() {
   };
 
   var message = {
-    content: '',
-    text: '',
     length: 0,
     cursor: 0,
+    cursorX: 694,
+    width: 0,
     cursorDelay: 0,
     delay: 0,
     flash: false
@@ -1327,14 +1328,6 @@ ready(function() {
 
         // Message display
         if (message.flash && message.delay > 0) {
-          if ((message.delay / 10 >> 0) % 2) {
-            if (message.text) {
-              message.text = '';
-            }
-          }
-          else if (message.text == '') {
-            message.text = message.content;
-          }
           message.delay--;
           if (message.delay == 0) {
             message.flash = false;
@@ -1342,10 +1335,14 @@ ready(function() {
         }
         else if (message.cursor < message.length) {
           message.cursor += 0.5;
-          message.text = message.content.slice(0, message.cursor >> 0);
           if (message.cursor >= 34) {
             message.cursor = 33;
           }
+          message.width = message.cursor * 15;
+          if (message.width > 492) {
+            message.width = 492;
+          }
+          message.cursorX = 694 + 14 * (message.cursor + 1);
         }
         else {
           if (message.cursorDelay == 0) {
@@ -1376,12 +1373,16 @@ ready(function() {
         context.fill();
         context.fillStyle = '#030';
         context.fillRect(684, 622, 512, 54);
-        context.fillStyle = '#4F4';
-        context.font = '24px Roboto Mono, Courier';
-        context.textAlign = 'left';
-        context.fillText(message.text, 694, 649);
-        if (message.cursorDelay > 48) {
-          context.fillText('_', 694 + 14 * (message.cursor + 1), 649);
+        if (message.width > 0 && (!message.flash || (message.flash && (message.delay / 10 >> 0) % 2))) {
+          context.drawImage(messageCanvas, 0, 0, message.width, 25, 696, 638, message.width, 25);
+        }
+        if (message.cursorDelay > 48 || message.cursor < message.length) {
+          context.strokeStyle = '#4F4';
+          context.beginPath();
+          context.moveTo(message.cursorX, 656);
+          context.lineTo(message.cursorX + 12, 656);
+          context.stroke();
+          context.closePath();
         }
 
         // Radar toy

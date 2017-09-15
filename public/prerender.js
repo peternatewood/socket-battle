@@ -50,4 +50,11 @@ ready(function() {
   fireButton.shadowColor = '#000';
   fireButton.fillText('FIRE!', 150, 31);
   fireButton.fillText('FIRE!', 150, 31);
+
+  var message = document.getElementById('message').getContext('2d');
+  // Set state now rather than later
+  message.fillStyle = '#4F4';
+  message.font = '24px Roboto Mono, Courier';
+  message.textAlign = 'left';
+  message.textBaseline = 'top';
 });
