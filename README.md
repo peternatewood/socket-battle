@@ -1,6 +1,6 @@
 # [Socket IO Sea Battle](https://still-falls-22958.herokuapp.com/)
 
-Two-player board game adaptation utilizing socket io.
+Two-player board game adaptation utilizing socket io. Try it out [here](https://still-falls-22958.herokuapp.com/), and bring along a friend so you can actually play :sweat_smile:
 
 ## Database Setup
 
