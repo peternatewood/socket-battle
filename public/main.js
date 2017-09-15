@@ -847,8 +847,8 @@ ready(function() {
           context.fillStyle = '#BA4';
           context.strokeStyle = '#870';
         }
-        context.fillText('Start Game', 120, 320);
-        context.strokeText('Start Game', 120, 320);
+        context.fillText('Start Game', 120, 352);
+        context.strokeText('Start Game', 120, 352);
         if (mouse.overOption == 1) {
           context.fillStyle = '#DC4';
           context.strokeStyle = '#A90';
@@ -857,8 +857,8 @@ ready(function() {
           context.fillStyle = '#BA4';
           context.strokeStyle = '#870';
         }
-        context.fillText('Tournament', 120, 420);
-        context.strokeText('Tournament', 120, 420);
+        context.fillText('Tournament', 120, 452);
+        context.strokeText('Tournament', 120, 452);
         if (mouse.overOption == 2) {
           context.fillStyle = '#DC4';
           context.strokeStyle = '#A90';
@@ -867,8 +867,8 @@ ready(function() {
           context.fillStyle = '#BA4';
           context.strokeStyle = '#870';
         }
-        context.fillText('Options', 120, 520);
-        context.strokeText('Options', 120, 520);
+        context.fillText('Options', 120, 552);
+        context.strokeText('Options', 120, 552);
         break;
       case 'options':
         // Hover rectangles
