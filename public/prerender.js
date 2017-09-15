@@ -72,4 +72,17 @@ function prerender() {
   message.font = '24px Roboto Mono';
   message.textAlign = 'left';
   message.textBaseline = 'middle';
+
+  var loading = document.getElementById('loading').getContext('2d');
+
+  loading.fillStyle = 'rgba(0,0,0,0.6)';
+  loading.fillRect(0, 0, 1200, 680);
+
+  loading.fillStyle = '#4F4';
+  loading.strokeStyle = '#4F4';
+  loading.lineWidth = 2;
+  loading.textAlign = 'center';
+  loading.font = '32px Roboto Mono, Courier';
+
+  loading.fillText('Searching for Opponent...', 600, 60);
 }

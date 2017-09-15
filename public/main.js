@@ -29,6 +29,7 @@ ready(function() {
   var fireButton = document.getElementById('fire-button');
   var messageCanvas = document.getElementById('message');
   var directions = document.getElementById('directions');
+  var loading = document.getElementById('loading');
 
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
@@ -1449,17 +1450,9 @@ ready(function() {
           var mag = Math.max(160, Math.sqrt(Math.pow(loader.x - 600, 2) + Math.pow(loader.y - 340, 2)));
           loader.rad = Math.atan2(loader.y - 340, loader.x - 600);
 
-          context.fillStyle = 'rgba(0,0,0,0.6)';
-          context.fillRect(0, 0, 1200, 680);
+          context.drawImage(loading, 0, 0);
 
-          context.fillStyle = '#4F4';
-          context.strokeStyle = '#4F4';
           context.lineWidth = 2;
-          context.textAlign = 'center';
-          context.font = '32px Roboto Mono, Courier';
-
-          context.fillText('Searching for Opponent...', 600, 60);
-
           context.beginPath();
           context.moveTo(600, 340);
           context.lineTo(600 + mag * Math.cos(loader.rad), 340 + mag * Math.sin(loader.rad));
