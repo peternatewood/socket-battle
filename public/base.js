@@ -74,13 +74,14 @@ function updateBoard(board, ship) {
 }
 
 function setMessage(message, content, flash) {
-  var context = document.getElementById('message').getContext('2d');
+  var messageContext = document.getElementById('message').getContext('2d');
 
-  context.clearRect(0, 0, 492, 54);
-  context.fillStyle = '#4F4';
-  context.font = '24px Roboto Mono, Courier';
-  context.textAlign = 'left';
-  context.fillText(content, 0, 0);
+  messageContext.clearRect(0, 0, 492, 54);
+  messageContext.fillStyle = '#4F4';
+  messageContext.font = '24px Roboto Mono, Courier';
+  messageContext.textAlign = 'left';
+  messageContext.textBaseline = 'alphabetic';
+  messageContext.fillText(content, 0, 20);
 
   message.length = content.length;
   message.cursorDelay = 0;

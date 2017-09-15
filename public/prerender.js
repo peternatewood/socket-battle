@@ -4,8 +4,7 @@ ready(function() {
   title.fillStyle = '#331';
   title.font = '120px Black Ops One';
   title.textAlign = 'left';
-  title.textBaseline = 'top';
-  title.fillText('Sea Battle', -7, 0);
+  title.fillText('Sea Battle', -7, 86);
 
   var fireButton = document.getElementById('fire-button').getContext('2d');
 
@@ -44,17 +43,16 @@ ready(function() {
   // FIRE! text
   fireButton.font = '32px Audiowide, Arial';
   fireButton.textAlign = 'right';
-  fireButton.textBaseline = 'middle';
   fireButton.fillStyle = '#FFF';
   fireButton.shadowBlur = 8;
   fireButton.shadowColor = '#000';
-  fireButton.fillText('FIRE!', 150, 31);
-  fireButton.fillText('FIRE!', 150, 31);
+  fireButton.fillText('FIRE!', 150, 41);
+  fireButton.fillText('FIRE!', 150, 41);
 
   var message = document.getElementById('message').getContext('2d');
   // Set state now rather than later
   message.fillStyle = '#4F4';
   message.font = '24px Roboto Mono, Courier';
   message.textAlign = 'left';
-  message.textBaseline = 'top';
+  message.textBaseline = 'middle';
 });

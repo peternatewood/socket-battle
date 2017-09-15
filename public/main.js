@@ -828,6 +828,7 @@ ready(function() {
         // Menu options
         context.lineWidth = 2;
         context.font = '48px Audiowide, Arial';
+        context.textAlign = 'left';
         if (mouse.overOption == 0) {
           context.fillStyle = '#DC4';
           context.strokeStyle = '#A90';
