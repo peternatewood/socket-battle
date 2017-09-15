@@ -30,6 +30,7 @@ ready(function() {
   var messageCanvas = document.getElementById('message');
   var directions = document.getElementById('directions');
   var loading = document.getElementById('loading');
+  var optionsText = document.getElementById('options-text');
 
   var optionShips = [
     new Ship(460, 532, 2, 5.49),
@@ -885,22 +886,11 @@ ready(function() {
           }
         }
 
-        // Background color options
-        context.font = '48px Audiowide, Arial';
-        context.textAlign = 'left';
-        context.textBaseline = 'top';
-        context.fillStyle = '#331';
-        context.strokeStyle = '#777';
-        context.lineWidth = 2;
-
-        context.fillText('Options', 32, 32);
-        context.strokeText('Options', 32, 32);
-
-        context.fillText('Background Color', 40, 128);
-        context.strokeText('Background Color', 40, 128);
+        context.drawImage(optionsText, 32, 32);
 
         context.lineWidth = 4;
         context.lineJoin = 'round';
+        // Background color options
         for (var i = 0; i < backgroundColors.length; i++) {
           context.fillStyle = backgroundColors[i];
           context.fillRect(48 + 60 * i, 192, 40, 40);
@@ -908,15 +898,6 @@ ready(function() {
           context.strokeRect(48 + 60 * i, 192, 40, 40);
         }
         // Gameboard color options
-        context.lineJoin = 'miter';
-        context.fillStyle = '#331';
-        context.strokeStyle = '#777';
-        context.lineWidth = 2;
-        context.fillText('Gameboard Color', 40, 288);
-        context.strokeText('Gameboard Color', 40, 288);
-
-        context.lineWidth = 4;
-        context.lineJoin = 'round';
         for (var i = 0; i < gameboardColors.length; i++) {
           context.fillStyle = gameboardColors[i];
           context.fillRect(48 + 60 * i, 352, 40, 40);
@@ -924,15 +905,6 @@ ready(function() {
           context.strokeRect(48 + 60 * i, 352, 40, 40);
         }
         // Ship color options
-        context.lineJoin = 'miter';
-        context.fillStyle = '#331';
-        context.strokeStyle = '#777';
-        context.lineWidth = 2;
-        context.fillText('Ships Color', 40, 448);
-        context.strokeText('Ships Color', 40, 448);
-
-        context.lineWidth = 4;
-        context.lineJoin = 'round';
         for (var i = 0; i < shipColors.length / 3; i++) {
           // Use hover color when hovering
           context.fillStyle = overRow == 2 && i == overOption ? shipColors[3 * i + 2] : shipColors[3 * i + 1];
@@ -946,25 +918,8 @@ ready(function() {
         }
 
         // Mute
-        context.lineJoin = 'miter';
-        context.fillStyle = '#331';
-        context.strokeStyle = '#777';
-        context.lineWidth = 2;
-        context.fillText('Mute Sounds', 824, 128);
-        context.strokeText('Mute Sounds', 824, 128);
-
-        context.fillStyle = '#331';
-        context.beginPath();
-        context.moveTo(736, 138);
-        context.lineTo(746, 138);
-        context.arc(736, 148, 30, -0.7, 0.7);
-        context.lineTo(746, 158);
-        context.lineTo(736, 158);
-        context.closePath();
-        context.fill();
-        context.stroke();
-
         if (!options.mute) {
+          context.strokeStyle = '#777';
           context.lineWidth = 4;
           context.beginPath();
           context.arc(736, 148, 40, -0.6, 0.6);

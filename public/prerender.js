@@ -85,4 +85,37 @@ function prerender() {
   loading.font = '32px Roboto Mono, Courier';
 
   loading.fillText('Searching for Opponent...', 600, 60);
+
+  var options = document.getElementById('options-text').getContext('2d');
+
+  options.font = '48px Audiowide, Arial';
+  options.fillStyle = '#331';
+  options.strokeStyle = '#777';
+  options.lineWidth = 2;
+
+  options.fillText('Options', 0, 36);
+  options.strokeText('Options', 0, 36);
+
+  options.fillText('Background Color', 8, 132);
+  options.strokeText('Background Color', 8, 132);
+
+  options.fillText('Gameboard Color', 8, 292);
+  options.strokeText('Gameboard Color', 8, 292);
+
+  options.fillText('Ships Color', 8, 452);
+  options.strokeText('Ships Color', 8, 452);
+
+  options.fillText('Mute Sounds', 792, 132);
+  options.strokeText('Mute Sounds', 792, 132);
+
+  // Mute icon
+  options.beginPath();
+  options.moveTo(704, 106);
+  options.lineTo(712, 106);
+  options.arc(704, 116, 30, -0.7, 0.7);
+  options.lineTo(712, 126);
+  options.lineTo(704, 126);
+  options.closePath();
+  options.fill();
+  options.stroke();
 }
