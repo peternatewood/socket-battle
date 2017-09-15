@@ -16,6 +16,14 @@ ready(function() {
   var fleetBoard = [];
   var ships = [];
 
+  // Ensure prerendering doesn't happen until fonts are loaded
+  WebFont.load({
+    google: {
+      families: ['Audiowide', 'Black Ops One', 'Roboto Mono']
+    },
+    active: prerender
+  });
+
   // Prerenders
   var title = document.getElementById('title');
   var fireButton = document.getElementById('fire-button');

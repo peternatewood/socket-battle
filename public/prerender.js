@@ -1,4 +1,4 @@
-ready(function() {
+function prerender() {
   var title = document.getElementById('title').getContext('2d');
 
   title.fillStyle = '#331';
@@ -72,4 +72,4 @@ ready(function() {
   message.font = '24px Roboto Mono';
   message.textAlign = 'left';
   message.textBaseline = 'middle';
-});
+}
