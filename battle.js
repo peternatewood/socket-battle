@@ -14,16 +14,12 @@ server.listen(PORT, function() {
 // Routing
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/signup', function(request, response) {
-  response.sendFile(path.join(__dirname, 'public/signup.html'));
-});
-
-app.get('/battle', function(request, response) {
-  response.sendFile(path.join(__dirname, 'public/battle.html'));
+app.get('/', function(request, response) {
+  response.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Database connection
-var databaseType = process.env.DB_TYPE || 'postgres';
+var databaseType = process.env.DB_TYPE || 'mysql';
 
 var dbCredentials = process.env.DATABASE_URL || {
   host      : process.env.DB_HOST     || 'localhost',
@@ -144,9 +140,9 @@ io.on('connection', function(socket) {
     if (user && user.token === data.token) {
       loggedIn = true;
       username = data.username;
-      var token = generateToken();
 
-      connection.loginUser(username, function() {
+      connection.loginUser(data.token, username, function() {
+        var token = generateToken();
         user.token = token;
 
         var gameData = {
