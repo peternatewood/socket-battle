@@ -18,21 +18,23 @@ The player who set up their game first, plays first. Left click on any tile in t
 
 The app uses either a MySQL or Postgres server to handle users and login tokens. Use environment variables to provide the database name and access credentials. If any variables are unavailable, the app will default to the following settings:
 
+    DB_TYPE='postgres'
     DB_HOST='localhost'
     DB_USER='root'
     DB_PASSWORD='root'
     DB_NAME='socket_battle'
 
-`DATABASE_URL` will override the above settings, for easy compatibility with Heroku deployment.
+`DATABASE_URL` will override the above settings (except for DB_TYPE) for easy compatibility with Heroku deployment.
 
 The `users` table should use the following schema:
 
 |Column Name  |Data Type|Length|
 |-------------|---------|------|
-|username     |VARCHAR  |255   |
-|password_hash|VARCHAR  |56    |
-|token        |VARCHAR  |56    |
-|created_at   |DATETIME |      |
-|updated_at   |DATETIME |      |
+|username     |string   |255   |
+|password_hash|string   |56    |
+|token        |string   |56    |
+|is_admin     |boolean  |1     |
+|created_at   |timestamp|      |
+|updated_at   |timestamp|      |
 
 Note that although the password_hash and login token are generated using sha1, the password-hash library generates a string 56 characters long.

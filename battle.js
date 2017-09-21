@@ -19,7 +19,7 @@ app.get('/', function(request, response) {
 });
 
 // Database connection
-var databaseType = process.env.DB_TYPE || 'mysql';
+var databaseType = process.env.DB_TYPE || 'postgres';
 
 var dbCredentials = process.env.DATABASE_URL || {
   host      : process.env.DB_HOST     || 'localhost',
@@ -36,7 +36,8 @@ connection.getUsers(function(rows) {
     u = rows[i];
     users[u.username] = {
       passwordHash: u.password_hash,
-      token: u.token
+      token: u.token,
+      is_admin: u.is_admin
     };
   }
 });
@@ -149,6 +150,11 @@ io.on('connection', function(socket) {
           username: data.username,
           token: token
         };
+
+        if (user.is_admin) {
+          socket.emit('is admin', gameData);
+        }
+
         // Player is rejoining game
         var room = activeGames[data.room];
 
@@ -254,7 +260,6 @@ io.on('connection', function(socket) {
       else {
         loggedIn = true;
         username = data.username;
-
         var token = generateToken();
 
         connection.loginUser(token, username, function() {
@@ -266,6 +271,9 @@ io.on('connection', function(socket) {
             token: token
           };
           socket.emit('login valid', response);
+          if (user.is_admin) {
+            socket.emit('is admin', response);
+          }
         });
       }
     }

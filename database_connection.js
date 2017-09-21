@@ -5,7 +5,7 @@ var mysqlConnection = function(credentials) {
   return this;
 }
 mysqlConnection.prototype.getUsers = function(callback, errCallback) {
-  this.connection.query('SELECT username, password_hash, token FROM users', function(err, rows, fields) {
+  this.connection.query('SELECT username, password_hash, token, is_admin FROM users', function(err, rows, fields) {
     if (err) {
       if (errCallback) {
         errCallback(err);
@@ -71,7 +71,7 @@ var psqlConnection = function(credentials) {
   return this;
 }
 psqlConnection.prototype.getUsers = function(callback, errCallback) {
-  var query = this.connection.any('SELECT username, password_hash, token FROM users');
+  var query = this.connection.any('SELECT username, password_hash, token, is_admin FROM users');
 
   if (errCallback) {
     query.catch(errCallback);
