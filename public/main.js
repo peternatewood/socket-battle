@@ -368,8 +368,8 @@ ready(function() {
 
   function handleMouseDown(event) {
     var rect = document.getElementById('canvas').getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+    var x = (event.clientX - rect.left) * (1200 / rect.width);
+    var y = (event.clientY - rect.top) * (1200 / rect.width);
 
     switch (scene) {
       case 'menu':
@@ -497,8 +497,8 @@ ready(function() {
   }
   function handleMouseMove(event) {
     var rect = document.getElementById('canvas').getBoundingClientRect();
-    var x = event.clientX - rect.left;
-    var y = event.clientY - rect.top;
+    var x = (event.clientX - rect.left) * (1200 / rect.width);
+    var y = (event.clientY - rect.top) * (1200 / rect.width);
 
     mouse.x = x;
     mouse.y = y;
@@ -670,7 +670,8 @@ ready(function() {
   function handleTouchStart(event) {
     var clientPos = {
       clientX: event.touches[0].clientX,
-      clientY: event.touches[0].clientY
+      clientY: event.touches[0].clientY,
+      button: event.touches.length > 1 ? 2 : 0
     };
 
     var mouseMove = new MouseEvent('mousemove', clientPos);
