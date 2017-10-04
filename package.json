@@ -4,12 +4,15 @@
   "description": "",
   "main": "battle.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "grunt uglify"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.4",
+    "grunt": "1.0.1",
+    "grunt-cli": "1.2.0",
+    "grunt-contrib-uglify": "3.1.0",
     "mysql": "^2.14.1",
     "password-hash": "^1.2.2",
     "pg-promise": "^6.5.4",
