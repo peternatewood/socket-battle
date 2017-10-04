@@ -237,6 +237,7 @@ ready(function() {
     if (scene == 'options') {
       if (previousScene) {
         scene = previousScene;
+        previousScene = '';
       }
       else {
         scene = 'menu';
