@@ -368,8 +368,9 @@ ready(function() {
   });
 
   function handleMouseDown(event) {
-    var x = event.layerX;
-    var y = event.layerY;
+    var rect = document.getElementById('canvas').getBoundingClientRect();
+    var x = (event.clientX - rect.left) * (1200 / rect.width);
+    var y = (event.clientY - rect.top) * (1200 / rect.width);
 
     switch (scene) {
       case 'menu':
@@ -496,8 +497,10 @@ ready(function() {
     }
   }
   function handleMouseMove(event) {
-    var x = event.layerX;
-    var y = event.layerY;
+    var rect = document.getElementById('canvas').getBoundingClientRect();
+    var x = (event.clientX - rect.left) * (1200 / rect.width);
+    var y = (event.clientY - rect.top) * (1200 / rect.width);
+
     mouse.x = x;
     mouse.y = y;
 
@@ -641,14 +644,57 @@ ready(function() {
 
   var canvas = document.getElementById('canvas');
   // Intercept and stop right-click menu
-  canvas.addEventListener('contextmenu', function(event) {
+  canvas.addEventListener('contextmenu', preventAndStopPropagation);
+
+  function preventAndStopPropagation(event) {
     event.preventDefault();
     event.stopPropagation();
-  });
+  }
+
   canvas.addEventListener('mousedown', handleMouseDown);
   canvas.addEventListener('mouseup', handleMouseUp);
   canvas.addEventListener('mousemove', handleMouseMove);
   canvas.addEventListener('mouseout', handleMouseOut);
+  // Touch Events
+  canvas.addEventListener('touchstart', handleTouchStart);
+  canvas.addEventListener('touchend', handleTouchEnd);
+  canvas.addEventListener('touchmove', handleTouchMove);
+  // Prevent touches from scaling and other stuff
+  document.body.addEventListener('touchstart', preventOnCanvas);
+  document.body.addEventListener('touchmove', preventOnCanvas);
+  document.body.addEventListener('touchend', preventOnCanvas);
+
+  function preventOnCanvas(event) {
+    if (event.target.id == 'canvas') { event.preventDefault(); }
+  }
+
+  function handleTouchStart(event) {
+    var clientPos = {
+      clientX: event.touches[0].clientX,
+      clientY: event.touches[0].clientY,
+      button: event.touches.length > 1 ? 2 : 0
+    };
+
+    var mouseMove = new MouseEvent('mousemove', clientPos);
+    var mouseDown = new MouseEvent('mousedown', clientPos);
+
+    canvas.dispatchEvent(mouseMove);
+    canvas.dispatchEvent(mouseDown);
+  }
+  function handleTouchEnd(event) {
+    var mouseUp = new MouseEvent('mouseup', {});
+
+    canvas.dispatchEvent(mouseUp);
+  }
+  function handleTouchMove(event) {
+    var clientPos = {
+      clientX: event.touches[0].clientX,
+      clientY: event.touches[0].clientY
+    };
+    var mouseMove = new MouseEvent('mousemove', clientPos);
+
+    canvas.dispatchEvent(mouseMove);
+  }
 
   function receiveRadarBlip(coords) {
     radar.x = coords.x;
